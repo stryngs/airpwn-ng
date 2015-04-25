@@ -57,41 +57,41 @@
 mon--()
 {
 	## src MAC -- Victim
-	nice -n 20 vicmac=$(awk -v i0="$i0" '{print $i0}' $LOGFILE | cut -d: -f 2-)
+	vicmac=$(awk -v i0="$i0" '{print $i0}' $LOGFILE | cut -d: -f 2-)
 	## src MAC -- Router LAN MAC
-	nice -n 20 rtrmac=$(awk -v i1="$i1" '{print $i1}' $LOGFILE | cut -d: -f 2-)
+	rtrmac=$(awk -v i1="$i1" '{print $i1}' $LOGFILE | cut -d: -f 2-)
 	## src IP -- Victim
-	nice -n 20 vicip=$(awk -v i2="$i2" '{print $i2}' $LOGFILE | cut -d. -f -4)
+	vicip=$(awk -v i2="$i2" '{print $i2}' $LOGFILE | cut -d. -f -4)
 	## src port -- Victim
-	nice -n 20 vicport=$(awk -v i2="$i2" '{print $i2}' $LOGFILE | cut -d. -f 5-)
+	vicport=$(awk -v i2="$i2" '{print $i2}' $LOGFILE | cut -d. -f 5-)
 	## dst IP -- Server
-	nice -n 20 svrip=$(awk -v i3="$i3" '{print $i3}' $LOGFILE | cut -d. -f -4)
+	svrip=$(awk -v i3="$i3" '{print $i3}' $LOGFILE | cut -d. -f -4)
 	## svr port -- Server
-	nice -n 20 svrport=$(awk -v i3="$i3" '{print $i3}' $LOGFILE | cut -d. -f 5- | sed 's/://')
+	svrport=$(awk -v i3="$i3" '{print $i3}' $LOGFILE | cut -d. -f 5- | sed 's/://')
 	## sequence number + length
-	nice -n 20 acknum=$(awk -v i4="$i4" '{print $i4}' $LOGFILE | cut -d: -f2 | sed 's/,//')
+	acknum=$(awk -v i4="$i4" '{print $i4}' $LOGFILE | cut -d: -f2 | sed 's/,//')
 	## old acknowledgement number
-	nice -n 20 seqnum=$(awk -v i5="$i5" '{print $i5}' $LOGFILE | sed 's/,//')
+	seqnum=$(awk -v i5="$i5" '{print $i5}' $LOGFILE | sed 's/,//')
 }
 
 tap--()
 {
 	## src MAC -- Victim
-	nice -n 20 vicmac=$(awk '{print $1}' $LOGFILE | cut -d: -f 1-)
+	vicmac=$(awk '{print $1}' $LOGFILE | cut -d: -f 1-)
 	## src MAC -- Router LAN MAC
-	nice -n 20 rtrmac=$(awk '{print $3}' $LOGFILE | cut -d: -f 1- | tr -d ',')
+	rtrmac=$(awk '{print $3}' $LOGFILE | cut -d: -f 1- | tr -d ',')
 	## src IP -- Victim
-	nice -n 20 vicip=$(awk '{print $9}' $LOGFILE | cut -d. -f -4)
+	vicip=$(awk '{print $9}' $LOGFILE | cut -d. -f -4)
 	## src port -- Victim
-	nice -n 20 vicport=$(awk '{print $9}' $LOGFILE | cut -d. -f 5-)
+	vicport=$(awk '{print $9}' $LOGFILE | cut -d. -f 5-)
 	## dst IP -- Server
-	nice -n 20 svrip=$(awk '{print $11}' $LOGFILE | cut -d. -f -4)
+	svrip=$(awk '{print $11}' $LOGFILE | cut -d. -f -4)
 	## svr port -- Server
-	nice -n 20 svrport=$(awk '{print $11}' $LOGFILE | cut -d. -f 5- | tr -d ':')
+	svrport=$(awk '{print $11}' $LOGFILE | cut -d. -f 5- | tr -d ':')
 	## sequence number + length
-	nice -n 20 acknum=$(awk '{print $15}' $LOGFILE | cut -d: -f2 | sed 's/,//')
+	acknum=$(awk '{print $15}' $LOGFILE | cut -d: -f2 | sed 's/,//')
 	## old acknowledgement number
-	nice -n 20 seqnum=$(awk '{print $17}' $LOGFILE | sed 's/,//')
+	seqnum=$(awk '{print $17}' $LOGFILE | sed 's/,//')
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
 
@@ -116,6 +116,7 @@ if [[ -z $1  || -z $2 || -z $3 ]]; then
 	echo -e "$ins\nUsage: ./airpwn-ng <Inject File> <Sniff NIC> <Inject NIC> <Index Value>$rst"
 	echo -e "$ins\n-OR-$rst"
 	echo -e "$ins\nUsage: ./airpwn-ng <Inject File> <Tap NIC> <Inject NIC>$rst"
+	exit 1
 fi
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
 

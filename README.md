@@ -1,5 +1,4 @@
-This is now the home for the new and "somewhat" improved version of airpwn... airpwn-ng!
-----------------------------------------------------------------------------------------
+#airpwn-ng
 
 airpwn-ng was born out of the need to create a program that would leverage a commonly known vulnerability that still exists in 2015, cookies without the SECURE flag set.  What!?!  Yes, that's right.  Major websites still lack the most basic of security when it boils down to it.  How to fix?  Release code to the community and let it sort itself out.  There are tons of ways to leverage this, but every one I have encountered is very passive or requires a Man in the Middle type scenario.  Enter, airpwn-ng and how it works.
 

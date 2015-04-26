@@ -1,5 +1,4 @@
 Example Steps to get airpwn-ng running for an Open Access Point:
-## Steps to perform this on WEP/WPA/WPA2 will be published later
 
 1. Drop desired NIC to monitor mode
 	- airmon-ng start wlan0
@@ -28,5 +27,30 @@ Example Steps to get airpwn-ng running for an Open Access Point:
 
 6. Now it's time to inject our content.
 	- ./airpwn-ng example-injects/wargames mon0 at0 <Index Value>
+
+## If you're injecting on WEP/WPA protected network:
+
+0. This guide assumes you have already installed dot11decrypt. It has been tested on just one NIC but you can use two for efficiency
+
+1. Drop desired NIC to monitor mode
+	- airmon-ng start wlan0
+	-OR
+	- airmon-zc start wlan0
+
+2. Change monitor mode NIC to the desired channel
+	- iwconfig mon0 <channel>
+	- if this doesn't work, set the monitor NIC's channel with airmon-ng start wlan0 <channel>
+
+3. Create a TAP interface that live-decrypts traffic using dot11decrypt
+	- dot11decrypt mon0 wpa:<essid>:<key>
+	- e.g. dot11decrypt mon0 wpa:MyNetwork:MyHardToCrackPassword
+	- IMPORTANT NOTE: dot11decrypt (and any other decryption software) needs to capture the 4-way handshake between the AP and the client before being able to decrypt traffic, so an AP-wide deauth should be performed right after enabling the TAP interface
+	- ALSO: dot11decrypt can handle more than one network on sniff by providing an arbitrary number of wpa:<essid>:<key> tuples, but airpwn-ng can only handle one AP in Encrypted Wireless mode for now
+
+4. Connect and authenticate to the target network with your injection NIC
+	- We're assuming wlan0 for this, in a one NIC scenario
+
+5. Now it's time to inject our content.
+	- ./airpwn-ng example-injects/wargames tap0 wlan0
 
 Okay, that's all.  How about a nice game of chess?

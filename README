@@ -1,4 +1,5 @@
-This is now the home for the new and "somewhat" improved version of airpwn... airpwn-ng!  I say "somewhat", because a lot of users in the community will giggle when they hear the language airpwn-ng has been written in, bash.  That's right, I said it, I'm not afraid to say it either; bash rocks.  If I knew how to code in a better language for this task, I would have, but, I think when you see how this program works, you might just be impressed.  Okay, let's get down to brass tacks, shall we?
+This is now the home for the new and "somewhat" improved version of airpwn
+==========================================================================
 
 airpwn-ng was born out of the need to create a program that would leverage a commonly known vulnerability that still exists in 2015, cookies without the SECURE flag set.  What!?!  Yes, that's right.  Major websites still lack the most basic of security when it boils down to it.  How to fix?  Release code to the community and let it sort itself out.  There are tons of ways to leverage this, but every one I have encountered is very passive or requires a Man in the Middle type scenario.  Enter, airpwn-ng and how it works.
 

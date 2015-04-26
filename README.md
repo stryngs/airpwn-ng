@@ -1,4 +1,3 @@
-# airpwn-ng
 This is now the home for the new and "somewhat" improved version of airpwn... airpwn-ng!
 ----------------------------------------------------------------------------------------
 

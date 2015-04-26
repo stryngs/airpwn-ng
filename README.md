@@ -26,6 +26,8 @@ That's cool...  So what can we do with it?
 
 What do we need to get started?
 ---
+- Aircrack-ng:
+ - http://www.aircrack-ng.org/
 - inotify-tools:
  - https://github.com/rvoicilas/inotify-tools/wiki
 - packit:

@@ -1,8 +1,6 @@
 The home of the new and improved version of airpwn... airpwn-ng
 ===============================================================
-
-airpwn-ng was born out of the need to create a program that would leverage a commonly known vector that still exists in 2015, <b>cookies</b> and their inherent lack of security.  <b>What!?!  Yes, that's right.  Major websites still lack the most basic of security when it boils down to it. </b>How to fix?  Release code to the community and let it sort itself out.  There are tons of ways to leverage this, but every one I have encountered is very passive or requires a <b>Man in the Middle</b> type scenario.  Enter <b>airpwn-ng</b>, and how it works.
-
+<hr>
 
 Overview
 ---

@@ -34,6 +34,8 @@ What do we need to get started?
  - http://packetfactory.openwall.net/projects/packit/
 - libpcap
 - tcpdump
+- dot11decrypt:
+ - https://github.com/mfontanini/dot11decrypt
 
 How do we use airpwn-ng?
 ---

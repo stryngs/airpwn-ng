@@ -1,26 +1,10 @@
+######################
+### Current Issues ###
+######################
+
 ## AP filter...
 	- Need to create the option to target specific Router LANs only
 		- A lack of this option creates chaos on a heavily congested channel with multiple Open APs
-
-
-## Known card numbering schema
-	- Different WiFi NICs create different output for tpcdump
-	- airpwn-ng was written using an Alfa AWUS 036h, subsequent tests with other NICs showed that the "columns" when "awk'd" would line up differently\
-		- The Alfa AWUS 036neh is a perfect example of this.  If you take the various print statements within awk in the script and subtract 2 from the column, it will line up perfectly
-	- This is not a showstopper by any means, but it definately detracts from the idea that this script would be a one-stop shop.
-		- The solution will be for the community to submit various captures using the following format:
-			- tcpdump -i <NIC> -c 1 -eKnSt 'tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420' 1>LOG
-		- After a new style capture is found, it can then be added to the list
-
-
-## Cookie Ideas
-	- A seperate process to grab cookies could be included.  This project, while it has the capability to do mostly anything for http injection, it is mainly geared towards insecure cookies.
-	- ngrep -d wlan0 -W byline 'Cookie:' port 80 | egrep '(Cookie:|->)'
-
-
-## DS Fields
-	- This will be implemented when the one NIC solution has been found
-		- https://dalewifisec.wordpress.com/2014/05/17/the-to-ds-and-from-ds-fields/
 
 
 ## Speeding things up
@@ -51,9 +35,20 @@
 	seqnum=$(awk '{sub(/,/, "", $42); print $42}' LOG)
 
 
+
+
+########################
+### Historical Stuff ###
+########################
+## DS Fields
+	- This issue has been fixed, but for historical purposes the below URL is kept
+		- https://dalewifisec.wordpress.com/2014/05/17/the-to-ds-and-from-ds-fields/
+
+
 ## Unsolicited packets
 - Since we are injecting stuff here, there is no "telling" what the kernel might do.  I'm not a pro at the whole tcp/ip thing, but I came across a snipet a while back that may prove useful for future work.  As a matter of historical reference for myself and to the community perhaps to where they could provide useful input, I will leave it here until I obtain a more clear understanding to whether or not something like this is needed
 	- iptables -A OUTPUT -p tcp --tcp-flags RST RST -j DROP
+		- Again, this has not been needed; but depending upon the implementation schema for NIC usage, perhaps it will be...
 
 
 ## DDoS Potential 2-way

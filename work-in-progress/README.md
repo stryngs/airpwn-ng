@@ -28,18 +28,12 @@ What do we need to get started?
 ---
 - Aircrack-ng:
  - http://www.aircrack-ng.org/
-- inotify-tools:
- - https://github.com/rvoicilas/inotify-tools/wiki
 - packit:
  - http://packetfactory.openwall.net/projects/packit/
 - libpcap
-- tcpdump
-- OPTIONAL:
- - dot11decrypt
-  - https://github.com/mfontanini/dot11decrypt
+- dot11decrypt (For WEP/WPA decryption):
+ - https://github.com/mfontanini/dot11decrypt
 
 How do we use airpwn-ng?
 ---
 - Refer to the Tutorial file for a basic example
-
-

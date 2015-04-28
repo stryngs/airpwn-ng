@@ -2,6 +2,35 @@
 ### Current Issues ###
 ######################
 
+## Capability List for airpwn-ng 
+OPEN WIFI:
+## Inject using 1 NIC for sniffing and the other for injection:
+bash	- yes
+python	- yes
+Specifics:
+	- 1 NIC in monitor mode
+	- 1 NIC in managed mode and associated to the wlan
+	
+## Inject using 1 NIC for sniffing and injection:
+bash	- yes
+python	- unconfirmed
+	- 1 NIC in monitor mode
+	- Accomplished in bash via airtun-ng as "bridge" of sorts
+
+CLOSED WIFI:
+## Inject using 1 NIC for sniffing and the other for injection:
+bash	- unconfirmed
+python	- yes
+Specifics:
+	- 1 NIC in monitor mode
+	- 1 NIC in managed mode and associated to the wlan
+	- Accomplished in python via dot11decrypt
+	
+## Inject using 1 NIC for sniffing and injection:
+bash	- unconfirmed
+python	- unconfirmed
+
+
 ## AP filter...
 	- Need to create the option to target specific Router LANs only
 		- A lack of this option creates chaos on a heavily congested channel with multiple Open APs

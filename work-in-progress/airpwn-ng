@@ -59,7 +59,7 @@
 from threading import Thread
 from Queue import Queue, Empty
 from scapy.all import *
-import subprocess,os,sys,argparse
+import subprocess,os,sys,argparse,signal
 
 #SET GLOBALS
 #### Some of these GLOBALS are declared in main()
@@ -111,6 +111,15 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
+#
+# Handle CTRL+C
+#
+def signal_handler(signal, frame):
+        print(bcolors.FAIL+'\n[!] Stopping injection and exiting airpwn-ng ...')
+        sys.exit(0)
+
+#ADD GLOBAL SIGNAL HANDLER
+signal.signal(signal.SIGINT, signal_handler)
 
 #
 # Processes injection file and returns a hex encoded payload

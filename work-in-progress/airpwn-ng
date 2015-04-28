@@ -62,6 +62,8 @@ from scapy.all import *
 import subprocess,os,sys,argparse
 
 #SET GLOBALS
+#### Some of these GLOBALS are declared in main()
+#### Why the doubles, main() is first yeah?...
 global websites
 global injectfile
 global m_iface
@@ -81,12 +83,20 @@ TARGETED=0
 HITCOUNTER=2
 covert=0
 websites=[]
+#### Is this an example of quicksetting a default so that wargames is chosen by default for the inject if inject is not specified??
+#### It seems that an "inject" is not required if building on they fly, so why set this unless the above applies?
 injectfile="wargames"
+
 m_iface = "tap0"
+
+#### wlan3 as default?  Perhaps 0 or 1, but 3???
 i_iface = "wlan3"
+
 m_finished = False
 t_finished = False
-m_dst = "192.168.1.68"
+
+#### m_dst is not used, seems like asd variable
+#### m_dst = "192.168.1.68"
 
 #
 # Bash colors class
@@ -140,6 +150,8 @@ def start_injection(vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum):
 	os.system(cmd)
 
 
+#### Perhaps this is a bottleneck, we can use ngrep to rip cookies in a more efficient manner if this is a bottleneck.
+#### Can we make this optional for beta testing?
 #
 # Processes incoming packets to check for cookies
 #
@@ -430,7 +442,7 @@ def process_targeted_packet(packet):
 
 
 #
-# Sets up the sniffer thread using stryngs' tcpdump filter
+# Sets up the sniffer thread using stryngs's tcpdump filter
 #
 def threaded_sniff_target(q):
 	global MONITOR
@@ -570,6 +582,7 @@ def main(args):
 	#TODO:	CHECK DEPENDENCIES
 	print "\n\nairpwn-ng - the new and improved 802.11 packet injector\n\n"
 
+	#### Globals because variables act like they do in C or something?
 	global m_iface
 	global MONITOR
 	global i_iface
@@ -580,6 +593,8 @@ def main(args):
 	global EXCLUSION
 	global EXCLUDE_LIST
 
+	#### mon must exist, so why not set MONITOR=1 from the beginning?
+	#### Currently MONITOR = 0 in the begin
 	if ("mon" in args.m):
 		MONITOR=1
 	m_iface = args.m
@@ -598,6 +613,7 @@ def main(args):
 		EXCLUSION=1
 		EXCLUDE_LIST=args.exclude_hosts
 	else:
+		#### What is asd?  Only used here...
 		asd=1
 
 	#USE INJECT FILE
@@ -605,6 +621,8 @@ def main(args):
 		injection=load_injection(args.injection)
 		print bcolors.OKGREEN+"[+] Loaded injection file",args.injection+bcolors.ENDC
 	#USE WEBSITE LIST AND CREATE INJECTIONS ON THE FLY
+	#### Create what on the fly?  Do we have a template for the base?  i.e....
+	#### Is there an iframe template, etc...
 	else:
 		injection=0
 		websites=load_websites_targeted(args.websites)
@@ -612,6 +630,7 @@ def main(args):
 			print bcolors.OKGREEN+"[+] Loaded target website ",website+bcolors.ENDC
 
 	# BROADCAST MODE
+	#### Nests suck, no way to "case???"
 	if (args.t is None):
 		print bcolors.WARNING+"[!] You are starting your attack in broadcast mode. This means you will inject packets into all clients you are able to detect. Use with caution."+bcolors.ENDC
 		if (injection==0):
@@ -645,7 +664,7 @@ def main(args):
 			threaded_sniff()
 
 
-
+#### I forget what this is called, but what the hell does it mean?
 if __name__ == '__main__':
 
 
@@ -661,11 +680,20 @@ if __name__ == '__main__':
 
 	parser.add_argument('-t',nargs='*',metavar='<MAC address>',help='Target MAC addresses')
 
+	#### An example list of how to be done would be helpful here:
+	#### 127.0.0.1, 192.168.0.0/24, 192.168.1.100-200, 192-197.123.123.0/24, etc...
 	parser.add_argument('--exclude-hosts',nargs='*',metavar='<host>',help='List of hosts to exclude from injection')
 
 	parser.add_argument('-o',metavar='<outfile>',help='Output File')
+	
+	#### Number of cookies...  So like if the browser has 5 cookies for a domain, and you specify 4, then it only grabs 4?
+	#### If true to above, then only the first four?  Random four, etc...
+	#### Description needed
 	parser.add_argument('-c',metavar='<count>',help='Number of cookies to grab per website on the --websites list')
 
+	#### Describe covert...
 	parser.add_argument('--covert',action='store_true',help='Uses less packets')
 	args = parser.parse_args()
 	main(args)
+
+

@@ -542,7 +542,7 @@ def main(args):
 			exit(1)
 		else:
 			for target in args.t:
-				print bcolors.OKGREEN+"[*] Adding target",target
+				print bcolors.OKGREEN+"[+] Adding target",target+bcolors.ENDC
 
 		HITCOUNTER_STATIC=len(args.t)
 		HITCOUNTER=HITCOUNTER_STATIC

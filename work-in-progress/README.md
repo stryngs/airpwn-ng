@@ -37,3 +37,9 @@ What do we need to get started?
 How do we use airpwn-ng?
 ---
 - Refer to the Tutorial file for a basic example
+
+Example Syntax
+---
+./airpwn-ng -m mon0 -i wlan0 --injection testinject
+
+./airpwn-ng -m mon0 -i wlan0 --websites websites.txt

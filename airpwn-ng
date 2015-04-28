@@ -281,7 +281,7 @@ def http_header(packet):
 
 	#TODO: Improve this check and implement --covert mode with stricter checks
         if (http_packet.find('GET') and (getarg.find("php") or getarg.find("asp") or getarg.find("htm") or getarg.find("html")) ):
-		if (packet.haslayer(IP)):
+		if (packet.haslayer(IP) and packet.haslayer(Ether)):
 			process=0
 			if (TARGETED):
 				for m_mac in mac_list:

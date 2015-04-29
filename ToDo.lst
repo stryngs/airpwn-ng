@@ -3,6 +3,7 @@
 ######################
 
 ## Capability List for airpwn-ng 
+
 OPEN WIFI:
 ## Inject using 1 NIC for sniffing and the other for injection:
 bash	- yes
@@ -13,7 +14,7 @@ Specifics:
 	
 ## Inject using 1 NIC for sniffing and injection:
 bash	- yes
-python	- unconfirmed
+python	- yes
 	- 1 NIC in monitor mode
 	- Accomplished in bash via airtun-ng as "bridge" of sorts
 
@@ -28,7 +29,7 @@ Specifics:
 	
 ## Inject using 1 NIC for sniffing and injection:
 bash	- unconfirmed
-python	- confirmed
+python	- yes
 
 
 ## AP filter...

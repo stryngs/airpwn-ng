@@ -28,7 +28,7 @@ Specifics:
 	
 ## Inject using 1 NIC for sniffing and injection:
 bash	- unconfirmed
-python	- unconfirmed
+python	- confirmed
 
 
 ## AP filter...

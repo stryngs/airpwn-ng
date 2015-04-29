@@ -355,7 +355,7 @@ def http_header(packet):
         if (http_packet.find('GET') and (getarg.find("php") or getarg.find("asp") or getarg.find("htm") or getarg.find("html")) ):
 		#MONITOR MODE:
 		if (MONITOR):
-			if ("GET" in packet.sprintf("{Raw:%Raw.load%}\n") and packet.haslayer(IP)):
+			if ("GET" in packet.sprintf("{Raw:%Raw.load%}\n") and packet.haslayer(IP) and packet.haslayer(TCP)):
 #				print list(expand(packet))
 				vicmac=packet.getlayer(Dot11).addr2
 				rtrmac=packet.getlayer(Dot11).addr1

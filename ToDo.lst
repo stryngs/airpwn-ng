@@ -1,35 +1,43 @@
+#################
+## Delegations ##
+#################
+
+stryngs:
+	- Work on gzip
+	- Make dot11decrypt work for 32 and 64 bit on multiple Distros
+
+
 ######################
 ### Current Issues ###
 ######################
 
 ## Capability List for airpwn-ng 
-
-OPEN WIFI:
-## Inject using 1 NIC for sniffing and the other for injection:
-bash	- yes
-python	- yes
-Specifics:
-	- 1 NIC in monitor mode
-	- 1 NIC in managed mode and associated to the wlan
+	OPEN WIFI:
+	## Inject using 1 NIC for sniffing and the other for injection:
+	bash	- yes
+	python	- yes
+	Specifics:
+		- 1 NIC in monitor mode
+		- 1 NIC in managed mode and associated to the wlan
+		
+	## Inject using 1 NIC for sniffing and injection:
+	bash	- yes
+	python	- yes
+		- 1 NIC in monitor mode
+		- Accomplished in bash via airtun-ng as "bridge" of sorts
 	
-## Inject using 1 NIC for sniffing and injection:
-bash	- yes
-python	- yes
-	- 1 NIC in monitor mode
-	- Accomplished in bash via airtun-ng as "bridge" of sorts
-
-CLOSED WIFI:
-## Inject using 1 NIC for sniffing and the other for injection:
-bash	- unconfirmed
-python	- yes
-Specifics:
-	- 1 NIC in monitor mode
-	- 1 NIC in managed mode and associated to the wlan
-	- Accomplished in python via dot11decrypt
-	
-## Inject using 1 NIC for sniffing and injection:
-bash	- unconfirmed
-python	- yes
+	CLOSED WIFI:
+	## Inject using 1 NIC for sniffing and the other for injection:
+	bash	- unconfirmed
+	python	- yes
+	Specifics:
+		- 1 NIC in monitor mode
+		- 1 NIC in managed mode and associated to the wlan
+		- Accomplished in python via dot11decrypt
+		
+	## Inject using 1 NIC for sniffing and injection:
+	bash	- unconfirmed
+	python	- yes
 
 
 ## AP filter...

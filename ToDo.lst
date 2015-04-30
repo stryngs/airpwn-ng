@@ -3,10 +3,18 @@
 #################
 
 stryngs:
+	- Understand main()
+	- airtun-ng auto thingie
 	- Work on gzip
 	- Make dot11decrypt work for 32 and 64 bit on multiple Distros
 		- Requires libc-bin >= 2.15
-	- Understand main()
+	
+##################
+## Accomplished ##
+##################
+
+stryngs:
+	- airtun-ng broadcast idea
 
 
 ######################

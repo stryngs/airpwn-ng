@@ -17,17 +17,20 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
-#vp2=AIRPWN_NG.VictimParameters(websites=["http://www.ebay.com"])
-#vp=AIRPWN_NG.VictimParameters(websites=["http://www.torrentleech.org"],inject_file="example-injects/wargames")
-#v1=AIRPWN_NG.Victim(mac="5c:f8:a1:f7:35:f0",victim_parameters=vp)
-#v2=AIRPWN_NG.Victim(mac="C8:B5:B7:26:CD:89",victim_parameters=vp2)
-#v1=AIRPWN_NG.Victim(mac="5c:f8:a1:f7:35:f0",victim_parameters=vp)
-#victims.append(v1)
-#victims.append(v2)
-##ph=AIRPWN_NG.PacketHandler(i="wlan3",victims=victims)
-#ph=AIRPWN_NG.PacketHandler(i="wlan3",victim_parameters=vp)
-#snif=AIRPWN_NG.Sniffer(ph,m="tap0",filter='tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420')
-#snif.threaded_sniff()
+#
+# Handle CTRL+C
+#
+def signal_handler(signal, frame):
+        print(bcolors.FAIL+'\n[!] Stopping injection and exiting airpwn-ng ...')
+        sys.exit(0)
+
+#ADD GLOBAL SIGNAL HANDLER
+signal.signal(signal.SIGINT, signal_handler)
+
+#
+# Processes injection file and returns a hex encoded payload
+#
+
 
 def load_websites_targeted(websites_file):
 	websites=[]

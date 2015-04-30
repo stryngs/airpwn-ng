@@ -5,6 +5,7 @@
 stryngs:
 	- Work on gzip
 	- Make dot11decrypt work for 32 and 64 bit on multiple Distros
+		- Requires libc-bin >= 2.15
 
 
 ######################

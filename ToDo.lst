@@ -7,6 +7,11 @@ stryngs:
 	- Make dot11decrypt work for 32 and 64 bit on multiple Distros
 	- Test broadcast theory with airtun-ng
 
+Jack64:
+	- Comment up lib/airpwn_ng.py
+	- Replace packit with a pure scapy implementation for injection
+	- ????
+	- Replace dot11decrypt with pure scapy WEP/WPA decryption of client traffic (LONGSHOT !)
 
 ######################
 ### Current Issues ###

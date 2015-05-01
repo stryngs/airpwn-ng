@@ -49,6 +49,10 @@ def main(args):
 	m_iface = args.m
 	i_iface = args.i
 
+	if ("mon" in m_iface and m_iface!=i_iface):
+		print bcolors.WARNING+"[!] It appears you are using a monitor mode interface as your monitoring input. If you are attacking open wireless networks, please use the same monitoring interface with -i for better performance."+bcolors.ENDC
+
+
 	#CHECK FOR EXCLUDED HOSTS
 	if (args.exclude_hosts is not None):
 		EXCLUSION=1

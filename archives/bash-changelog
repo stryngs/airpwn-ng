@@ -1,0 +1,5 @@
+## Changelog
+
+#1.4
+- Merged card-detect into airpwn-ng
+	- This eliminated a user step

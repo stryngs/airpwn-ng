@@ -420,6 +420,14 @@ class PacketHandler:
 					v1=Victim(ip=vicip,mac=vicmac,victim_parameters=self.victim_parameters)
 					self.newvictims.append(v1)
 		else:
+			try:
+				k=cookie[1]
+			except:
+				try:
+					k=cookie[0]
+					cookie[1]="NONE"
+				except:
+					cookie=["NONE","NONE"]
 			if (cookie[1] is not None):
 				for victim in self.victims:
 					if (victim.ip is not None):
@@ -532,7 +540,7 @@ class Sniffer:
 			sniff(iface = self.m,filter = self.filter, prn = lambda x : q.put(x))
 
 	def threaded_sniff(self):
-		q = Queue()
+		q = Queue(200)
 		sniffer = Thread(target = self.sniff, args=(q,))
 		sniffer.daemon = True
 		sniffer.start()

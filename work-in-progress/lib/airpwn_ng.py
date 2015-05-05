@@ -280,6 +280,7 @@ it uses scapy or packit to inject packets on the networks
 			cmd+=injection
 			cmd+='" >/dev/null 2>&1'
 			os.system(cmd)
+			#TODO: Send FIN to client + server to stop junk
 	#		print cmd
 		
 

@@ -43,15 +43,22 @@ def load_websites_targeted(websites_file):
 
 
 def main(args):
-	#TODO:	CHECK DEPENDENCIES
 	print "\n\nairpwn-ng - the new and improved 802.11 packet injector\n\n"
 
+	#CHECK DEPENDENCIES
+	try:
+		p = subprocess.Popen(["packit"], stdout=subprocess.PIPE)
+		out, err = p.communicate()
+	except:
+		print bcolors.WARNING+"[!] Packit was not found on your system, so injection for WEP/WPA encrypted networks will not work."+bcolors.ENDC
 	m_iface = args.m
 	i_iface = args.i
 
 	if ("mon" in m_iface and m_iface!=i_iface):
 		print bcolors.WARNING+"[!] It appears you are using a monitor mode interface as your monitoring input. If you are attacking open wireless networks, please use the same monitoring interface with -i for better performance."+bcolors.ENDC
 
+	if ("mon" not in m_iface):
+		print bcolors.WARNING+"[!] It appears your are trying to attack a WEP/WPA protected network. Please ensure -m is your dot11 tap interface."+bcolors.ENDC
 
 	#CHECK FOR EXCLUDED HOSTS
 	if (args.exclude_hosts is not None):
@@ -145,8 +152,7 @@ def main(args):
 
 #### I forget what this is called, but what the hell does it mean?
 if __name__ == '__main__':
-
-
+	
         #ARGUMENT PARSING
         parser = argparse.ArgumentParser(description='airpwn-ng - the new and improved 802.11 packet injector')
 

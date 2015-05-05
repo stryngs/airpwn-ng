@@ -68,12 +68,26 @@ def main(args):
 	injection=0
 	#USE INJECT FILE
 	if (args.injection is not None):
+		#CHECK IF INJECTION FILE EXISTS
+		try:
+			f = open (args.injection,'r')
+			f.close()
+		except:
+			print bcolors.FAIL+"[!] Selected injection file",args.injection,"does not exist."+bcolors.ENDC
+			exit(1)
 		print bcolors.OKGREEN+"[+] Loaded injection file",args.injection+bcolors.ENDC
 		injection=1
 	#USE WEBSITE LIST AND CREATE INJECTIONS ON THE FLY
 	#### Create what on the fly?  Do we have a template for the base?  i.e....
 	#### Is there an iframe template, etc...
 	else:
+		#CHECK IF WEBSITES FILE EXISTS
+		try:
+			f = open(args.websites,'r')
+			f.close()
+		except:
+			print bcolors.FAIL+"[!] Selected websites file",args.websites,"does not exist."+bcolors.ENDC
+			exit(1)	
 		injection=0
 		websites=load_websites_targeted(args.websites)
 		for website in websites:

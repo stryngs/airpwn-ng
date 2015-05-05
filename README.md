@@ -40,6 +40,6 @@ How do we use airpwn-ng?
 
 Example Syntax
 ---
-./airpwn-ng -m mon0 -i wlan0 --injection testinject
+./airpwn-ng -m mon0 -i mon0 --injection testinject
 
-./airpwn-ng -m mon0 -i wlan0 --websites websites.txt
+./airpwn-ng -m tap0 -i wlan0 --websites websites.txt

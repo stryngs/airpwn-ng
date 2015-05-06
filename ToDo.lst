@@ -10,7 +10,7 @@ stryngs:
 		- Requires libc-bin >= 2.15
 
 Jack64:
-	- Comment up lib/airpwn_ng.py
+	- Comment up lib/airpwn_ng.py (Completed !)
 	- Replace packit with a pure scapy implementation for injection (Completed for monitor mode)
 	- ????
 	- Replace dot11decrypt with pure scapy WEP/WPA decryption of client traffic (LONGSHOT !)

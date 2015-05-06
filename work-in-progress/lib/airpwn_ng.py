@@ -161,15 +161,8 @@ class VictimParameters:
                 iframes+=''' }\n}\ntry{\nsetTimeout(setIframeSrc'''+str(i)+''', 10);\n} catch (err){\n}\n'''
                 iframes+='''</script>\n'''
                 injection=self.create_iframe_injection(iframes)
-#		k=binascii.hexlify(injection)
-#		n=2
-#		inject="0x"
-#		for item in [k[i:i+n] for i in range(0, len(k), n)]:
-#			inject+=item+" "
-#		injection=inject
 		return injection
 
-#	def load_inject_file(self):
 		
 
 

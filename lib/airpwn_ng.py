@@ -1,9 +1,7 @@
-import cProfile
 from threading import Thread
 from Queue import Queue, Empty
 from scapy.all import *
 import gzip
-from cStringIO import StringIO
 import binascii
 
 

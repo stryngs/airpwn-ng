@@ -21,7 +21,7 @@ class bcolors:
 Handle CTRL+C
 '''
 def signal_handler(signal, frame):
-        print(bcolors.FAIL+'\n[!] Stopping injection and exiting airpwn-ng ...')
+        print(bcolors.FAIL+'\n[!] Stopping injection and exiting airpwn-ng ...'+bcolors.ENDC)
         sys.exit(0)
 
 #ADD GLOBAL SIGNAL HANDLER

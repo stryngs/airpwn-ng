@@ -10,6 +10,16 @@ Overview
 	- What if the user isn't browsing the vulnerable site at the point in time which you are sniffing?
 	- Wait, you say I can't force your browser to do something?  I sure can if you have cookies stored...
 
+Features
+---
+
+- Inject to all visible clients (a.k.a Broadcast Mode)
+- Inject on both open networks and WEP/WPA protected networks
+- Targeted injection with -t MAC:ADDRESS [MAC:ADDRESS]
+- Gather all visible cookies (Broadcast Mode)
+- Gather cookies for specific websites (--websites websites_list.txt)
+	- In this scenario, airpwn-ng will auto-generate invisible iframes for injection that trigger the request for each website in websites_list.txt
+	- [BETA] Can be used with --covert flag that attempts to inject a big iframe with the real requested website along with the generated invisible iframes. If successful, the victim should get no indication of compromise. This is still beta and doesn't work with all websites.
 
 How do we do it?
 ---

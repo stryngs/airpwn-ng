@@ -9,10 +9,10 @@ Example Steps to get airpwn-ng running for an Open Access Point:
 
 ## For purposes of clarity, mon0 will reference the Monitor Mode NIC from here on out.
 
-2. Connect your injection NIC to the target network. We'll assume wlan1 is doing this for the next command.
+## Because we are now using only scapy for injection, if you are injecting on an open network, scapy will switch the from-DS flag in order to inject directly from your machine to the victim, eliminating the need to connect to the target AP.
 
-3. Now it's time to inject our content.
-	- ./airpwn-ng -m mon0 -i wlan1 --inject example-injects/wargames
+2. Now it's time to inject our content.
+	- ./airpwn-ng -m mon0 -i mon0 --inject example-injects/wargames
 
 ## If you're injecting on WEP/WPA protected network:
 
@@ -36,7 +36,7 @@ Example Steps to get airpwn-ng running for an Open Access Point:
 4. Connect and authenticate to the target network with your injection NIC
 	- We're assuming wlan0 for this, in a one NIC scenario
 
-5. Now it's time to inject our content.
+5. Now it's time to inject our content. Because the network is encrypted, we work around that issue by using wlan0 which is a connected and authenticated client on the AP to inject Ethernet packets instead of 802.11 packets, meaning these WILL be routed by the gateway before they reach the victim AND the attack MAC address will be revealed.
 	- ./airpwn-ng -m tap0 -i wlan0 --inject example-injects/wargames
 
 Okay, that's all.  How about a nice game of chess?

@@ -26,20 +26,21 @@ That's cool...  So what can we do with it?
 
 What do we need to get started?
 ---
+- scapy:
+ - http://www.secdev.org/projects/scapy/
 - Aircrack-ng:
  - http://www.aircrack-ng.org/
-- packit:
- - http://packetfactory.openwall.net/projects/packit/
 - libpcap
 - dot11decrypt (For WEP/WPA decryption):
  - https://github.com/mfontanini/dot11decrypt
 
 How do we use airpwn-ng?
 ---
-- Refer to the Tutorial file for a basic example
+- Refer to the Tutorial file for a basic attack scenario
 
 Example Syntax
 ---
-./airpwn-ng -m mon0 -i mon0 --injection testinject
-
-./airpwn-ng -m tap0 -i wlan0 --websites websites.txt
+- Open networks:
+`./airpwn-ng -m mon0 -i mon0 --injection testinject`
+- WEP/WPA protected networks:
+`./airpwn-ng -m tap0 -i wlan0 --websites websites.txt`

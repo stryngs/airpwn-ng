@@ -20,6 +20,7 @@ Features
 - Gather cookies for specific websites (--websites websites_list.txt)
 	- In this scenario, airpwn-ng will auto-generate invisible iframes for injection that trigger the request for each website in websites_list.txt
 	- [BETA] Can be used with --covert flag that attempts to inject a big iframe with the real requested website along with the generated invisible iframes. If successful, the victim should get no indication of compromise. This is still beta and doesn't work with all websites.
+	- [BETA] Airpwn-ng API so you can make your own custom attacks. Examples: https://github.com/stryngs/airpwn-ng/blob/master/work-in-progress/api-examples/
 
 How do we do it?
 ---

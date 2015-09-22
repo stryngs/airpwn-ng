@@ -335,7 +335,7 @@ class Injector:
 			try:
 				sendp(packet,iface=self.interface,verbose=0)
 			except:
-				raise
+				pass
 		else:
 			headers=self.get_headers(injection)
 			if (TSVal is not None):
@@ -345,7 +345,7 @@ class Injector:
 			try:
 				sendp(packet,iface=self.interface,verbose=0)
 			except:
-				raise
+				pass
 			return
 		
 

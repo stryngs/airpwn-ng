@@ -17,6 +17,7 @@ class bcolors:
 	UNDERLINE = '\033[4m'
 
 
+
 def signal_handler(signal, frame):
 	'''Handle CTRL+C.'''	
 	print(bcolors.FAIL + '\n[!] Stopping injection and exiting airpwn-ng ...' + bcolors.ENDC)
@@ -24,6 +25,7 @@ def signal_handler(signal, frame):
 
 ## ADD GLOBAL SIGNAL HANDLER
 signal.signal(signal.SIGINT, signal_handler)
+
 
 def load_websites_targeted(websites_file):
 	'''Load websites from a file to a List object, ignoring lines starting with #.'''
@@ -33,6 +35,7 @@ def load_websites_targeted(websites_file):
 			if (line.strip()[0] != "#"):
 				websites.append(line.strip())
 	return websites
+
 
 def main(args):
 	'''
@@ -204,4 +207,3 @@ if __name__ == '__main__':
 
 	args = parser.parse_args()
 	main(args)
-

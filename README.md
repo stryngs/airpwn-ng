@@ -10,6 +10,7 @@ Overview
 	- What if the user isn't browsing the vulnerable site at the point in time which you are sniffing?
 	- Wait, you say I can't force your browser to do something?  I sure can if you have cookies stored...
 - Demo video: https://www.youtube.com/watch?v=hiyaUZh-UiU
+- Find us on IRC (Freenode) at ##ICSec
 Features
 ---
 

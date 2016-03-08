@@ -1,23 +1,17 @@
-Example Steps to get airpwn-ng running for an Open Access Point:
+Open Access Point Guidance:
+  - Drop desired NIC to monitor mode
+    - Scapy switches the from-DS flag and allows for injecting directly from your machine to the victim, eliminating the need to connect to the target AP.
 
-1. Drop desired NIC to monitor mode
-	- airmon-ng start wlan0
-	-OR
-	- airmon-zc start wlan0
+  - Inject content:
+    - ./airpwn-ng -m <monitor mode NIC> -i <monitor mode NIC> --inject example-injects/wargames
 
-## It should be noted here that -zc will create wlan0mon and -ng will create mon0.  Depending on the svn of your aircrack-ng, -zc might have already replaced -ng.  Either or will work fine, but some people will experience -1 problems when dealing with channels using -ng.
 
-## For purposes of clarity, mon0 will reference the Monitor Mode NIC from here on out.
+WEP/WPA Guidance:
+  - Pre-reqs:
+    - dot11decrypt
+    - libtins
 
-## Because we are now using only scapy for injection, if you are injecting on an open network, scapy will switch the from-DS flag in order to inject directly from your machine to the victim, eliminating the need to connect to the target AP.
-
-2. Now it's time to inject our content.
-	- ./airpwn-ng -m mon0 -i mon0 --inject example-injects/wargames
-
-## If you're injecting on WEP/WPA protected network:
-
-0. This guide assumes you have already installed dot11decrypt. It has been tested on just one NIC but you can use two for efficiency
-
+	
 1. Drop desired NIC to monitor mode
 	- airmon-ng start wlan0
 	-OR

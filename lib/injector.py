@@ -8,7 +8,7 @@ global npackets
 npackets = 0
 BLOCK_HOSTS = set()
 
-class bcolors:
+class bcolors(object):
 	'''Define the color schema'''
 
 	HEADER = '\033[95m'
@@ -23,7 +23,7 @@ class bcolors:
 
 
 ### packit is mentioned, are we still using it?
-class Injector:
+class Injector(object):
 	'''Injector class, based on the interface selected, it uses scapy or packit to inject packets on the networks.'''
 
 	def __init__(self, interface):

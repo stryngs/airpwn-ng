@@ -4,7 +4,7 @@ from scapy.all import *
 import binascii, fcntl, gzip, socket, struct, sys, time
 from lib.injector import *
 
-class Sniffer:
+class Sniffer(object):
 	'''This is the highest level object in the library.
 	
 	It uses an instance of PacketHandler as the processing engine for packets received from scapy's sniff() function.
@@ -44,7 +44,7 @@ class Sniffer:
 			sniff(iface = self.m, filter = self.filter, prn = lambda x : q.put(x), store=0)
 
 
-	def threaded_sniff(self, single = False):
+	def threaded_sniff(self, args, single = False):
 		'''This starts a Queue which receives packets and processes them.
 		
 		It uses the PacketHandler.process function.
@@ -57,7 +57,7 @@ class Sniffer:
 		while True:
 			try:
 				pkt = q.get(timeout = 1)
-				self.packethandler.process(self.m, pkt, single)
+				self.packethandler.process(self.m, pkt, single, args)
 				q.task_done()
 			except Empty:
 				#q.task_done()

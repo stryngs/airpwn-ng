@@ -4,7 +4,7 @@ from scapy.all import *
 import binascii, fcntl, gzip, socket, struct, sys, time
 #from lib.injector import *
 
-class VictimParameters:
+class VictimParameters(object):
 	'''
 	An instance of this class is always necessary to run the application, as it holds your injections.
 

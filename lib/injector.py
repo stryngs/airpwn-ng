@@ -101,5 +101,3 @@ class Injector(object):
 
 			### Shouldn't need the empty return as we're not breaking from anything...
 			return
-
-

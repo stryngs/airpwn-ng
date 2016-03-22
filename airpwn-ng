@@ -5,7 +5,6 @@ from Queue import Queue, Empty
 import logging, subprocess, os, sys, argparse, signal
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
-import lib.injector as INJECT
 import lib.packet_handler as PH
 import lib.sniffer as SNIFF
 import lib.parameters as PARAM

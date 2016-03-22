@@ -2,7 +2,6 @@ from Queue import Queue, Empty
 from threading import Thread
 from scapy.all import *
 import binascii, fcntl, gzip, socket, struct, sys, time
-from lib.injector import *
 from lib.parameters import *
 from lib.packet_handler import *
 from lib.sniffer import *

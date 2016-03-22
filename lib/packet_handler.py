@@ -2,7 +2,10 @@ from Queue import Queue, Empty
 from threading import Thread
 from scapy.all import *
 import binascii, fcntl, gzip, socket, struct, sys, time
+
+### Trace the * -vs- Injector
 from lib.injector import *
+
 from lib.victim import *
 
 class PacketHandler(object):
@@ -209,19 +212,19 @@ class PacketHandler(object):
 				for victim in self.newvictims:
 					if (victim.ip is not None):
 						if (victim.ip == vicip):
-							victim.add_cookie(cookie)
+							victim.add_cookie(cookie, args)
 							exists = 1
 
 					else:
 						if (victim.mac is not None):
 							if (victim.mac.lower() == vicmac.lower()):
-								victim.add_cookie(cookie)
+								victim.add_cookie(cookie, args)
 								exists = 1
 
 				if (exists == 0):
 					#print "here"
 					v1 = Victim(ip = vicip, mac = vicmac, victim_parameters = self.victim_parameters)
-					v1.add_cookie(cookie)
+					v1.add_cookie(cookie, args)
 					self.newvictims.append(v1)
 
 			else:
@@ -232,12 +235,12 @@ class PacketHandler(object):
 					for victim in self.newvictims:
 						if (victim.ip is not None):
 							if (victim.ip == vicip):
-								victim.add_cookie(cookie)
+								victim.add_cookie(cookie, args)
 
 						else:
 							if (victim.mac is not None):
 								if (victim.mac.lower() == vicmac.lower()):
-									victim.add_cookie(cookie)
+									victim.add_cookie(cookie, args)
 
 				exists = 0
 				for victim in self.newvictims:
@@ -270,7 +273,7 @@ class PacketHandler(object):
 					if (victim.ip is not None):
 						if (victim.ip == vicip):
 							vic_in_targets = 1
-							victim.add_cookie(cookie)
+							victim.add_cookie(cookie, args)
 
 					else:
 						if (victim.mac is not None):
@@ -287,7 +290,7 @@ class PacketHandler(object):
 						if (victim.ip is not None):
 							if (victim.ip == vicip):
 								vic_in_targets = 1
-								victim.add_cookie(cookie)
+								victim.add_cookie(cookie, args)
 
 						else:
 							if (victim.mac is not None):
@@ -312,19 +315,19 @@ class PacketHandler(object):
 					for victim in self.newvictims:
 						if (victim.ip is not None):
 							if (victim.ip == vicip):
-								victim.add_cookie(cookie)
+								victim.add_cookie(cookie, args)
 								exists = 1
 
 						else:
 							if (victim.mac is not None):
 								if (victim.mac.lower() == vicmac.lower()):
-									victim.add_cookie(cookie)
+									victim.add_cookie(cookie, args)
 									exists = 1
 
 					if (exists == 0):
 						#print "here"
 						v1 = Victim(ip = vicip, mac = vicmac, victim_parameters = self.victim_parameters)
-						v1.add_cookie(cookie)
+						v1.add_cookie(cookie, args)
 						self.newvictims.append(v1)
 
 				else:
@@ -335,12 +338,12 @@ class PacketHandler(object):
 						for victim in self.newvictims:
 							if (victim.ip is not None):
 								if (victim.ip == vicip):
-									victim.add_cookie(cookie)
+									victim.add_cookie(cookie, args)
 
 							else:
 								if (victim.mac is not None):
 									if (victim.mac.lower() == vicmac.lower()):
-										victim.add_cookie(cookie)
+										victim.add_cookie(cookie, args)
 
 					exists = 0
 					for victim in self.newvictims:

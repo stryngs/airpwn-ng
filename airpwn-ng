@@ -5,10 +5,10 @@ from Queue import Queue, Empty
 import logging, subprocess, os, sys, argparse, signal
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
-import lib.packet_handler as PH
-import lib.sniffer as SNIFF
-import lib.parameters as PARAM
-import lib.victim as TGT
+from lib.packet_handler import PacketHandler 
+from lib.sniffer import Sniffer
+from lib.parameters import VictimParameters
+from lib.victim import Victim
 
 class bcolors:
 	'''Define the color schema'''
@@ -156,59 +156,59 @@ def style_inject(args, i_iface, m_iface):
 	if args.covert:
 		## Broadcast mode
 		if not args.t:
-			vp = PARAM.VictimParameters(inject_file = args.injection, covert = args.covert, highjack = highjacker)
+			vp = VictimParameters(inject_file = args.injection, covert = args.covert, highjack = highjacker)
 		## Targeted mode
 		else:
-			vp = PARAM.VictimParameters(inject_file = args.injection, covert = args.covert)
+			vp = VictimParameters(inject_file = args.injection, covert = args.covert)
 	else:
-		vp = PARAM.VictimParameters(inject_file = args.injection)
+		vp = VictimParameters(inject_file = args.injection)
 
 	## Broadcast mode
 	if not args.t:
 		if (args.exclude_hosts is None):
-			ph = PH.PacketHandler(i = i_iface, victim_parameters = vp)
+			ph = PacketHandler(i = i_iface, victim_parameters = vp)
 		else:
-			ph = PH.PacketHandler(i = i_iface, victim_parameters = vp, excluded = args.exclude_hosts)
+			ph = PacketHandler(i = i_iface, victim_parameters = vp, excluded = args.exclude_hosts)
 
 	## Targeted mode
 	else:
 		victims = []
 		for victim in args.t:
-			v1 = TGT.Victim(mac = victim, victim_parameters = vp)
+			v1 = Victim(mac = victim, victim_parameters = vp)
 			victims.append(v1)
 
 		if (args.exclude_hosts is None):
-			ph = PH.PacketHandler(i = i_iface, victims = victims)
+			ph = PacketHandler(i = i_iface, victims = victims)
 		else:
-			ph = PH.PacketHandler(i = i_iface, victims = victims, excluded = args.exclude_hosts)
+			ph = PacketHandler(i = i_iface, victims = victims, excluded = args.exclude_hosts)
 
 	## Single packet injection logic
 	if args.single:
 		if "mon" in m_iface:
-			snif = SNIFF.Sniffer(ph, m = m_iface)
+			snif = Sniffer(ph, m = m_iface)
 			snif.threaded_sniff(args, True)
 		else:
 			## Broadcast mode
 			if not args.t:
-				snif = SNIFF.Sniffer(ph, m = m_face, filter = '')
+				snif = Sniffer(ph, m = m_face, filter = '')
 
 			## Targeted mode
 			else:
-				snif = SNIFF.Sniffer(ph, m = m_iface)
+				snif = Sniffer(ph, m = m_iface)
 
 			snif.threaded_sniff(args, True)
 	else:
 		if ("mon" in m_iface):
-			snif = SNIFF.Sniffer(ph, m = m_iface)
+			snif = Sniffer(ph, m = m_iface)
 			snif.threaded_sniff(args)
 		else:
 			## Broadcast mode
 			if not args.t:
-				snif = SNIFF.Sniffer(ph, m = m_iface, filter = '')
+				snif = Sniffer(ph, m = m_iface, filter = '')
 
 			## Targeted mode
 			else:
-				snif = SNIFF.Sniffer(ph, m = m_iface)
+				snif = Sniffer(ph, m = m_iface)
 
 			snif.threaded_sniff(args)
 
@@ -216,34 +216,34 @@ def style_inject(args, i_iface, m_iface):
 def style_web(args, websites, i_iface, m_iface):
 	''' Handle Website Lists '''
 	if args.covert:
-		vp = PARAM.VictimParameters(websites = websites, covert = args.covert)
+		vp = VictimParameters(websites = websites, covert = args.covert)
 	else:
-		vp = PARAM.VictimParameters(websites = websites)
+		vp = VictimParameters(websites = websites)
 
 	## Broadcast mode
 	if not args.t:
 		if (args.exclude_hosts is None):
-			ph = PH.PacketHandler(i = i_iface, victim_parameters = vp)
+			ph = PacketHandler(i = i_iface, victim_parameters = vp)
 		else:
-			ph = PH.PacketHandler(i = i_iface, victim_parameters = vp, excluded = args.exclude_hosts)
+			ph = PacketHandler(i = i_iface, victim_parameters = vp, excluded = args.exclude_hosts)
 
 	## Targeted mode
 	else:
 		victims = []
 		for victim in args.t:
-			v1 = TGT.Victim(mac = victim, victim_parameters = vp)
+			v1 = Victim(mac = victim, victim_parameters = vp)
 			victims.append(v1)
 
 		if (args.exclude_hosts is None):
-			ph = PH.PacketHandler(i = i_iface, victims = victims)
+			ph = PacketHandler(i = i_iface, victims = victims)
 		else:
-			ph = PH.PacketHandler(i = i_iface, victims = victims, excluded = args.exclude_hosts)
+			ph = PacketHandler(i = i_iface, victims = victims, excluded = args.exclude_hosts)
 
 	if ("mon" in m_iface):
-		snif = SNIFF.Sniffer(ph, m = m_iface)
+		snif = Sniffer(ph, m = m_iface)
 		snif.threaded_sniff()
 	else:
-		snif = SNIFF.Sniffer(ph, m = m_iface, filter = '')
+		snif = Sniffer(ph, m = m_iface, filter = '')
 		snif.threaded_sniff()
 
 

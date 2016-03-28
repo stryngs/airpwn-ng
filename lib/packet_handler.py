@@ -2,10 +2,7 @@ from Queue import Queue, Empty
 from threading import Thread
 from scapy.all import *
 import binascii, fcntl, gzip, socket, struct, sys, time
-
-### Trace the * -vs- Injector
 from lib.injector import *
-
 from lib.victim import *
 
 class PacketHandler(object):
@@ -430,6 +427,7 @@ class PacketHandler(object):
 
 							#print injection
 							### Broadcast injector is here
+							#self.Injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, single)
 							self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, single)
 
 				else:
@@ -445,6 +443,7 @@ class PacketHandler(object):
 									else:
 										return 0
 								#print injection
+								#self.Injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr)
 								self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr)
 
 		else:
@@ -474,6 +473,7 @@ class PacketHandler(object):
 										return 0
 
 								#print injection
+								#self.Injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr)
 								self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr)
 
 					else:
@@ -490,6 +490,7 @@ class PacketHandler(object):
 											return 0
 
 									#print injection
+									#self.Injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr)
 									self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr)
 
 			if (self.excluded is not None):
@@ -516,6 +517,7 @@ class PacketHandler(object):
 									return 0
 
 							#print injection
+							#self.Injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr)
 							self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr)
 
 				else:
@@ -538,6 +540,7 @@ class PacketHandler(object):
 
 								#print injection
 								#print host, filename
+								#self.Injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr)
 								self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr)
 
 

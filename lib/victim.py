@@ -2,10 +2,19 @@ from Queue import Queue, Empty
 from threading import Thread
 from scapy.all import *
 import binascii, fcntl, gzip, socket, struct, sys, time
-from lib.parameters import *
-from lib.packet_handler import *
-from lib.sniffer import *
 import sqlite3 as lite
+
+class bcolors(object):
+	'''Define the color schema'''
+
+	HEADER = '\033[95m'
+	OKBLUE = '\033[94m'
+	OKGREEN = '\033[92m'
+	WARNING = '\033[93m'
+	FAIL = '\033[91m'
+	ENDC = '\033[0m'
+	BOLD = '\033[1m'
+	UNDERLINE = '\033[4m'
 
 class Victim(object):
 	'''Victim class is your target, define it by setting ip or mac address.

@@ -40,7 +40,7 @@ class Injector(object):
 	def get_headers(self, injection):
 		''' Create the HTML headers'''
 		headers = "HTTP/1.1 200 OK\r\n"
-		headers += "Date: " + time.strftime("%a, %d %b %Y %H:%M:%S GMT") + "\r\n"
+		headers += "Date: " + time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime()) + "\r\n"
 		headers += "Server: Apache\r\n"
 		#headers += "Cache-Control: public, max-age=99999\r\n"
 		#headers += "Expires:Sun, 26 Jul 2016 02:37:33 GMT\r\n"

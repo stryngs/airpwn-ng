@@ -1,57 +1,61 @@
 airpwn-ng
-	- injection_check(args)
-	- main(args)
-	- menu()
-	- load_websites_targeted(websites_file)
-	- style_inject(args, i_iface, m_iface)
-	- style_web(args, websites, i_iface, m_iface)
-	- signal_handler(signal, frame)
+    - injection_check(args)
+    - main(args)
+    - menu()
+    - load_websites_targeted(websites_file)
+    - style_inject(args, i_iface, m_iface)
+    - style_web(args, websites, i_iface, m_iface)
+    - signal_handler(signal, frame)
+
+
+headers.py
+    - class Headers
+        - get_headers(self, injection)
 
 
 injector.py
-	- class Injector
-		- __init__(self, interface)
-		- getHwAddr(self, ifname)
-		- get_headers(self, injection)
-		- float_to_hex(self,f)
-		- inject(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, single = False)
+    - class Injector
+        - __init__(self, interface)
+        - getHwAddr(self, ifname)
+        - float_to_hex(self,f)
+        - inject(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, single = False)
 
 
 packet_handler.py
-	- class PacketHandler
-		- __init__(self, *positional_parameters, **keyword_parameters)
-		- proc_excluded(self, excluded)
-		- search_cookie(self, ret2)
-		- get_request(self, pkt)
-		- handle_default(self, packet, single)
-		- cookie_mgmt(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, args)
-		- covert_injection(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, injection)
-		- proc_injection(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, single)
-		- process(self, interface, pkt, single, args)
+    - class PacketHandler
+        - __init__(self, *positional_parameters, **keyword_parameters)
+        - proc_excluded(self, excluded)
+        - search_cookie(self, ret2)
+        - get_request(self, pkt)
+        - handle_default(self, packet, single)
+        - cookie_mgmt(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, args)
+        - covert_injection(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, injection)
+        - proc_injection(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, single)
+        - process(self, interface, pkt, single, args)
 
 
 parameters.py
-	- class VictimParameters
-		- __init__(self, *positional_parameters, **keyword_parameters)
-		- default_request_handler(self, request)
-		- hex_injection(self, injection)
-		- proc_in_request(self, request)
-		- create_iframe(self, website, id)
-		- load_injection(self, injectionfile)
-		- create_iframe_injection(self, injects)
-		- get_iframe(self,website,i)
+    - class VictimParameters
+        - __init__(self, *positional_parameters, **keyword_parameters)
+        - default_request_handler(self, request)
+        - hex_injection(self, injection)
+        - proc_in_request(self, request)
+        - create_iframe(self, website, id)
+        - load_injection(self, injectionfile)
+        - create_iframe_injection(self, injects)
+        - get_iframe(self,website,i)
 
 
 sniffer.py
-	- class Sniffer
-		- __init__(self,packethandler, *positional_parameters, **keyword_parameters)
-		- sniff(self, q)
-		- threaded_sniff(self, args, single = False)
+    - class Sniffer
+        - __init__(self,packethandler, *positional_parameters, **keyword_parameters)
+        - sniff(self, q)
+        - threaded_sniff(self, args, single = False)
 
 
 victim.py
-	- class Victim
-		- __init__(self, *positional_parameters, **keyword_parameters)
-		- get_injection(self)
-		- check_add_cookie(self, cookie, args)
-		- add_cookie(self, cookie, args)
+    - class Victim
+        - __init__(self, *positional_parameters, **keyword_parameters)
+        - get_injection(self)
+        - check_add_cookie(self, cookie, args)
+        - add_cookie(self, cookie, args)

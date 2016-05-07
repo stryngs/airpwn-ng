@@ -244,16 +244,16 @@ def style_web(args, websites, i_iface, m_iface):
 
     if ("mon" in m_iface):
         snif = Sniffer(ph, m = m_iface)
-        snif.threaded_sniff()
+        snif.threaded_sniff(args)
     else:
         snif = Sniffer(ph, m = m_iface, filter = '')
-        snif.threaded_sniff()
+        snif.threaded_sniff(args)
 
 
 def signal_handler(signal, frame):
     """Handle CTRL+C."""
     print(bcolors.FAIL + '\n[!] Stopping injection and exiting airpwn-ng ...' + bcolors.ENDC)
-    print(bcolors.OKGREEN + '\n[+] Cookies stored to cookies.log and cookies.sqlite' + bcolors.ENDC)
+    print(bcolors.OKGREEN + '\n[+] Cookies stored to cookies.log and cookies.db' + bcolors.ENDC)
     sys.exit(0)
 
 

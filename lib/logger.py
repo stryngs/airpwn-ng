@@ -1,24 +1,55 @@
-from Queue import Queue, Empty
-from threading import Thread
-from scapy.all import *
-import binascii, fcntl, gzip, socket, struct, sys, time
+import time
 import sqlite3 as lite
 
 class Database(object):
-    """database logs"""
+    """Database style logs"""
 
-    def __init__(self):
+    def __init__(self, dbFile):
         ## DB the cookies
-        self.con = lite.connect('cookies.db')
+        self.con = lite.connect(dbFile)
         self.con.text_factory = str
         self.db = self.con.cursor()
         self.db.execute("CREATE TABLE IF NOT EXISTS ip2mac(ip TEXT, mac TEXT, UNIQUE(ip, mac))")
         self.db.execute("CREATE TABLE IF NOT EXISTS cookies(ip TEXT, dm TEXT, ck TEXT)")
 
-    def sqlite(self, ip, mac, dm, cookie):
+    def sqlite_cookies(self, ip, mac, dm, cookie):
+        """Database method for using sqlite to store cookies"""
         with self.con:
             self.db.execute("INSERT OR IGNORE INTO ip2mac VALUES(?, ?);", (ip, mac))
             self.db.execute("INSERT OR IGNORE INTO cookies VALUES(?, ?, ?);", (ip, dm, cookie))
+
+    def extract_cookies(self):
+        with self.con:
+            ## Obtain rows within cookies table
+            getRows = self.db.execute("SELECT count(rowid) from cookies;")
+            tVal = getRows.fetchone()
+            rCount = tVal[0] + 1
+            
+            ## Loop through rows
+            ### Probably can deal without a range, but to make sure order stays correct...
+            for row in range(1, rCount):
+                with open('cookie-grab_%s.ck' % row, 'w') as oFile:
+                    getDM = self.db.execute("SELECT dm FROM cookies WHERE rowid = ?;", (row,))
+                    dmVal = getDM.fetchone()
+                    dList.append(dmVal[0])
+                    getCK = self.db.execute("SELECT ck FROM cookies WHERE rowid = ?;", (row,))
+                    ckVal = getCK.fetchone()
+                    cList.append(ckVal[0])
+
+                    ## Grab top cookie
+                    name = ckVal[0].split(';')[0].split(':')[1].strip().split('=')[0]
+                    nameLen = len(ckVal[0].split(';')[0].strip().split('=')[0]) + 1
+                    oFile.write(dmVal[0] + '\t' + 'TRUE' + '\t' + '/' + '\t' + 'FALSE' + '\t' + cExp + '\t' + name + '\t' + ckVal[0].split(';')[0].strip()[nameLen:] + '\t' + '1' + '\r\n')
+
+                    ## Grab the rest of the cookies
+                    cLen = len(ckVal[0].split(';'))
+                    for c in range(1, cLen):
+                        name = ckVal[0].split(';')[c].strip().split('=')[0]
+                        nameLen = len(ckVal[0].split(';')[c].strip().split('=')[0]) + 1
+                        oFile.write(dmVal[0] + '\t' + 'TRUE' + '\t' + '/' + '\t' + 'FALSE' + '\t' + cExp + '\t' + name + '\t' + ckVal[0].split(';')[c].strip()[nameLen:] + '\t' + '1' + '\r\n')
+                    
+                    print 'cookie-grab_%s.ck created!' % row
+
 
 
 class Logfile(object):
@@ -28,5 +59,17 @@ class Logfile(object):
         ## Plaintext log of cookies
         self.cFile = open('cookies.log', 'w')
 
-    def cookies(self, ip, mac, dm, cookie, option):
-            self.cFile.write(ip + '\n' + mac + '\n' + dm + '\n' + cookie + '\n\n')
+    def cookies(self, ip, mac, dm, cookie):
+        """Method for storing plaintext cookie sniffs"""
+        self.cFile.write(ip + '\n' + mac + '\n' + dm + '\n' + cookie + '\n\n')
+
+
+
+
+
+con = lite.connect('cookies.db')
+db = con.cursor()
+dList = []
+cList = []
+cExp = str(int(time.time()) + 31536000)
+

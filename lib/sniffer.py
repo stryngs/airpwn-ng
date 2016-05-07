@@ -1,8 +1,10 @@
+from lib.injector import Injector
 from Queue import Queue, Empty
 from threading import Thread
 from scapy.all import *
-import binascii, fcntl, gzip, socket, struct, sys, time
-from lib.injector import Injector
+
+### Pretty confident these modules aren't needed here
+#import binascii, fcntl, gzip, socket, struct, sys, time
 
 class Sniffer(object):
 	'''This is the highest level object in the library.

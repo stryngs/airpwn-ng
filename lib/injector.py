@@ -1,9 +1,13 @@
 from lib.headers import Headers
-from Queue import Queue, Empty
 from scapy.all import *
-from threading import Thread
-import binascii, fcntl, gzip, re, socket, struct, sys, time
+import fcntl, socket, struct, sys, time
 
+### Pretty sure these modules aren't needed
+#import binascii, gzip, re
+#from Queue import Queue, Empty
+#from threading import Thread
+
+### What about these?
 global BLOCK_HOSTS
 global npackets
 npackets = 0
@@ -23,12 +27,8 @@ class bcolors(object):
 
 
 
-### packit is mentioned, are we still using it?
 class Injector(object):
-    """Injector class, based on the interface selected 
-    
-    It uses scapy or packit to inject packets on the networks.
-    """
+    """Uses scapy to inject packets on the networks"""
 
     def __init__(self, interface):
         self.interface = interface

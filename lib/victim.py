@@ -1,9 +1,10 @@
 from lib.logger import Database, Logfile
-from Queue import Queue, Empty
-from threading import Thread
-from scapy.all import *
-import binascii, fcntl, gzip, socket, struct, sys, time
-import sqlite3 as lite
+
+### Pretty confident these modules aren't needed here
+#from Queue import Queue, Empty
+#from threading import Thread
+#from scapy.all import *
+#import binascii, fcntl, gzip, socket, struct, sys, time
 
 class bcolors(object):
     """Define the color schema"""
@@ -26,6 +27,10 @@ class Victim(object):
     """
 
     def __init__(self, *positional_parameters, **keyword_parameters):
+        self.cookies = []
+        self.db = Database('cookies.db')
+        self.log = Logfile()
+
         if ('ip' in keyword_parameters):
             self.ip = keyword_parameters['ip']
         else:
@@ -48,11 +53,6 @@ class Victim(object):
         if (self.victim_parameters is None):
             print "[ERROR] Please create VictimParameters for this Victim"
             exit(1)
-
-        self.cookies = []
-
-        self.db = Database()
-        self.log = Logfile()
 
 
     def get_injection(self):
@@ -114,11 +114,11 @@ class Victim(object):
             #print cookie[1]
             if not args.t:
                 self.log.cookies(self.ip, self.mac, cookie[0], cookie[1])
-                self.db.sqlite(self.ip, self.mac, cookie[0], cookie[1])
+                self.db.sqlite_cookies(self.ip, self.mac, cookie[0], cookie[1])
             else:
                 ip = ''
                 self.log.cookies(ip, self.mac, cookie[0], cookie[1])
-                self.db.sqlite(ip, self.mac, cookie[0], cookie[1])
+                self.db.sqlite_cookies(ip, self.mac, cookie[0], cookie[1])
             
             if (self.victim_parameters.highjack is not None):
                 self.victim_parameters.highjack(cookie)

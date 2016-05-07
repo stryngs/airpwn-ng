@@ -1,14 +1,17 @@
 #! /usr/bin/python2.7
 
-from threading import Thread
-from Queue import Queue, Empty
 import logging, subprocess, os, sys, argparse, signal
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
-from lib.packet_handler import PacketHandler 
-from lib.sniffer import Sniffer
+from lib.logger import Database
+from lib.packet_handler import PacketHandler
 from lib.parameters import VictimParameters
+from lib.sniffer import Sniffer
 from lib.victim import Victim
+
+### Pretty sure these modules aren't needed:
+#from threading import Thread
+#from Queue import Queue, Empty
 
 class bcolors:
     """Define the color schema"""
@@ -59,6 +62,12 @@ def main(args):
 
     It uses the library classes and functions according to what arguments are provided.
     """
+    ## Cookie extractor
+    if args.cm:
+        db = Database(args.cm)
+        db.extract_cookies()
+        exit(0)
+
     ## Set vars
     m_iface = args.m
     i_iface = args.i
@@ -116,6 +125,9 @@ def menu():
         print ''
         print '    --websites <filename>'
         print '      List of websites to sniff cookies from'
+        print ''
+        print '    --cm'
+        print '      Extract cookies from the DB'
         print ''
         print '********************************************'
         print '**           Optional Arguments           **'
@@ -268,9 +280,12 @@ if __name__ == '__main__':
 
     group.add_argument('--injection', metavar = '<filename>', help = 'File with your injection code')
     group.add_argument('--websites', metavar = '<filename>', help = 'List of websites to sniff cookies from')
+    group.add_argument('--cm', metavar = '<filename>', help = 'Extract cookies from the DB')
 
-    parser.add_argument('-m', metavar = '<interface>', required = True, help = 'Your monitor interface')
-    parser.add_argument('-i', metavar = '<interface>', required = True, help = 'Your injection interface')
+    #parser.add_argument('-m', metavar = '<interface>', required = True, help = 'Your monitor interface')
+    parser.add_argument('-m', metavar = '<interface>', help = 'Your monitor interface')
+    #parser.add_argument('-i', metavar = '<interface>', required = True, help = 'Your injection interface')
+    parser.add_argument('-i', metavar = '<interface>', help = 'Your injection interface')
     parser.add_argument('-t', nargs = '*', metavar = '<MAC address>', help = 'Target MAC addresses')
     parser.add_argument('--exclude-hosts', nargs = '*', metavar = '<host>', help = 'Space separated list of hosts/IP addresses to exclude from injection')
     parser.add_argument('--covert', action = 'store_true', help = 'Hides cookie grabbing iframes inside the requested page')

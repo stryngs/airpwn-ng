@@ -1,7 +1,10 @@
 from Queue import Queue, Empty
-from threading import Thread
 from scapy.all import *
-import binascii, fcntl, gzip, socket, struct, sys, time
+import binascii
+
+### Pretty sure these modules aren't needed
+#from threading import Thread
+#import fcntl, gzip, socket, struct, sys, time
 
 class VictimParameters(object):
 	'''

@@ -1,9 +1,15 @@
-from Queue import Queue, Empty
-from threading import Thread
-from scapy.all import *
-import binascii, fcntl, gzip, socket, struct, sys, time
+### Have not figured out why it must be * here:
 from lib.injector import *
-from lib.victim import *
+
+from lib.victim import Victim
+from scapy.all import *
+import socket
+
+
+### Pretty sure these modules aren't needed:
+#from Queue import Queue, Empty
+#from threading import Thread
+#import binascii, fcntl, gzip, struct, sys, time
 
 class PacketHandler(object):
     """This class does all the heavy-lifting.
@@ -55,7 +61,7 @@ class PacketHandler(object):
         #injector = Injector(self.i)
 
 
-    ### 
+    ###
     def proc_excluded(self, excluded):
         """Check if argument provided in excluded is an ip.
         

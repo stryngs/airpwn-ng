@@ -5,12 +5,6 @@ from lib.victim import Victim
 from scapy.all import *
 import socket
 
-
-### Pretty sure these modules aren't needed:
-#from Queue import Queue, Empty
-#from threading import Thread
-#import binascii, fcntl, gzip, struct, sys, time
-
 class PacketHandler(object):
     """This class does all the heavy-lifting.
 

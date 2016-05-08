@@ -9,10 +9,6 @@ from lib.parameters import VictimParameters
 from lib.sniffer import Sniffer
 from lib.victim import Victim
 
-### Pretty sure these modules aren't needed:
-#from threading import Thread
-#from Queue import Queue, Empty
-
 class bcolors:
     """Define the color schema"""
 

@@ -1,11 +1,5 @@
 from lib.logger import Database, Logfile
 
-### Pretty confident these modules aren't needed here
-#from Queue import Queue, Empty
-#from threading import Thread
-#from scapy.all import *
-#import binascii, fcntl, gzip, socket, struct, sys, time
-
 class bcolors(object):
     """Define the color schema"""
 
@@ -105,8 +99,8 @@ class Victim(object):
 
         if (not exists and cookie[1] != "NONE"):
             print ""
-            print "[+] New cookie detected for ", self.mac
-            print cookie
+            print bcolors.OKGREEN + "[+] New cookie detected for: %s -- %s" % (cookie[0], self.mac) + bcolors.ENDC
+            #print cookie
             ### Trace why no ip...
             #print self.ip
             #print self.mac
@@ -130,10 +124,10 @@ class Victim(object):
                 self.cookies.append(cookie)
                 if (self.ip is not None):
                     print ""
-                    print bcolors.WARNING + "[!] No cookie on client", self.ip, " for website", cookie[0] + bcolors.ENDC
+                    print bcolors.WARNING + "[!] No cookie on client %s for %s" % (self.ip, cookie[0]) + bcolors.ENDC
                 else:
                     print ""
-                    print bcolors.WARNING + "[!] No cookie on client", self.mac, " for website", cookie[0] + bcolors.ENDC
+                    print bcolors.WARNING + "[!] No cookie on client %s for %s" % (self.mac, cookie[0]) + bcolors.ENDC
 
 
     def add_cookie(self, cookie, args):

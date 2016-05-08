@@ -131,6 +131,10 @@ class PacketHandler(object):
         """Extracts request payload as a string from the packet object
         if there is a payload, otherwise returns None.
         """
+        ### This is where we can see the return from the server for the Domain=
+        ### Needed for extract_cookies() in logger.py
+        #print pkt.sprintf("{IP:%IP.src% -> %IP.dst%\n}{Raw:%Raw.load%\n}")
+        
         ret2 = "\n".join(pkt.sprintf("{Raw:%Raw.load%}\n").split(r"\r\n"))
         if (len(ret2.strip()) > 0):
             #print ret2.translate(None,"'").strip()

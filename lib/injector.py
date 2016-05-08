@@ -2,11 +2,6 @@ from lib.headers import Headers
 from scapy.all import *
 import fcntl, socket, struct, sys, time
 
-### Pretty sure these modules aren't needed
-#import binascii, gzip, re
-#from Queue import Queue, Empty
-#from threading import Thread
-
 ### What about these?
 global BLOCK_HOSTS
 global npackets

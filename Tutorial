@@ -11,26 +11,26 @@ WEP/WPA Guidance:
     - dot11decrypt
     - libtins
 
-	
+
 1. Drop desired NIC to monitor mode
-	- airmon-ng start wlan0
-	-OR
-	- airmon-zc start wlan0
+    - airmon-ng start wlan0
+    -OR
+    - airmon-zc start wlan0
 
 2. Change monitor mode NIC to the desired channel
-	- iwconfig mon0 <channel>
-	- if this doesn't work, set the monitor NIC's channel with airmon-ng start wlan0 <channel>
+    - iwconfig mon0 <channel>
+    - if this doesn't work, set the monitor NIC's channel with airmon-ng start wlan0 <channel>
 
 3. Create a TAP interface that live-decrypts traffic using dot11decrypt
-	- dot11decrypt mon0 wpa:<essid>:<key>
-	- e.g. dot11decrypt mon0 wpa:MyNetwork:MyHardToCrackPassword
-	- IMPORTANT NOTE: dot11decrypt (and any other decryption software) needs to capture the 4-way handshake between the AP and the client before being able to decrypt traffic, so an AP-wide deauth should be performed right after enabling the TAP interface
-	- ALSO: dot11decrypt can handle more than one protected network by providing an arbitrary number of wpa:<essid>:<key> tuples, but airpwn-ng can only handle one AP in Encrypted Wireless mode for now
+    - dot11decrypt mon0 wpa:<essid>:<key>
+    - e.g. dot11decrypt mon0 wpa:MyNetwork:MyHardToCrackPassword
+    - IMPORTANT NOTE: dot11decrypt (and any other decryption software) needs to capture the 4-way handshake between the AP and the client before being able to decrypt traffic, so an AP-wide deauth should be performed right after enabling the TAP interface
+    - ALSO: dot11decrypt can handle more than one protected network by providing an arbitrary number of wpa:<essid>:<key> tuples, but airpwn-ng can only handle one AP in Encrypted Wireless mode for now
 
 4. Connect and authenticate to the target network with your injection NIC
-	- We're assuming wlan0 for this, in a one NIC scenario
+    - We're assuming wlan0 for this, in a one NIC scenario
 
 5. Now it's time to inject our content. Because the network is encrypted, we work around that issue by using wlan0 which is a connected and authenticated client on the AP to inject Ethernet packets instead of 802.11 packets, meaning these WILL be routed by the gateway before they reach the victim AND the attack MAC address will be revealed.
-	- ./airpwn-ng -m tap0 -i wlan0 --inject example-injects/wargames
+    - ./airpwn-ng -m tap0 -i wlan0 --inject example-injects/wargames
 
 Okay, that's all.  How about a nice game of chess?

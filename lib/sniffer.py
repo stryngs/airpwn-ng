@@ -39,9 +39,9 @@ class Sniffer(object):
         It can also be an empty string.
         """
         if ("mon" in self.m):
-            sniff(iface = self.m, prn = lambda x : q.put(x), store=0)
+            sniff(iface = self.m, prn = lambda x: q.put(x), store = 0)
         else:
-            sniff(iface = self.m, filter = self.filter, prn = lambda x : q.put(x), store=0)
+            sniff(iface = self.m, filter = self.filter, prn = lambda x: q.put(x), store = 0)
 
 
     def threaded_sniff(self, args, single = False):
@@ -57,8 +57,17 @@ class Sniffer(object):
         while True:
             try:
                 pkt = q.get(timeout = 1)
-                self.packethandler.process(self.m, pkt, single, args)
-                q.task_done()
+                
+                ### speed patch testing
+                ### This will cause inbound cookies to be missed
+                    ### This should be a defaulted parameter, warning the user that --> inbound option selected == < speed
+                ### to-DS is:   1L
+                ### from-DS is: 2L
+                if pkt[Dot11].FCfield == 1:
+                    self.packethandler.process(self.m, pkt, single, args)
+                    q.task_done()
+                else:
+                    pass
             except Empty:
                 #q.task_done()
                 pass

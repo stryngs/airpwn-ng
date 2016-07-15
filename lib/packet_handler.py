@@ -138,7 +138,6 @@ class PacketHandler(object):
         
         ret2 = "\n".join(pkt.sprintf("{Raw:%Raw.load%}\n").split(r"\r\n"))
         if (len(ret2.strip()) > 0):
-            #print ret2.translate(None,"'").strip()
             return ret2.translate(None, "'").strip()
         else:
             return None
@@ -175,7 +174,11 @@ class PacketHandler(object):
                         if (ip2 == svrip):
                             BLOCK_HOSTS.remove((ip2, seq2))
 
-            if ("GET" not in request):
+            ## Look for desired plaintext here
+            #print request
+            if 'GET /' in request:
+                pass
+            else:
                 return 0
             #print BLOCK_HOSTS
             #print request
@@ -206,8 +209,6 @@ class PacketHandler(object):
         return None
 
 
-    ### Reword docstring
-    ### Not sure if the above was mine or your comment, if mine, delete...
     def cookie_mgmt(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, args):
         """This function does cookie management for broadcast mode and targeted mode.
 
@@ -575,8 +576,8 @@ class PacketHandler(object):
             #ls(pkt)
             try:
                 vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr = self.handle_default(pkt, single)
+                self.cookie_mgmt(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, args)
+                self.proc_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, single)
             except:
                 return
-
-            self.cookie_mgmt(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, args)
-            self.proc_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, single)
+ 

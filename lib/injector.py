@@ -1,25 +1,14 @@
 from lib.headers import Headers
+from lib.visuals import bcolors
 from scapy.all import *
 import fcntl, socket, struct, sys, time
 
-### What about these?
-global BLOCK_HOSTS
 global npackets
 npackets = 0
-BLOCK_HOSTS = set()
 
-class bcolors(object):
-    """Define the color schema"""
-
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-
+### Verify these can be removed
+#global BLOCK_HOSTS
+#BLOCK_HOSTS = set()
 
 
 class Injector(object):
@@ -41,12 +30,8 @@ class Injector(object):
 
 
     ### Should be able to dict this?
-    ### packit is no longer used, describe....
     def inject(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, single = False):
-        """Inject function performs the actual injection.
-        
-        Uses scapy for open networks (monitor-mode) and packit for WEP/WPA injection.
-        """
+        """Inject function performs the actual injection using scapy."""
         global npackets
         npackets += 1
         sys.stdout.write(bcolors.OKBLUE + "[*] Injecting Packet to victim " + vicmac + " (TOTAL: " + str(npackets) + " injected packets)\r" + bcolors.ENDC)
@@ -84,5 +69,4 @@ class Injector(object):
             except:
                 pass
 
-            ### Shouldn't need the empty return as we're not breaking from anything...
             return

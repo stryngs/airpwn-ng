@@ -1,9 +1,16 @@
-### Have not figured out why it must be * here:
-from lib.injector import *
-
+from lib.injector import Injector
 from lib.victim import Victim
 from scapy.all import *
 import socket
+
+## Originally in injector.py and imported via *
+global BLOCK_HOSTS
+BLOCK_HOSTS = set()
+
+### Verify these can be removed
+#global npackets
+#npackets = 0
+
 
 class PacketHandler(object):
     """This class does all the heavy-lifting.
@@ -568,7 +575,6 @@ class PacketHandler(object):
             #ls(pkt)
             try:
                 vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr = self.handle_default(pkt, single)
-            ### Why the naked return?
             except:
                 return
 

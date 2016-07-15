@@ -33,11 +33,11 @@ class Sniffer(object):
 
 
     def sniff(self, q):
-        '''Target function for Queue (multithreading).
+        """Target function for Queue (multithreading).
         
         Usually we set a filter for GET requests on the dot11 tap interface.
         It can also be an empty string.
-        '''
+        """
         if ("mon" in self.m):
             sniff(iface = self.m, prn = lambda x : q.put(x), store=0)
         else:
@@ -45,11 +45,11 @@ class Sniffer(object):
 
 
     def threaded_sniff(self, args, single = False):
-        '''This starts a Queue which receives packets and processes them.
+        """This starts a Queue which receives packets and processes them.
         
         It uses the PacketHandler.process function.
         Call this function to begin actual sniffing + injection. 
-        '''
+        """
         q = Queue()
         sniffer = Thread(target = self.sniff, args = (q,))
         sniffer.daemon = True

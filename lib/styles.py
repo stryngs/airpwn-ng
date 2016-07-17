@@ -9,7 +9,8 @@ class Web(object):
     It uses the library classes and functions according to what arguments are provided.
     """
 
-    def style_web(self, args, websites, i_iface, m_iface, expSocket):
+    #def style_web(self, args, websites, i_iface, m_iface, expSocket):
+    def style_web(self, args, websites, i_iface, m_iface, misc):
         """Handle Website Lists"""
         if args.covert:
             vp = VictimParameters(websites = websites, covert = args.covert)
@@ -19,9 +20,9 @@ class Web(object):
         ## Broadcast mode
         if not args.t:
             if (args.exclude_hosts is None):
-                ph = PacketHandler(expSocket, i = i_iface, exp = args.e, victim_parameters = vp)
+                ph = PacketHandler(misc, i = i_iface, victim_parameters = vp)
             else:
-                ph = PacketHandler(expSocket, i = i_iface, exp = args.e, victim_parameters = vp, excluded = args.exclude_hosts)
+                ph = PacketHandler(misc, i = i_iface, victim_parameters = vp, excluded = args.exclude_hosts)
 
         ## Targeted mode
         else:
@@ -31,9 +32,9 @@ class Web(object):
                 victims.append(v1)
 
             if (args.exclude_hosts is None):
-                ph = PacketHandler(expSocket, i = i_iface, exp = args.e, victims = victims)
+                ph = PacketHandler(misc, i = i_iface, victims = victims)
             else:
-                ph = PacketHandler(expSocket, i = i_iface, exp = args.e, victims = victims, excluded = args.exclude_hosts)
+                ph = PacketHandler(misc, i = i_iface, victims = victims, excluded = args.exclude_hosts)
 
         if ("mon" in m_iface):
             snif = Sniffer(ph, m = m_iface)
@@ -51,7 +52,8 @@ class Inject(object):
     It uses the library classes and functions according to what arguments are provided.
     """
 
-    def style_inject(self, args, i_iface, m_iface, expSocket):
+    #def style_inject(self, args, i_iface, m_iface, expSocket):
+    def style_inject(self, args, i_iface, m_iface, misc):
         """Handle injection without a targeted domain list"""
         ## Handle victim parameters
         if args.covert:
@@ -67,9 +69,9 @@ class Inject(object):
         ## Broadcast mode
         if not args.t:
             if (args.exclude_hosts is None):
-                ph = PacketHandler(expSocket, i = i_iface, exp = args.e, victim_parameters = vp)
+                ph = PacketHandler(misc, i = i_iface, victim_parameters = vp)
             else:
-                ph = PacketHandler(expSocket, i = i_iface, exp = args.e, victim_parameters = vp, excluded = args.exclude_hosts)
+                ph = PacketHandler(misc, i = i_iface, victim_parameters = vp, excluded = args.exclude_hosts)
 
         ## Targeted mode
         else:
@@ -79,9 +81,9 @@ class Inject(object):
                 victims.append(v1)
 
             if (args.exclude_hosts is None):
-                ph = PacketHandler(expSocket, i = i_iface, exp = args.e, victims = victims)
+                ph = PacketHandler(misc, i = i_iface, victims = victims)
             else:
-                ph = PacketHandler(expSocket, i = i_iface, exp = args.e, victims = victims, excluded = args.exclude_hosts)
+                ph = PacketHandler(misc, i = i_iface, victims = victims, excluded = args.exclude_hosts)
 
         ## Single packet injection logic
         if args.single:

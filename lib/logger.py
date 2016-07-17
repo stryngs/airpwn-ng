@@ -61,7 +61,7 @@ class Database(object):
                 print 'cookie-grab_%s.ck created!' % row
 
 
-
+### Should redo naming schema now that Tee() exists
 class Logfile(object):
     """Plaintext logs"""
     

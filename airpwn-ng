@@ -4,6 +4,7 @@ import logging, subprocess, os, sys, argparse, signal
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
 from lib.logger import Database, Tee as tee
+from lib.misc import Misc
 from lib.styles import Web, Inject
 from lib.victim import Victim
 from lib.visuals import bcolors
@@ -12,7 +13,9 @@ def crtlC(args):
     """Handle CTRL+C."""
     def tmp(signal, frame):
         print(bcolors.FAIL + '\n[!] Stopping injection and exiting airpwn-ng ...' + bcolors.ENDC)
-        print(bcolors.OKGREEN + '\n[+] Cookies stored to cookies.log and cookies.sqlite' + bcolors.ENDC)
+        print(bcolors.OKGREEN + '\n[+] Cookies stored to ' + bcolors.WARNING + 'cookies.log ' + bcolors.OKGREEN +  'and ' + bcolors.WARNING + 'cookies.sqlite' + bcolors.ENDC)
+        if args.o:
+            print(bcolors.OKGREEN + '\n[+] Output log stored to ' + bcolors.WARNING + '%s' + bcolors.ENDC) % args.o
         sys.exit(0)
     return tmp
 
@@ -67,7 +70,7 @@ def main(args):
         stdOut = sys.stdout
         sys.stdout = sys.stderr
         sys.stderr = stdOut
-        oLog = open('output.log', 'w')
+        oLog = open(args.o, 'w')
         sys.stdout = tee(stdOut, oLog)
     
     ## Cookie extractor
@@ -81,12 +84,9 @@ def main(args):
     i_iface = args.i
     injection = 0
     
-    ## Socket patch
-    if args.e:
-        expSocket = conf.L2socket(iface = i_iface)
-    else:
-        expSocket = False
-
+    ## Grab experiments
+    misc = Misc(args)
+    
     ## User printouts
     os.system('clear')
     print "\nairpwn-ng - The new and improved 802.11 packet injector\n"
@@ -119,12 +119,14 @@ def main(args):
     if injection == 1:
         ## Injection file used
         i = Inject()
-        i.style_inject(args, i_iface, m_iface, expSocket)
+        #i.style_inject(args, i_iface, m_iface, expSocket)
+        i.style_inject(args, i_iface, m_iface, misc)
 
     else:
         ## Website file used
         w = Web()
-        w.style_web(args, websites, i_iface, m_iface, expSocket)
+        #w.style_web(args, websites, i_iface, m_iface, expSocket)
+        w.style_web(args, websites, i_iface, m_iface, misc)
 
 
 def menu():
@@ -149,14 +151,28 @@ def menu():
         print '********************************************'
         print '**           Optional Arguments           **'
         print '********************************************'
-        print '  -m <interface>'
-        print '    Your monitor interface'
+        print '  -b'
+        print '    Sniff cookies both ways'
+        print '    ***Packet injection becomes slower***'
+        print ''
+        print '  -e'
+        print '    Experimental single socket injection'
+        print '    ***Packet injection becomes faster***'
         print ''
         print '  -i <interface>'
-        print '    Your injection interface'
+        print '     Your injection interface'
+        print ''
+        print '  -m <interface>'
+        print '     Your monitor interface'
+        print ''
+        print '  -o <output file'
+        print '     Create logfile of stdout and stderr'
         print ''
         print '  -t [<MAC MAC>]'
-        print '    Targeted MACs'
+        print '     Targeted MACs'
+        print ''
+        print '  -v'
+        print '    Print packet load'
         print ''
         print '  --exclude-hosts [<host host>]'
         print '    Hosts to exclude from injection'
@@ -186,6 +202,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', metavar = '<interface>', help = 'Your monitor interface')
     parser.add_argument('-o', metavar = '<outfile>', help = 'Output File')
     parser.add_argument('-t', nargs = '*', metavar = '<MAC address>', help = 'Target MAC addresses')
+    parser.add_argument('-v', action = 'store_true', help = 'Verbose packet output')
     parser.add_argument('--exclude-hosts', nargs = '*', metavar = '<host>', help = 'Space separated list of hosts/IP addresses to exclude from injection')
     parser.add_argument('--covert', action = 'store_true', help = 'Hides cookie grabbing iframes inside the requested page')
     parser.add_argument('--single', action = 'store_true', help = 'Single packet injection attempt')

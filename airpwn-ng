@@ -80,9 +80,16 @@ def main(args):
     m_iface = args.m
     i_iface = args.i
     injection = 0
+    
+    ## Socket patch
+    if args.e:
+        expSocket = conf.L2socket(iface = i_iface)
+    else:
+        expSocket = False
 
     ## User printouts
-    print "\n\nairpwn-ng - The new and improved 802.11 packet injector\n\n"
+    os.system('clear')
+    print "\nairpwn-ng - The new and improved 802.11 packet injector\n"
     if ("mon" in m_iface and m_iface != i_iface):
         print bcolors.WARNING + "[!] It appears you are using a monitor mode interface as your monitoring input. If you are attacking open wireless networks, please use the same monitoring interface with -i for better performance." + bcolors.ENDC
     if ("mon" not in m_iface):
@@ -112,12 +119,12 @@ def main(args):
     if injection == 1:
         ## Injection file used
         i = Inject()
-        i.style_inject(args, i_iface, m_iface)
+        i.style_inject(args, i_iface, m_iface, expSocket)
 
     else:
         ## Website file used
         w = Web()
-        w.style_web(args, websites, i_iface, m_iface)
+        w.style_web(args, websites, i_iface, m_iface, expSocket)
 
 
 def menu():
@@ -173,6 +180,8 @@ if __name__ == '__main__':
     group.add_argument('--websites', metavar = '<filename>', help = 'List of websites to sniff cookies from')
     group.add_argument('--cm', metavar = '<filename>', help = 'Extract cookies from the DB')
 
+    parser.add_argument('-b', action = 'store_true', help = 'Sniff both ways')
+    parser.add_argument('-e', action = 'store_true', help = 'Experimental socket patch')
     parser.add_argument('-i', metavar = '<interface>', help = 'Your injection interface')
     parser.add_argument('-m', metavar = '<interface>', help = 'Your monitor interface')
     parser.add_argument('-o', metavar = '<outfile>', help = 'Output File')

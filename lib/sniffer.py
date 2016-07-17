@@ -48,26 +48,39 @@ class Sniffer(object):
         """This starts a Queue which receives packets and processes them.
         
         It uses the PacketHandler.process function.
-        Call this function to begin actual sniffing + injection. 
+        Call this function to begin actual sniffing + injection.
+        
+        If args.b is thrown, a two-way sniff is implemented
+        Otherwise airpwn-ng will only look at packets headed outbound
+        While airpwn-ng only hijacks inbound frames to begin with,
+        -b is useful for grabbing any cookies inbound from a server
+        
+        Of note:        
+            to-DS is:    1L
+            from-DS is:  2L
         """
         q = Queue()
         sniffer = Thread(target = self.sniff, args = (q,))
         sniffer.daemon = True
         sniffer.start()
-        while True:
-            try:
-                pkt = q.get(timeout = 1)
-                
-                ### speed patch testing
-                ### This will cause inbound cookies to be missed
-                    ### This should be a defaulted parameter, warning the user that --> inbound option selected == < speed
-                ### to-DS is:   1L
-                ### from-DS is: 2L
-                if pkt[Dot11].FCfield == 1:
+        if args.b:
+            while True:
+                try:
+                    pkt = q.get(timeout = 1)
+                    if pkt[Dot11].FCfield == 1:
+                        self.packethandler.process(self.m, pkt, single, args)
+                        q.task_done()
+                    else:
+                        pass
+                except Empty:
+                    #q.task_done()
+                    pass
+        else:
+            while True:
+                try:
+                    pkt = q.get(timeout = 1)
                     self.packethandler.process(self.m, pkt, single, args)
                     q.task_done()
-                else:
+                except Empty:
+                    #q.task_done()
                     pass
-            except Empty:
-                #q.task_done()
-                pass

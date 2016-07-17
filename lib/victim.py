@@ -108,19 +108,24 @@ class Victim(object):
             self.cookies.append(cookie)
 
         else:
-            if (cookie[1] == "NONE"):
+            if cookie[1] == "NONE":
                 ## ADD THE NONE ANYWAY COOKIE SO GET_INJECTION() CAN SKIP TO THE NEXT IFRAME
                 self.cookies.append(cookie)
                 if (self.ip is not None):
                     print ""
-                    print bcolors.WARNING + "[!] No cookie on client %s for %s" % (self.ip, cookie[0]) + bcolors.ENDC
+                    #print bcolors.WARNING + "[!] No cookie on client %s for %s" % (self.ip, cookie[0]) + bcolors.ENDC
+                    print bcolors.WARNING + "[!] No cookie on client " + bcolors.OKBLUE + "%s" % (self.ip) + bcolors.WARNING + " for " + bcolors.OKBLUE + "%s" % (cookie[0]) + bcolors.ENDC
                 else:
                     print ""
-                    print bcolors.WARNING + "[!] No cookie on client %s for %s" % (self.mac, cookie[0]) + bcolors.ENDC
+                    #print bcolors.WARNING + "[!] No cookie on client %s for %s" % (self.mac, cookie[0]) + bcolors.ENDC
+                    print bcolors.WARNING + "[!] No cookie on client " + bcolors.OKBLUE + "%s" % (self.ip) + bcolors.WARNING + " for " + bcolors.OKBLUE + "%s" % (cookie[0]) + bcolors.ENDC
 
 
     def add_cookie(self, cookie, args):
-        '''Cookie handling function, if --websites is set, ignores all cookies for hosts other than specified.'''
+        '''Cookie handling function
+        if --websites is set,
+        will ignore all cookies for hosts other than specified.
+        '''
         ## Print cookie
         if (self.victim_parameters.websites is not None):
             for website in self.victim_parameters.websites:

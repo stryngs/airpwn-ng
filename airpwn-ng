@@ -119,14 +119,12 @@ def main(args):
     if injection == 1:
         ## Injection file used
         i = Inject()
-        #i.style_inject(args, i_iface, m_iface, expSocket)
-        i.style_inject(args, i_iface, m_iface, misc)
+        i.style_inject(args, misc)
 
     else:
         ## Website file used
         w = Web()
-        #w.style_web(args, websites, i_iface, m_iface, expSocket)
-        w.style_web(args, websites, i_iface, m_iface, misc)
+        w.style_web(args, websites, misc)
 
 
 def menu():

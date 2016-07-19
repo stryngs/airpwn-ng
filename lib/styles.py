@@ -9,8 +9,7 @@ class Web(object):
     It uses the library classes and functions according to what arguments are provided.
     """
 
-    #def style_web(self, args, websites, i_iface, m_iface, expSocket):
-    def style_web(self, args, websites, i_iface, m_iface, misc):
+    def style_web(self, args, websites, misc):
         """Handle Website Lists"""
         if args.covert:
             vp = VictimParameters(websites = websites, covert = args.covert)
@@ -20,9 +19,9 @@ class Web(object):
         ## Broadcast mode
         if not args.t:
             if (args.exclude_hosts is None):
-                ph = PacketHandler(misc, i = i_iface, victim_parameters = vp)
+                ph = PacketHandler(Misc = misc, i = args.i, victim_parameters = vp)
             else:
-                ph = PacketHandler(misc, i = i_iface, victim_parameters = vp, excluded = args.exclude_hosts)
+                ph = PacketHandler(Misc = misc, i = args.i, victim_parameters = vp, excluded = args.exclude_hosts)
 
         ## Targeted mode
         else:
@@ -32,15 +31,15 @@ class Web(object):
                 victims.append(v1)
 
             if (args.exclude_hosts is None):
-                ph = PacketHandler(misc, i = i_iface, victims = victims)
+                ph = PacketHandler(Misc = misc, i = args.i, victims = victims)
             else:
-                ph = PacketHandler(misc, i = i_iface, victims = victims, excluded = args.exclude_hosts)
+                ph = PacketHandler(Misc = misc, i = args.i, victims = victims, excluded = args.exclude_hosts)
 
-        if ("mon" in m_iface):
-            snif = Sniffer(ph, m = m_iface)
+        if 'mon' in args.m:
+            snif = Sniffer(ph, m = args.m)
             snif.threaded_sniff(args)
         else:
-            snif = Sniffer(ph, m = m_iface, filter = '')
+            snif = Sniffer(ph, m = args.m, filter = '')
             snif.threaded_sniff(args)
 
 
@@ -52,8 +51,7 @@ class Inject(object):
     It uses the library classes and functions according to what arguments are provided.
     """
 
-    #def style_inject(self, args, i_iface, m_iface, expSocket):
-    def style_inject(self, args, i_iface, m_iface, misc):
+    def style_inject(self, args, misc):
         """Handle injection without a targeted domain list"""
         ## Handle victim parameters
         if args.covert:
@@ -69,9 +67,9 @@ class Inject(object):
         ## Broadcast mode
         if not args.t:
             if (args.exclude_hosts is None):
-                ph = PacketHandler(misc, i = i_iface, victim_parameters = vp)
+                ph = PacketHandler(Misc = misc, i = args.i, victim_parameters = vp)
             else:
-                ph = PacketHandler(misc, i = i_iface, victim_parameters = vp, excluded = args.exclude_hosts)
+                ph = PacketHandler(Misc = misc, i = args.i, victim_parameters = vp, excluded = args.exclude_hosts)
 
         ## Targeted mode
         else:
@@ -81,36 +79,36 @@ class Inject(object):
                 victims.append(v1)
 
             if (args.exclude_hosts is None):
-                ph = PacketHandler(misc, i = i_iface, victims = victims)
+                ph = PacketHandler(misc = Misc, i = args.i, victims = victims)
             else:
-                ph = PacketHandler(misc, i = i_iface, victims = victims, excluded = args.exclude_hosts)
+                ph = PacketHandler(misc = Misc, i = args.i, victims = victims, excluded = args.exclude_hosts)
 
         ## Single packet injection logic
         if args.single:
-            if "mon" in m_iface:
-                snif = Sniffer(ph, m = m_iface)
+            if 'mon' in args.m:
+                snif = Sniffer(ph, m = args.m)
                 snif.threaded_sniff(args, True)
             else:
                 ## Broadcast mode
                 if not args.t:
-                    snif = Sniffer(ph, m = m_face, filter = '')
+                    snif = Sniffer(ph, m = args.m, filter = '')
 
                 ## Targeted mode
                 else:
-                    snif = Sniffer(ph, m = m_iface)
+                    snif = Sniffer(ph, m = args.m)
 
                 snif.threaded_sniff(args, True)
         else:
-            if ("mon" in m_iface):
-                snif = Sniffer(ph, m = m_iface)
+            if 'mon' in args.m:
+                snif = Sniffer(ph, m = args.m)
                 snif.threaded_sniff(args)
             else:
                 ## Broadcast mode
                 if not args.t:
-                    snif = Sniffer(ph, m = m_iface, filter = '')
+                    snif = Sniffer(ph, m = args.m, filter = '')
 
                 ## Targeted mode
                 else:
-                    snif = Sniffer(ph, m = m_iface)
+                    snif = Sniffer(ph, m = args.m)
 
                 snif.threaded_sniff(args)

@@ -10,14 +10,14 @@ class Sniffer(object):
     for packets received from scapy's sniff() function.
     """
 
-    def __init__(self,packethandler, *positional_parameters, **keyword_parameters):
+    def __init__(self, packethandler, *positional_parameters, **keyword_parameters):
         if ('filter' in keyword_parameters):
-                        self.filter = keyword_parameters['filter']
+            self.filter = keyword_parameters['filter']
         else:
             self.filter = None
 
         if ('m' in keyword_parameters):
-                        self.m = keyword_parameters['m']
+            self.m = keyword_parameters['m']
         else:
             self.m = None
 

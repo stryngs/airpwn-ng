@@ -52,7 +52,7 @@ class Injector(object):
                 pass
 
             ### Single packet exit point
-            ### Have to work on how to exit cleanly, instantiation is probably preventing...
+            ### Have to work on how to exit cleanly, instantiation is preventing?...
             if args.single:
                 #sys.stdout.write(bcolors.OKBLUE + "[*] Injecting Packet to victim " + vicmac + " (TOTAL: " + str(npackets) + " injected packets)\r\n" + bcolors.ENDC)
                 sys.stdout.write(bcolors.OKBLUE + "[*] Injecting Packet to victim " + bcolors.WARNING + vicmac + bcolors.OKBLUE + " (TOTAL: " + str(npackets) + " injected packets)\r" + bcolors.ENDC)

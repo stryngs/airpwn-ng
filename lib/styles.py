@@ -35,6 +35,7 @@ class Web(object):
             else:
                 ph = PacketHandler(Misc = misc, i = args.i, victims = victims, excluded = args.exclude_hosts)
 
+        ## Begin sniffing
         if 'mon' in args.m:
             snif = Sniffer(ph, m = args.m)
             snif.threaded_sniff(args)
@@ -83,32 +84,17 @@ class Inject(object):
             else:
                 ph = PacketHandler(misc = Misc, i = args.i, victims = victims, excluded = args.exclude_hosts)
 
-        ## Single packet injection logic
-        if args.single:
-            if 'mon' in args.m:
-                snif = Sniffer(ph, m = args.m)
-                snif.threaded_sniff(args, True)
-            else:
-                ## Broadcast mode
-                if not args.t:
-                    snif = Sniffer(ph, m = args.m, filter = '')
-
-                ## Targeted mode
-                else:
-                    snif = Sniffer(ph, m = args.m)
-
-                snif.threaded_sniff(args, True)
+        ## Begin sniffing
+        if 'mon' in args.m:
+            snif = Sniffer(ph, m = args.m)
+            snif.threaded_sniff(args, misc)
         else:
-            if 'mon' in args.m:
-                snif = Sniffer(ph, m = args.m)
-                snif.threaded_sniff(args)
+            ## Broadcast mode
+            if not args.t:
+                snif = Sniffer(ph, m = args.m, filter = '')
+
+            ## Targeted mode
             else:
-                ## Broadcast mode
-                if not args.t:
-                    snif = Sniffer(ph, m = args.m, filter = '')
+                snif = Sniffer(ph, m = args.m)
 
-                ## Targeted mode
-                else:
-                    snif = Sniffer(ph, m = args.m)
-
-                snif.threaded_sniff(args)
+            snif.threaded_sniff(args, misc)

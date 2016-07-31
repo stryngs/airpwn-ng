@@ -44,7 +44,7 @@ class Sniffer(object):
             sniff(iface = self.m, filter = self.filter, prn = lambda x: q.put(x), store = 0)
 
 
-    def threaded_sniff(self, args, single = False):
+    def threaded_sniff(self, args, misc):
         """This starts a Queue which receives packets and processes them.
         
         It uses the PacketHandler.process function.
@@ -68,7 +68,7 @@ class Sniffer(object):
                 try:
                     pkt = q.get(timeout = 1)
                     if pkt[Dot11].FCfield == 1:
-                        self.packethandler.process(self.m, pkt, single, args)
+                        self.packethandler.process(self.m, pkt, args, misc)
                         q.task_done()
                     else:
                         pass
@@ -79,7 +79,7 @@ class Sniffer(object):
             while True:
                 try:
                     pkt = q.get(timeout = 1)
-                    self.packethandler.process(self.m, pkt, single, args)
+                    self.packethandler.process(self.m, pkt, args, misc)
                     q.task_done()
                 except Empty:
                     #q.task_done()

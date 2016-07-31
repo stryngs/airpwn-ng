@@ -56,14 +56,12 @@ class PacketHandler(object):
             print "[ERROR] Please specify victim parameters or Victim List"
             exit(1)
 
-        if 'Misc' in keyword_parameters:
-            misc = keyword_parameters['Misc']
-            self.expSocket = misc.expSocket
-            self.single = misc.single
-            self.verbose = misc.verbose
+        if 'Args' in keyword_parameters:
+            args = keyword_parameters['Args']
+            self.single = args.single
+            self.verbose = args.v
 
         else:
-            self.expSocket = False
             self.single = False
             self.verbose = False
             
@@ -85,13 +83,15 @@ class PacketHandler(object):
                     except:
                         pass
 
-                ### Clean this nest
+                ### This logic can be cleaner/faster
+                ### regex -or- (mac check, then assume if try fails, it must be ip)
                 else:
+                    #print test
                     try:
-                        if (int(test[0])>0 and int(test[0]) < 256):
-                            if (int(test[0])>0 and int(test[0]) < 256):
-                                if (int(test[0])>0 and int(test[0]) < 256):
-                                    if (int(test[0])>0 and int(test[0]) < 256):
+                        if int(test[0])>0 and int(test[0]) < 256:
+                            if int(test[1])>0 and int(test[1]) < 256:
+                                if int(test[2])>0 and int(test[2]) < 256:
+                                    if int(test[3])>0 and int(test[3]) < 256:
                                         processed.add(item)
 
                     except:
@@ -402,7 +402,7 @@ class PacketHandler(object):
         return injection
 
 
-    def proc_injection(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, misc):
+    def proc_injection(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, args):
         """Process injection function using the PacketHandler.victims List.
         
         If it was set, to check if the packet belongs to any of the targets.
@@ -437,7 +437,7 @@ class PacketHandler(object):
 
                             #print injection
                             ### Broadcast injector is here
-                            self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.expSocket, misc)
+                            self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args)
 
                 else:
                     if (victim.mac is not None):
@@ -452,7 +452,7 @@ class PacketHandler(object):
                                     else:
                                         return 0
                                 #print injection
-                                self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.expSocket)
+                                self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args)
 
         else:
             if (self.victim_parameters is not None):
@@ -481,7 +481,7 @@ class PacketHandler(object):
                                         return 0
 
                                 #print injection
-                                self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.expSocket)
+                                self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args)
 
                     else:
                         if (victim.mac is not None):
@@ -497,7 +497,7 @@ class PacketHandler(object):
                                             return 0
 
                                     #print injection
-                                    self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.expSocket)
+                                    self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args)
 
             if (self.excluded is not None):
                 if (svrip in self.excluded):
@@ -523,7 +523,7 @@ class PacketHandler(object):
                                     return 0
 
                             #print injection
-                            self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.expSocket)
+                            self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args)
 
                 else:
                     if (victim.mac is not None):
@@ -545,10 +545,10 @@ class PacketHandler(object):
 
                                 #print injection
                                 #print host, filename
-                                self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, self.expSocket)
+                                self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args)
 
 
-    def process(self, interface, pkt, args, misc):
+    def process(self, interface, pkt, args):
         """Process packets coming from the sniffer.
         
         You can override the handler with one of your own,
@@ -564,7 +564,7 @@ class PacketHandler(object):
             try:
                 vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr = self.handle_default(pkt)
                 self.cookie_mgmt(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, args)
-                self.proc_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, misc)
+                self.proc_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, args)
             except:
                 return
  

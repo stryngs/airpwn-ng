@@ -9,7 +9,7 @@ class Web(object):
     It uses the library classes and functions according to what arguments are provided.
     """
 
-    def style_web(self, args, websites, misc):
+    def style_web(self, args, websites):
         """Handle Website Lists"""
         if args.covert:
             vp = VictimParameters(websites = websites, covert = args.covert)
@@ -19,9 +19,9 @@ class Web(object):
         ## Broadcast mode
         if not args.t:
             if (args.exclude_hosts is None):
-                ph = PacketHandler(Misc = misc, i = args.i, victim_parameters = vp)
+                ph = PacketHandler(Args = args, i = args.i, victim_parameters = vp)
             else:
-                ph = PacketHandler(Misc = misc, i = args.i, victim_parameters = vp, excluded = args.exclude_hosts)
+                ph = PacketHandler(Args = args, i = args.i, victim_parameters = vp, excluded = args.exclude_hosts)
 
         ## Targeted mode
         else:
@@ -31,9 +31,9 @@ class Web(object):
                 victims.append(v1)
 
             if (args.exclude_hosts is None):
-                ph = PacketHandler(Misc = misc, i = args.i, victims = victims)
+                ph = PacketHandler(Args = args, i = args.i, victims = victims)
             else:
-                ph = PacketHandler(Misc = misc, i = args.i, victims = victims, excluded = args.exclude_hosts)
+                ph = PacketHandler(Args = args, i = args.i, victims = victims, excluded = args.exclude_hosts)
 
         ## Begin sniffing
         if 'mon' in args.m:
@@ -52,7 +52,7 @@ class Inject(object):
     It uses the library classes and functions according to what arguments are provided.
     """
 
-    def style_inject(self, args, misc):
+    def style_inject(self, args):
         """Handle injection without a targeted domain list"""
         ## Handle victim parameters
         if args.covert:
@@ -68,9 +68,9 @@ class Inject(object):
         ## Broadcast mode
         if not args.t:
             if (args.exclude_hosts is None):
-                ph = PacketHandler(Misc = misc, i = args.i, victim_parameters = vp)
+                ph = PacketHandler(Args = args, i = args.i, victim_parameters = vp)
             else:
-                ph = PacketHandler(Misc = misc, i = args.i, victim_parameters = vp, excluded = args.exclude_hosts)
+                ph = PacketHandler(Args = args, i = args.i, victim_parameters = vp, excluded = args.exclude_hosts)
 
         ## Targeted mode
         else:
@@ -80,14 +80,14 @@ class Inject(object):
                 victims.append(v1)
 
             if (args.exclude_hosts is None):
-                ph = PacketHandler(misc = Misc, i = args.i, victims = victims)
+                ph = PacketHandler(Args = args, i = args.i, victims = victims)
             else:
-                ph = PacketHandler(misc = Misc, i = args.i, victims = victims, excluded = args.exclude_hosts)
+                ph = PacketHandler(Args = args, i = args.i, victims = victims, excluded = args.exclude_hosts)
 
         ## Begin sniffing
         if 'mon' in args.m:
             snif = Sniffer(ph, m = args.m)
-            snif.threaded_sniff(args, misc)
+            snif.threaded_sniff(args)
         else:
             ## Broadcast mode
             if not args.t:
@@ -97,4 +97,4 @@ class Inject(object):
             else:
                 snif = Sniffer(ph, m = args.m)
 
-            snif.threaded_sniff(args, misc)
+            snif.threaded_sniff(args)

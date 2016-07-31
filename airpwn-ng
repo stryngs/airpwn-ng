@@ -4,7 +4,6 @@ import logging, subprocess, os, sys, argparse, signal
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
 from lib.logger import Database, Tee as tee
-from lib.misc import Misc
 from lib.styles import Web, Inject
 from lib.victim import Victim
 from lib.visuals import bcolors
@@ -84,9 +83,6 @@ def main(args):
     i_iface = args.i
     injection = 0
     
-    ## Grab experiments
-    misc = Misc(args)
-    
     ## User printouts
     os.system('clear')
     print "\nairpwn-ng - The new and improved 802.11 packet injector\n"
@@ -119,12 +115,12 @@ def main(args):
     if injection == 1:
         ## Injection file used
         i = Inject()
-        i.style_inject(args, misc)
+        i.style_inject(args)
 
     else:
         ## Website file used
         w = Web()
-        w.style_web(args, websites, misc)
+        w.style_web(args, websites)
 
 
 def menu():
@@ -152,10 +148,6 @@ def menu():
         print '  -b'
         print '    Sniff cookies both ways'
         print '    ***Packet injection becomes slower***'
-        print ''
-        print '  -e'
-        print '    Experimental single socket injection'
-        print '    ***Packet injection becomes faster***'
         print ''
         print '  -i <interface>'
         print '     Your injection interface'
@@ -195,7 +187,6 @@ if __name__ == '__main__':
     group.add_argument('--cm', metavar = '<filename>', help = 'Extract cookies from the DB')
 
     parser.add_argument('-b', action = 'store_true', help = 'Sniff both ways')
-    parser.add_argument('-e', action = 'store_true', help = 'Experimental socket patch')
     parser.add_argument('-i', metavar = '<interface>', help = 'Your injection interface')
     parser.add_argument('-m', metavar = '<interface>', help = 'Your monitor interface')
     parser.add_argument('-o', metavar = '<outfile>', help = 'Output File')

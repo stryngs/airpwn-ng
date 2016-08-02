@@ -45,6 +45,7 @@ class Sniffer(object):
 
 
     def handler(self, q, m, pkt, args):
+        """This function exists solely to reduce lines of code"""
         self.packethandler.process(m, pkt, args)
         q.task_done()
 

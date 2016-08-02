@@ -44,6 +44,11 @@ class Sniffer(object):
             sniff(iface = self.m, filter = self.filter, prn = lambda x: q.put(x), store = 0)
 
 
+    def handler(self, q, m, pkt, args):
+        self.packethandler.process(m, pkt, args)
+        q.task_done()
+
+
     def threaded_sniff(self, args):
         """This starts a Queue which receives packets and processes them.
         
@@ -63,24 +68,56 @@ class Sniffer(object):
         sniffer = Thread(target = self.sniff, args = (q,))
         sniffer.daemon = True
         sniffer.start()
-        if args.b:
+
+        ## Deal with only BSSID filtering
+        if args.bssid and not args.b:
+            print 'bssid only'
             while True:
                 try:
                     pkt = q.get(timeout = 1)
-                    if pkt[Dot11].FCfield == 1:
-                        self.packethandler.process(self.m, pkt, args)
-                        q.task_done()
+                    if pkt[Dot11].addr3 == args.bssid:
+                        self.handler(q, self.m, pkt, args)
                     else:
                         pass
                 except Empty:
                     #q.task_done()
                     pass
-        else:
+
+        ## Deal with only no speedpatch
+        elif args.b and not args.bssid:
+            print 'speedpatch only'
             while True:
                 try:
                     pkt = q.get(timeout = 1)
-                    self.packethandler.process(self.m, pkt, args)
-                    q.task_done()
+                    if pkt[Dot11].FCfield == 1:
+                        self.handler(q, self.m, pkt, args)
+                    else:
+                        pass
+                except Empty:
+                    #q.task_done()
+                    pass
+
+        ## Deal with BSSID filtering and no speedpatch
+        elif args.bssid and args.b:
+            print 'bssid and speedpatch'
+            while True:
+                try:
+                    pkt = q.get(timeout = 1)
+                    if pkt[Dot11].addr3 == args.bssid and pkt[Dot11].FCfield == 1:
+                        self.handler(q, self.m, pkt, args)
+                    else:
+                        pass
+                except Empty:
+                    #q.task_done()
+                    pass
+
+        ## Deal with anything else
+        else:
+            print 'anything else'
+            while True:
+                try:
+                    pkt = q.get(timeout = 1)
+                    self.handler(q, self.m, pkt, args)
                 except Empty:
                     #q.task_done()
                     pass

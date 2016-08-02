@@ -72,7 +72,6 @@ class Sniffer(object):
 
         ## Deal with only BSSID filtering
         if args.bssid and not args.b:
-            print 'bssid only'
             while True:
                 try:
                     pkt = q.get(timeout = 1)
@@ -86,7 +85,6 @@ class Sniffer(object):
 
         ## Deal with only no speedpatch
         elif args.b and not args.bssid:
-            print 'speedpatch only'
             while True:
                 try:
                     pkt = q.get(timeout = 1)
@@ -100,7 +98,6 @@ class Sniffer(object):
 
         ## Deal with BSSID filtering and no speedpatch
         elif args.bssid and args.b:
-            print 'bssid and speedpatch'
             while True:
                 try:
                     pkt = q.get(timeout = 1)
@@ -114,7 +111,6 @@ class Sniffer(object):
 
         ## Deal with anything else
         else:
-            print 'anything else'
             while True:
                 try:
                     pkt = q.get(timeout = 1)

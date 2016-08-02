@@ -209,5 +209,5 @@ if __name__ == '__main__':
     signal_handler = crtlC(args)
     signal.signal(signal.SIGINT, signal_handler)
 
-    print args
+    ## Launch
     main(args)

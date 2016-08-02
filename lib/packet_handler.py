@@ -56,15 +56,15 @@ class PacketHandler(object):
             print "[ERROR] Please specify victim parameters or Victim List"
             exit(1)
 
-        if 'Args' in keyword_parameters:
-            args = keyword_parameters['Args']
-            self.single = args.single
-            self.verbose = args.v
-
+        ## Argument handling
+        args = keyword_parameters['Args']
+        self.single = args.single
+        self.verbose = args.v
+        if args.trigger is None:
+            self.trigger = 'GET /'
         else:
-            self.single = False
-            self.verbose = False
-            
+            self.trigger = args.trigger
+
         self.newvictims = []
         self.injector = Injector(self.i)
 
@@ -181,7 +181,7 @@ class PacketHandler(object):
                         if (ip2 == svrip):
                             BLOCK_HOSTS.remove((ip2, seq2))
 
-            if 'GET /' in request:
+            if self.trigger in request:
                 if self.verbose and request:
                     print '\n\n%s' % request
                 pass

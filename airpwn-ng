@@ -133,14 +133,14 @@ def menu():
         print '**                 Launcher Choices                 **'
         print '******************************************************'
         print '  Choose from 1 of the following:'
+        print '    --cm'
+        print '      Extract cookies from the DB'
+        print ''
         print '    --injection <filename>'
         print '      File with your injection code'
         print ''
         print '    --websites <filename>'
         print '      List of websites to sniff cookies from'
-        print ''
-        print '    --cm'
-        print '      Extract cookies from the DB'
         print ''
         print '******************************************************'
         print '**                Optional Arguments                **'
@@ -164,17 +164,20 @@ def menu():
         print '  -v'
         print '    Print packet load'
         print ''
-        print '  --exclude-hosts [<host host>]'
-        print '    Hosts to exclude from injection'
+        print '  --bssid'
+        print '    Target BSSID'
         print ''
         print '  --covert'
         print '    Hide iFrames inside the requested page'
         print ''
-        print ' --trigger <string>'
-        print '    String to trigger injection on [Default is: GET /]'
+        print '  --exclude-hosts [<host host>]'
+        print '    Hosts to exclude from injection'
         print ''
         print '  --single'
         print '    Beta method for beef hooking'
+        print ''
+        print '  --trigger <string>'
+        print '    String to trigger injection on [Default is: GET /]'
         sys.exit(0)
 
 
@@ -185,9 +188,9 @@ if __name__ == '__main__':
 
     group = parser.add_mutually_exclusive_group(required = True)
 
+    group.add_argument('--cm', metavar = '<filename>', help = 'Extract cookies from the DB')
     group.add_argument('--injection', metavar = '<filename>', help = 'File with your injection code')
     group.add_argument('--websites', metavar = '<filename>', help = 'List of websites to sniff cookies from')
-    group.add_argument('--cm', metavar = '<filename>', help = 'Extract cookies from the DB')
 
     parser.add_argument('-b', action = 'store_true', help = 'Sniff both ways')
     parser.add_argument('-i', metavar = '<interface>', help = 'Your injection interface')
@@ -195,10 +198,11 @@ if __name__ == '__main__':
     parser.add_argument('-o', metavar = '<outfile>', help = 'Output File')
     parser.add_argument('-t', nargs = '*', metavar = '<MAC address>', help = 'Target MAC addresses')
     parser.add_argument('-v', action = 'store_true', help = 'Verbose packet output')
-    parser.add_argument('--exclude-hosts', nargs = '*', metavar = '<host>', help = 'Space separated list of hosts/IP addresses to exclude from injection')
+    parser.add_argument('--bssid', metavar = '<tgt BSSID>', help = 'Target BSSID')
     parser.add_argument('--covert', action = 'store_true', help = 'Hides cookie grabbing iframes inside the requested page')
-    parser.add_argument('--trigger', metavar = '<trigger>', help = 'Trigger string for injection')
+    parser.add_argument('--exclude-hosts', nargs = '*', metavar = '<host>', help = 'Space separated list of hosts/IP addresses to exclude from injection')    
     parser.add_argument('--single', action = 'store_true', help = 'Single packet injection attempt')
+    parser.add_argument('--trigger', metavar = '<trigger>', help = 'Trigger string for injection')
     args = parser.parse_args()
 
     ## ADD GLOBAL SIGNAL HANDLER

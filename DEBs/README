@@ -1,0 +1,10 @@
+In this directory you will find pre-made .debs.  Building libtins and dot11decrypt, while trivial, can sometimes be "trying"...
+
+So, we did the hardwork for you and built the .debs; feel free to use them or do it yourself.
+
+What we don't want to hear, is folks complaining that our .debs are not built the "proper" way.  If you don't like how we did it, do it yourself.
+
+In src/ you will find the master files we downloaded from github on 2 August 2016; from there we built.
+
+This is a new structure and work in progress, so only the 64-bit versions should be considered as the "latest and greatest".  While the other architectures should work, do not consider them "solid" until they have been rebuilt accordingly.
+

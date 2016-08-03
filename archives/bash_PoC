@@ -1,60 +1,5 @@
 #!/usr/bin/env bash
 
-##~~~~~~~~~~~~~~~~~~~~~~~~~ File and License Info ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
-## Filename: airpwn-ng
-## Copyright (C) <2015>  <stryngs>
-
-##  This program is free software: you can redistribute it and/or modify
-##  it under the terms of the GNU General Public License as published by
-##  the Free Software Foundation, either version 3 of the License, or
-##  (at your option) any later version.
-
-##  This program is distributed in the hope that it will be useful,
-##  but WITHOUT ANY WARRANTY; without even the implied warranty of
-##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##  GNU General Public License for more details.
-
-##  You should have received a copy of the GNU General Public License
-##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
-
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Legal Notice ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
-## This script was written with the intent for Legal PenTesting uses only.
-## Make sure that you have consent prior to use on a device other than your own.
-## Doing so without the above is a violation of Federal/State Laws within the United States of America.
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
-
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Thoughts... ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
-## I consider any script/program I write to always be a work in progress.
-## Please send any tips/tricks/streamlining ideas/comments/kudos via email to: info [AT] ethicalreporting.org
-
-## Comments written with a triple # are notes to myself, please ignore them.
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
-
-
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~ Credits and Kudos ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
-## First and foremost, to God above for giving me the abilities I have, Amen.
-
-## Kudos to my wife for always standing by my side, having faith in me, and showing the greatest of patience for my obsession with hacking.
-
-## toast and his excellent work with the original concept of airpwn.  airpwn-ng wouldn't exist without the original work done by him...
-## Thank you for allowing me to have the privilege of the original name.  I hope this script lives up to what it should be!
-
-## The wireshark community for it's excellent String Matching Capture Filter Generator
-	# https://www.wireshark.org/tools/string-cf.html
-
-## Jack64 for his excellent help and eagerness to improve this.  Thank you for the help mate...
-
-## blind for the excellent work at finding the wireshark URL that helped with parsing the GET / function for airpwn-ng
-
-## xmnr for the idea to issue a nice of -20 throughout the script
-
-## Kryczek for the idea to use airtun-ng as the last mile solution for injection
-
-## The "Community" for always working towards improving the existing.....
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
-
-
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~ Repetitious Functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~##
 mon--()
 {
@@ -183,3 +128,57 @@ else
 fi
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
 
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~ File and License Info ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
+## Filename: airpwn-ng
+## Copyright (C) <2015>  <stryngs>
+
+##  This program is free software: you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+
+##  You should have received a copy of the GNU General Public License
+##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Legal Notice ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
+## This script was written with the intent for Legal PenTesting uses only.
+## Make sure that you have consent prior to use on a device other than your own.
+## Doing so without the above is a violation of Federal/State Laws within the United States of America.
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Thoughts... ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
+## I consider any script/program I write to always be a work in progress.
+## Please send any tips/tricks/streamlining ideas/comments/kudos via email to: info [AT] ethicalreporting.org
+
+## Comments written with a triple # are notes to myself, please ignore them.
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
+
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~ Credits and Kudos ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##
+## First and foremost, to God above for giving me the abilities I have, Amen.
+
+## Kudos to my wife for always standing by my side, having faith in me, and showing the greatest of patience for my obsession with hacking.
+
+## toast and his excellent work with the original concept of airpwn.  airpwn-ng wouldn't exist without the original work done by him...
+## Thank you for allowing me to have the privilege of the original name.  I hope this script lives up to what it should be!
+
+## The wireshark community for it's excellent String Matching Capture Filter Generator
+	# https://www.wireshark.org/tools/string-cf.html
+
+## Jack64 for his excellent help and eagerness to improve this.  Thank you for the help mate...
+
+## blind for the excellent work at finding the wireshark URL that helped with parsing the GET / function for airpwn-ng
+
+## xmnr for the idea to issue a nice of -20 throughout the script
+
+## Kryczek for the idea to use airtun-ng as the last mile solution for injection
+
+## The "Community" for always working towards improving the existing.....
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##

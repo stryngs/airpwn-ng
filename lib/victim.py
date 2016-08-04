@@ -1,4 +1,4 @@
-from lib.logger import Database, Logfile
+from lib.logger import Database, cookieLogger
 from lib.visuals import Bcolors
 
 class Victim(object):
@@ -12,7 +12,7 @@ class Victim(object):
     def __init__(self, *positional_parameters, **keyword_parameters):
         self.cookies = []
         self.db = Database('cookies.sqlite')
-        self.log = Logfile()
+        self.log = cookieLogger()
 
         if ('ip' in keyword_parameters):
             self.ip = keyword_parameters['ip']

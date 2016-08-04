@@ -61,9 +61,9 @@ class Database(object):
                 print 'cookie-grab_%s.ck created!' % row
 
 
-### Should redo naming schema now that Tee() exists
-class Logfile(object):
-    """Plaintext logs"""
+
+class cookieLogger(object):
+    """Plaintext cookie logs"""
     
     def __init__(self):
         ## Plaintext log of cookies

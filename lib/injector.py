@@ -1,5 +1,5 @@
 from lib.headers import Headers
-from lib.visuals import bcolors
+from lib.visuals import Bcolors
 from scapy.all import *
 import fcntl, socket, struct, sys, time
 
@@ -34,8 +34,8 @@ class Injector(object):
         """Inject function performs the actual injection using scapy."""
         global npackets
         npackets += 1
-        ###sys.stdout.write(bcolors.OKBLUE + "[*] Injecting Packet to victim " + vicmac + " (TOTAL: " + str(npackets) + " injected packets)\r" + bcolors.ENDC)
-        sys.stdout.write(bcolors.OKBLUE + "[*] Injecting Packet to victim " + bcolors.WARNING + vicmac + bcolors.OKBLUE + " (TOTAL: " + str(npackets) + " injected packets)\r" + bcolors.ENDC)
+        ###sys.stdout.write(Bcolors.OKBLUE + "[*] Injecting Packet to victim " + vicmac + " (TOTAL: " + str(npackets) + " injected packets)\r" + Bcolors.ENDC)
+        sys.stdout.write(Bcolors.OKBLUE + "[*] Injecting Packet to victim " + Bcolors.WARNING + vicmac + Bcolors.OKBLUE + " (TOTAL: " + str(npackets) + " injected packets)\r" + Bcolors.ENDC)
         sys.stdout.flush()
         if ("mon" in self.interface):
             hdr = Headers()
@@ -54,8 +54,8 @@ class Injector(object):
             ### Single packet exit point
             ### Have to work on how to exit cleanly, instantiation is preventing?...
             if args.single:
-                #sys.stdout.write(bcolors.OKBLUE + "[*] Injecting Packet to victim " + vicmac + " (TOTAL: " + str(npackets) + " injected packets)\r\n" + bcolors.ENDC)
-                sys.stdout.write(bcolors.OKBLUE + "[*] Injecting Packet to victim " + bcolors.WARNING + vicmac + bcolors.OKBLUE + " (TOTAL: " + str(npackets) + " injected packets)\r" + bcolors.ENDC)
+                #sys.stdout.write(Bcolors.OKBLUE + "[*] Injecting Packet to victim " + vicmac + " (TOTAL: " + str(npackets) + " injected packets)\r\n" + Bcolors.ENDC)
+                sys.stdout.write(Bcolors.OKBLUE + "[*] Injecting Packet to victim " + Bcolors.WARNING + vicmac + Bcolors.OKBLUE + " (TOTAL: " + str(npackets) + " injected packets)\r" + Bcolors.ENDC)
                 sys.exit(0)
 
         else:

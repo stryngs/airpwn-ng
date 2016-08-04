@@ -1,5 +1,5 @@
 from lib.logger import Database, Logfile
-from lib.visuals import bcolors
+from lib.visuals import Bcolors
 
 class Victim(object):
     """Victim class is your target, define it by setting ip or mac address.
@@ -88,7 +88,7 @@ class Victim(object):
 
         if (not exists and cookie[1] != "NONE"):
             print ""
-            print bcolors.OKGREEN + "[+] New cookie detected for: %s -- %s" % (cookie[0], self.mac) + bcolors.ENDC
+            print Bcolors.OKGREEN + "[+] New cookie detected for: %s -- %s" % (cookie[0], self.mac) + Bcolors.ENDC
             #print cookie
             ### Trace why no ip...
             #print self.ip
@@ -113,12 +113,12 @@ class Victim(object):
                 self.cookies.append(cookie)
                 if (self.ip is not None):
                     print ""
-                    #print bcolors.WARNING + "[!] No cookie on client %s for %s" % (self.ip, cookie[0]) + bcolors.ENDC
-                    print bcolors.WARNING + "[!] No cookie on client " + bcolors.OKBLUE + "%s" % (self.ip) + bcolors.WARNING + " for " + bcolors.OKBLUE + "%s" % (cookie[0]) + bcolors.ENDC
+                    #print Bcolors.WARNING + "[!] No cookie on client %s for %s" % (self.ip, cookie[0]) + Bcolors.ENDC
+                    print Bcolors.WARNING + "[!] No cookie on client " + Bcolors.OKBLUE + "%s" % (self.ip) + Bcolors.WARNING + " for " + Bcolors.OKBLUE + "%s" % (cookie[0]) + Bcolors.ENDC
                 else:
                     print ""
-                    #print bcolors.WARNING + "[!] No cookie on client %s for %s" % (self.mac, cookie[0]) + bcolors.ENDC
-                    print bcolors.WARNING + "[!] No cookie on client " + bcolors.OKBLUE + "%s" % (self.ip) + bcolors.WARNING + " for " + bcolors.OKBLUE + "%s" % (cookie[0]) + bcolors.ENDC
+                    #print Bcolors.WARNING + "[!] No cookie on client %s for %s" % (self.mac, cookie[0]) + Bcolors.ENDC
+                    print Bcolors.WARNING + "[!] No cookie on client " + Bcolors.OKBLUE + "%s" % (self.ip) + Bcolors.WARNING + " for " + Bcolors.OKBLUE + "%s" % (cookie[0]) + Bcolors.ENDC
 
 
     def add_cookie(self, cookie, args):

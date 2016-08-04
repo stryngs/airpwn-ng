@@ -1,6 +1,6 @@
 import os
 
-class bcolors(object):
+class Bcolors(object):
     """Define the color schema"""
 
     HEADER = '\033[95m'
@@ -14,7 +14,7 @@ class bcolors(object):
 
 
 
-class pager(object):
+class Pager(object):
     """Homebrew paging"""
     def __init__(self):
         self.tHeight, self.tWidth = os.popen('stty size', 'r').read().split()

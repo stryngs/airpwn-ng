@@ -6,15 +6,15 @@ from scapy.all import *
 from lib.logger import Database, Tee as tee
 from lib.styles import Web, Inject
 from lib.victim import Victim
-from lib.visuals import bcolors, pager
+from lib.visuals import Bcolors, Pager
 
 def crtlC(args):
     """Handle CTRL+C."""
     def tmp(signal, frame):
-        print(bcolors.FAIL + '\n[!] Stopping injection and exiting airpwn-ng ...' + bcolors.ENDC)
-        print(bcolors.OKGREEN + '\n[+] Cookies stored to ' + bcolors.WARNING + 'cookies.log ' + bcolors.OKGREEN +  'and ' + bcolors.WARNING + 'cookies.sqlite' + bcolors.ENDC)
+        print(Bcolors.FAIL + '\n[!] Stopping injection and exiting airpwn-ng ...' + Bcolors.ENDC)
+        print(Bcolors.OKGREEN + '\n[+] Cookies stored to ' + Bcolors.WARNING + 'cookies.log ' + Bcolors.OKGREEN +  'and ' + Bcolors.WARNING + 'cookies.sqlite' + Bcolors.ENDC)
         if args.o:
-            print(bcolors.OKGREEN + '\n[+] Output log stored to ' + bcolors.WARNING + '%s' + bcolors.ENDC) % args.o
+            print(Bcolors.OKGREEN + '\n[+] Output log stored to ' + Bcolors.WARNING + '%s' + Bcolors.ENDC) % args.o
         sys.exit(0)
     return tmp
 
@@ -27,9 +27,9 @@ def injection_check(args):
             f = open (args.injection, 'r')
             f.close()
         except:
-            print bcolors.FAIL + "[!] Selected injection file", args.injection, "does not exist." + bcolors.ENDC
+            print Bcolors.FAIL + "[!] Selected injection file", args.injection, "does not exist." + Bcolors.ENDC
             exit(1)
-        print bcolors.OKGREEN+"[+] Loaded injection file", args.injection + bcolors.ENDC
+        print Bcolors.OKGREEN+"[+] Loaded injection file", args.injection + Bcolors.ENDC
         injection = 1
         websites = None
         return injection, websites
@@ -40,12 +40,12 @@ def injection_check(args):
             f = open(args.websites, 'r')
             f.close()
         except:
-            print bcolors.FAIL + "[!] Selected websites file", args.websites, "does not exist." + bcolors.ENDC
+            print Bcolors.FAIL + "[!] Selected websites file", args.websites, "does not exist." + Bcolors.ENDC
             exit(1)
         injection = 0
         websites = load_websites_targeted(args.websites)
         for website in websites:
-            print bcolors.OKGREEN + "[+] Loaded target website ", website + bcolors.ENDC
+            print Bcolors.OKGREEN + "[+] Loaded target website ", website + Bcolors.ENDC
         return injection, websites
 
 
@@ -87,9 +87,9 @@ def main(args):
     os.system('clear')
     print "\nairpwn-ng - The new and improved 802.11 packet injector\n"
     if ("mon" in m_iface and m_iface != i_iface):
-        print bcolors.WARNING + "[!] It appears you are using a monitor mode interface as your monitoring input. If you are attacking open wireless networks, please use the same monitoring interface with -i for better performance." + bcolors.ENDC
+        print Bcolors.WARNING + "[!] It appears you are using a monitor mode interface as your monitoring input. If you are attacking open wireless networks, please use the same monitoring interface with -i for better performance." + Bcolors.ENDC
     if ("mon" not in m_iface):
-        print bcolors.WARNING + "[!] It appears your are trying to attack a WEP/WPA protected network. Please ensure -m is your dot11 tap interface and that -i is connected to the target AP." + bcolors.ENDC
+        print Bcolors.WARNING + "[!] It appears your are trying to attack a WEP/WPA protected network. Please ensure -m is your dot11 tap interface and that -i is connected to the target AP." + Bcolors.ENDC
 
     ### NOT IMPLEMENTED YET
     ## Whitelist checks
@@ -102,15 +102,15 @@ def main(args):
 
     if args.t is None:
         ## Broadcast mode
-        print bcolors.WARNING + "[!] You are starting your attack in broadcast mode. This means you will inject packets into all clients you are able to detect. Use with caution." + bcolors.ENDC
+        print Bcolors.WARNING + "[!] You are starting your attack in broadcast mode. This means you will inject packets into all clients you are able to detect. Use with caution." + Bcolors.ENDC
     else:
         ## Targeted mode
         if (len(args.t) == 0):
-            print bcolors.WARNING + "[!] You must specify at least one target MAC address with -t for targeted mode"
+            print Bcolors.WARNING + "[!] You must specify at least one target MAC address with -t for targeted mode"
             exit(1)
         else:
             for target in args.t:
-                print bcolors.OKGREEN + "[+] Adding target", target + bcolors.ENDC
+                print Bcolors.OKGREEN + "[+] Adding target", target + Bcolors.ENDC
 
     if injection == 1:
         ## Injection file used

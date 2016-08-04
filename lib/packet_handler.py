@@ -236,7 +236,7 @@ class PacketHandler(object):
 
             else:
                 if (cookie[0] is not None and cookie[1] is None):
-                    #print bcolors.WARNING + "[!] No cookie found for", cookie[0] + bcolors.ENDC
+                    #print Bcolors.WARNING + "[!] No cookie found for", cookie[0] + Bcolors.ENDC
                     newcookie = [cookie[0], "NONE"]
                     cookie = newcookie
                     for victim in self.newvictims:
@@ -290,7 +290,7 @@ class PacketHandler(object):
 
             else:
                 if (cookie[0] is not None and cookie[1] is None):
-                    #print bcolors.WARNING + "[!] Victim ", vicmac, "cookie not found for website", cookie[0] + bcolors.ENDC
+                    #print Bcolors.WARNING + "[!] Victim ", vicmac, "cookie not found for website", cookie[0] + Bcolors.ENDC
                     newcookie = [cookie[0], "NONE"]
                     cookie = newcookie
                     for victim in self.victims:
@@ -339,7 +339,7 @@ class PacketHandler(object):
 
                 else:
                     if (cookie[0] is not None and cookie[1] is None):
-                        #print bcolors.WARNING + "[!] No cookie found for", cookie[0] + bcolors.ENDC
+                        #print Bcolors.WARNING + "[!] No cookie found for", cookie[0] + Bcolors.ENDC
                         newcookie = [cookie[0], "NONE"]
                         cookie = newcookie
                         for victim in self.newvictims:

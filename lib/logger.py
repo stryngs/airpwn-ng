@@ -12,13 +12,15 @@ class Database(object):
         self.db.execute("CREATE TABLE IF NOT EXISTS ip2mac(ip TEXT, mac TEXT, UNIQUE(ip, mac))")
         self.db.execute("CREATE TABLE IF NOT EXISTS cookies(mac TEXT, ip TEXT, dm TEXT, ck TEXT, UNIQUE(mac, ip, dm, ck))")
 
+
     def sqlite_cookies(self, ip, mac, dm, cookie):
         """Database method for using sqlite to store cookies"""
         with self.con:
             self.db.execute("INSERT OR IGNORE INTO ip2mac VALUES(?, ?);", (ip, mac))
             self.db.execute("INSERT OR IGNORE INTO cookies VALUES(?, ?, ?, ?);", (mac, ip, dm, cookie))
 
-    def extract_cookies(self):
+
+    def cookieExtractor(self):
         """Database method for parsing stored cookies
         Requires Cookies Manager+ (v1.7) for import
 
@@ -69,6 +71,7 @@ class cookieLogger(object):
         ## Plaintext log of cookies
         self.cFile = open('cookies.log', 'w')
 
+
     def cookies(self, ip, mac, dm, cookie):
         """Method for storing plaintext cookie sniffs"""
         self.cFile.write(ip + '\n' + mac + '\n' + dm + '\n' + cookie + '\n\n')
@@ -81,15 +84,18 @@ class Tee(object):
         self.fd1 = _fd1
         self.fd2 = _fd2
 
+
     def __del__(self) :
         if self.fd1 != sys.stdout and self.fd1 != sys.stderr :
             self.fd1.close()
         if self.fd2 != sys.stdout and self.fd2 != sys.stderr :
             self.fd2.close()
 
+
     def write(self, text) :
         self.fd1.write(text)
         self.fd2.write(text)
+
 
     def flush(self) :
         self.fd1.flush()

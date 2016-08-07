@@ -30,11 +30,10 @@ class Injector(object):
 
 
     ### Should be able to dict this?
-    def inject(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args):
+    def inject(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args, procTimerStart, procTimerEnd):
         """Inject function performs the actual injection using scapy."""
         global npackets
         npackets += 1
-        ###sys.stdout.write(Bcolors.OKBLUE + "[*] Injecting Packet to victim " + vicmac + " (TOTAL: " + str(npackets) + " injected packets)\r" + Bcolors.ENDC)
         sys.stdout.write(Bcolors.OKBLUE + "[*] Injecting Packet to victim " + Bcolors.WARNING + vicmac + Bcolors.OKBLUE + " (TOTAL: " + str(npackets) + " injected packets)\r" + Bcolors.ENDC)
         sys.stdout.flush()
         if ("mon" in self.interface):
@@ -48,6 +47,10 @@ class Injector(object):
 
             try:
                 sendp(packet, iface = self.interface, verbose = 0)
+                if args.d:
+                    print '\nProcess Began: %f' % procTimerStart
+                    print 'Process Ended: %f' % procTimerEnd
+                    print 'Process Delta: %f' % (procTimerEnd - procTimerStart)
             except:
                 pass
 
@@ -69,6 +72,11 @@ class Injector(object):
 
             try:
                 sendp(packet,iface = self.interface, verbose = 0)
+                if args.d:
+                    print '\nProcess Began: %f' % procTimerStart
+                    print 'Process Ended: %f' % procTimerEnd
+                    print 'Process Delta: %f' % (procTimerEnd - procTimerStart)
+                
             except:
                 pass
 

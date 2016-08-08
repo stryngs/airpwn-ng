@@ -144,6 +144,9 @@ def menu():
         txt += '    Sniff cookies both ways\n'
         txt += '    ***Packet injection becomes slower***\n'
         txt += '\n'
+        txt += '  -d\n'
+        txt += '    Enable debugging mode\n'        
+        txt += '\n'
         txt += '  -i <interface>\n'
         txt += '     Your injection interface\n'
         txt += '\n'
@@ -174,7 +177,7 @@ def menu():
         txt += '  --trigger <string>\n'
         txt += '    String to trigger injection on [Default is: GET /]\n\n'
 
-        viewer = pager()
+        viewer = Pager()
         viewer.scroll(txt)
         sys.exit(0)
 

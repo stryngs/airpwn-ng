@@ -76,6 +76,7 @@ class Injector(object):
                 packet = Ether(src = self.getHwAddr(self.interface), dst = vicmac)/IP(dst = vicip, src = svrip)/TCP(flags = "FA", sport = int(svrport), dport = int(vicport), seq = int(seqnum), ack = int(acknum), options = [('NOP', None), ('NOP', None), ('Timestamp', ((round(time.time()), 0)))])/Raw(load = headers + injection)
 
             try:
+                print packet.show()
                 sendp(packet,iface = self.interface, verbose = 0)
                 injectTimerEnd = time.time()
                 if args.d:

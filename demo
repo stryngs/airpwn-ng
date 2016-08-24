@@ -1,0 +1,76 @@
+#!/usr/bin/python2.7
+
+import logging
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+from rc4 import rc4
+from lib.crypto import Wep
+from scapy.all import *
+
+def fire(num, pkts, keyText = '0123456789'):
+    """Helps to follow along a decryption for airpwn-ng purposes
+    Mod keyText as you see fit
+    Do:
+    x = fire(...)
+    x
+    """
+    ePkt = pkts[num].copy()
+    fullStream, stream, iVal, seed = crypto.decoder(ePkt, keyText)
+    return crypto.deBuilder(ePkt, fullStream)
+    
+
+crypto = Wep()
+
+### Example of Decoding
+keyText = '0123456789'
+wepICMP = rdpcap('work-in-progress/pkt-coding/PCAPs/wep_pings.pcap')
+openICMP = rdpcap('work-in-progress/pkt-coding/PCAPs/open_pings.pcap')
+
+## This is our packet grabbed via scapy on wlan0mon
+ePkt = wepICMP[3].copy()
+
+## This is a decoded wepdata string
+fullStream, stream, iVal, seed = crypto.decoder(ePkt, keyText)
+print 'decoder ran'
+
+## This is our newly minted packet!
+### Of note, I don't think my NIC handles ICV properly?
+### len() anything openICMP[N][LLC] where N is 0-3: 96
+### len() anything wepICMP[N][Dot11WEP].wepdata where N is 0-3: 96
+
+### Here is a piece of the broken NIC patch?
+decodedPacket = crypto.deBuilder(ePkt, fullStream)
+#decodedPacket = crypto.deBuilder(ePkt, stream)
+print 'deBuilder ran\n'
+
+
+### We do our thing, decide we want to trigger on decodedPacket.......
+### Keep in mind, this is a LAN style attack, k?
+### Will have to mod for actual airpwn-ng usage
+### Go ahead and flip whatever bits for from/to-ds, mac, etc..
+
+
+### Example of Encoding
+## Take decodedPacket and copy it for use outbound
+#outPacket = decodedPacket.copy()
+
+## Encode the LLC layer via rc4
+stream, wepICV = crypto.encoder(decodedPacket, iVal, keyText)
+print '\nencoder ran'
+
+## This is our newly minted packet!
+outPacket = crypto.enBuilder(decodedPacket, stream, iVal, wepICV)
+print 'enBuilder ran\n'
+
+## Display results
+print 'Original:'
+print ePkt[Dot11WEP].show()
+print ''
+print 'New:'
+print outPacket[Dot11WEP].show()
+print ''
+print 'wepdata compare:'
+print ePkt[Dot11WEP].wepdata == outPacket[Dot11WEP].wepdata
+print ''
+print 'icv compare:'
+print ePkt[Dot11WEP].icv == outPacket[Dot11WEP].icv
+

@@ -51,13 +51,15 @@ print ''
 #iVal = raw_input()
 #if not iVal:
     #iVal = '\xba0\x0e'
-iVal = ePkt[Dot11WEP].iv
+#iVal = ePkt[Dot11WEP].iv
+iVal = binascii.hexlify(ePkt[Dot11WEP].iv)
 
 ## Input the password
 #keyText = raw_input('password? [0123456789] -- Enter accepts [] val\n')
 #if not keyText:
     #keyText = binascii.unhexlify('0123456789')
-keyText = binascii.unhexlify('0123456789')
+#keyText = binascii.unhexlify('0123456789')
+keyText = '0123456789'
 #else:
     #keyText = binascii.unhexlify(keyText)
 
@@ -66,7 +68,8 @@ print ''
 #print repr(keyText)
 
 ## Concatenate password to IV
-seed = iVal + keyText
+#seed = iVal + keyText
+seed = binascii.unhexlify(iVal + keyText)
 arc4 = Engine(seed)
 
 if option == 'e':

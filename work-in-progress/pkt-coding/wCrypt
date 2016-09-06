@@ -1,0 +1,96 @@
+#!/usr/bin/python2.7
+
+import binascii, logging
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+from scapy.all import *
+from lib.convos import Conversions
+from lib.crypto import Crypto
+from lib.engine import Engine
+
+## Definitions:
+## IV   -- Initialization Vector
+## MPDU -- Medium Access Control (MAC) Protocol Data Unit
+
+"""
+Things to know
+
+to-DS+wep:   65L
+from-DS+wep: 66L
+
+## From sender to router
+FCfield=to-DS+wep ID=11264 addr1=ce:e1:d5:00:13:9a addr2=4e:40:cd:16:5a:1d addr3=c4:d9:87:e4:62:5e
+
+## From router to receiver
+FCfield=from-DS+wep ID=11264 addr1=c4:d9:87:e4:62:5e addr2=ce:e1:d5:00:13:9a addr3=4e:40:cd:16:5a:1d
+
+router    -- ce:e1:d5:00:13:9a (192.168.100.1)
+sender    -- 4e:40:cd:16:5a:1d (192.168.100.136)
+receiver  -- c4:d9:87:e4:62:5e (192.168.100.148)
+"""
+
+## Add the Conversions lib for debugging
+switch = Conversions()
+
+## Use a known good WEP IV
+iVal = '\xe2\xd1\xc6'
+
+## Create the password
+keyText = '0123456789'
+
+## Concatenate password to IV
+seed = iVal + keyText
+
+## Instantiate accordingly
+arc4 = Engine(seed)
+
+## Load a sniffed ICMP from open wifi AP
+openICMP = rdpcap('PCAPs/open_pings.pcap')
+
+## Load a sniffed ICMP from WEP encrypted wifi AP for comparisons
+wepICMP = rdpcap('PCAPs/wep_pings.pcap')
+
+## Select the packet containing an echo request
+pkt = openICMP[0].copy()
+
+## Grab the MPDU plaintext data that should be encrypted
+plainText = pkt[LLC].copy()
+#plainText = pkt[IP].copy()
+
+## Calculate the WEP Integrity Check Value (ICV)
+wepICV = binascii.crc32(str(plainText))
+
+## Remove the LLC from the pkt
+del pkt[LLC]
+
+## Add on the [Dot11WEP] layer
+pkt = pkt/Dot11WEP()
+
+## Append the ICV to the MPDU plaintext data
+clearText = str(plainText) + str(wepICV)
+
+## Obtain a list of the cipher data
+cipherList = arc4.engine(clearText, 'encode')
+
+## Turn the list into a string
+cipherText = ''
+for i in cipherList:
+    cipherText += i
+
+## Set the [Dot11] addr fields
+#addr1=c4:d9:87:e4:62:5e addr2=ce:e1:d5:00:13:9a addr3=4e:40:cd:16:5a:1d
+pkt[Dot11].addr1 = 'c4:d9:87:e4:62:5e'
+pkt[Dot11].addr2 = 'ce:e1:d5:00:13:9a'
+pkt[Dot11].addr3 = '4e:40:cd:16:5a:1d'
+
+## Set [Dot11].FCfield to from-DS+wep
+pkt[Dot11].FCfield = 66L
+
+## Set the [Dot11WEP] layer fields
+pkt[Dot11WEP].iv = iVal
+pkt[Dot11WEP].keyid = 0
+pkt[Dot11WEP].wepdata = cipherText
+pkt[Dot11WEP].icv = wepICV
+
+## Compare
+pkt[Dot11].show()
+wepICMP[1][Dot11].show()

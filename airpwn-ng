@@ -195,6 +195,8 @@ if __name__ == '__main__':
     parser.add_argument('-i', metavar = '<interface>', help = 'Your injection interface')
     parser.add_argument('-m', metavar = '<interface>', help = 'Your monitor interface')
     parser.add_argument('-o', metavar = '<outfile>', help = 'Output File')
+    parser.add_argument('-p', action = 'store_true', help = 'Use pyDot11')
+    parser.add_argument('-w', metavar = '<word>', help = 'wep password')
     parser.add_argument('-t', nargs = '*', metavar = '<MAC address>', help = 'Target MAC addresses')
     parser.add_argument('-v', action = 'store_true', help = 'Verbose packet output')
     parser.add_argument('--bssid', metavar = '<tgt BSSID>', help = 'Target BSSID')

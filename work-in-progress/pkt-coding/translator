@@ -1,0 +1,104 @@
+#!/usr/bin/python2.7
+
+import argparse, binascii, logging
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+from scapy.all import *
+from lib.convos import Conversions
+from lib.crypto import Crypto
+from lib.engine import Engine
+
+### Need to compare this against our current engine
+#from rc4 import rc4
+
+## Debugging stuff
+switch = Conversions()
+def ipUnpacker(cipherText):
+    counter = 1
+    x = 0
+    y = 20
+    for i in range(len(cipherText)):
+        try:
+            print 'attempt ', counter
+            print IP(cipherText[x:y]).summary()
+            x += 1
+            y += 1
+            counter += 1
+        except:
+            print 'Not enough bytes remain'
+            break
+
+## Load a sniffed ICMP from WEP encrypted wifi AP for comparisons
+wepICMP = rdpcap('PCAPs/wep_pings.pcap')
+
+## Load a sniffed ICMP from open wifi AP
+openICMP = rdpcap('PCAPs/open_pings.pcap')
+
+## Select the packets containing an echo request
+### Only works with 1?  Gotta be the way it's packaged..
+pkt = openICMP[0].copy()
+ePkt = wepICMP[0].copy()
+
+## Show wep stuff
+ePkt[Dot11WEP].show()
+print ''
+
+option = raw_input('[e]ncode or [d]ecode?\n')
+print ''
+
+## Input the WEP iv
+#printIV = repr('\xba0\x0e')
+#print 'iv? [%s] -- Enter accepts [] val\n' % printIV
+#iVal = raw_input()
+#if not iVal:
+    #iVal = '\xba0\x0e'
+iVal = ePkt[Dot11WEP].iv
+
+## Input the password
+#keyText = raw_input('password? [0123456789] -- Enter accepts [] val\n')
+#if not keyText:
+    #keyText = binascii.unhexlify('0123456789')
+keyText = binascii.unhexlify('0123456789')
+#else:
+    #keyText = binascii.unhexlify(keyText)
+
+print ''
+#print repr(iVal)
+#print repr(keyText)
+
+## Concatenate password to IV
+seed = iVal + keyText
+arc4 = Engine(seed)
+
+if option == 'e':
+    string = raw_input('String to encode?\n')
+    cipherList = arc4.engine(string, 'encode')
+elif option == 'd':
+    #printString = repr('\xae8\xd5\x03\x8b\xad\x92m\x9b\xeb{i2\x95\xbb\xaa\xca.\x88\xb3\xfe\x8c\xdc\xd4\xc8\xbb\x80&`B\xe8\xba\xfd#\x98\xcf\x82\xb4\xbb9\xfa\xdb\xe6&B\xfc\xae=\xc9O\x8a`@\xd6\xec\xfe\xb9w"\x18\x14\xee\xa0\x0e\xba\xf9?\xd3\xb0\xea\x89HTL\x0b\xc5(\xc1\x9c\xc7\x9a\xf9\x7f\\1\xc5\xd2\x82\xdf\x8d\xd7\xcf\x81\x95S\x01')
+    #print '[%s]\nEnter accepts [] val\n' % printString
+    #string = raw_input()
+    #if not string:
+        #string = '\xae8\xd5\x03\x8b\xad\x92m\x9b\xeb{i2\x95\xbb\xaa\xca.\x88\xb3\xfe\x8c\xdc\xd4\xc8\xbb\x80&`B\xe8\xba\xfd#\x98\xcf\x82\xb4\xbb9\xfa\xdb\xe6&B\xfc\xae=\xc9O\x8a`@\xd6\xec\xfe\xb9w"\x18\x14\xee\xa0\x0e\xba\xf9?\xd3\xb0\xea\x89HTL\x0b\xc5(\xc1\x9c\xc7\x9a\xf9\x7f\\1\xc5\xd2\x82\xdf\x8d\xd7\xcf\x81\x95S\x01'
+    string = ePkt[Dot11WEP].wepdata
+    cipherList = arc4.engine(string, 'decode')
+    attempt = pkt.copy()
+
+## Turn the list into a string
+cipherText = ''
+for i in cipherList:
+    cipherText += i
+
+
+print '\nRC4 outcome is:'
+print repr(cipherText)
+if option == 'd':
+    attempt = pkt.copy()
+    llcStruct = LLC(cipherText)
+    attempt[LLC] = llcStruct
+    print '\nPacket objects are pkt, ePkt and attempt'
+    print 'attempt is a .copy() of pkt with the [LLC] field modded via the RC4 outcome'
+    print '\ndo: pkt'
+    print 'Notice the existance of [LLC]'
+    print '\ndo: attempt'
+    print 'You can also play with ipUnpacker(cipherText)'
+else:
+    print '\nPacket objects are pkt, ePkt, attempt'

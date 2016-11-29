@@ -1,0 +1,86 @@
+### This is a high-level explanation of the different scenarios created by used airpwn-ng
+
+## Open WiFi and using --injection
+# /airpwn-ng
+    main(args)
+    misc = Misc(args)
+        - /lib/misc.py
+    injection, websites = injection_check(args)
+    i = Inject()
+        - /lib/styles.py
+    i.style_inject(args, misc)
+
+# /lib/styles.py
+    vp = VictimParameters(inject_file = args.injection)
+        - /lib/parameters.py
+        - self.inject_file = keyword_parameters['inject_file']
+    ph = PacketHandler(Misc = misc, i = args.i, victim_parameters = vp)
+        - /lib/packet_handler.py
+        - self.i = keyword_parameters['i']
+        - self.victim_parameters = keyword_parameters['victim_parameters']
+        - self.newvictims = []
+        - self.injector = Injector(self.i)
+            - /lib/injector.py
+            - self.interface = interface
+    snif = Sniffer(ph, m = args.m)
+        - /lib/sniffer.py
+        - self.m = keyword_parameters['m']
+        - self.packethandler = packethandler
+    snif.threaded_sniff(args)
+
+# /lib/sniffer.py
+    q = Queue()
+    sniffer = Thread(target = self.sniff, args = (q,))
+    sniffer.daemon = True
+    sniffer.start()
+    while True:
+        try:
+            pkt = q.get(timeout = 1)
+            self.packethandler.process(self.m, pkt, single, args)
+            - /lib/packet_handler.py
+                try:
+                    vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr = self.handle_default(pkt, single)
+                        if packet.haslayer(IP) and packet.haslayer(TCP):
+                            if packet.haslayer(Dot11) and not packet.haslayer(Ether):
+                                vicmac = packet.getlayer(Dot11).addr2
+                                rtrmac = packet.getlayer(Dot11).addr1
+                            vicip = packet.getlayer(IP).src
+                            svrip = packet.getlayer(IP).dst
+                            vicport = packet.getlayer(TCP).sport
+                            svrport = packet.getlayer(TCP).dport
+                            size = len(packet.getlayer(TCP).load)
+                            acknum = str(int(packet.getlayer(TCP).seq) + size)
+                            seqnum = packet.getlayer(TCP).ack
+                            request = self.get_request(packet)
+                                ret2 = "\n".join(pkt.sprintf("{Raw:%Raw.load%}\n").split(r"\r\n"))
+                                if (len(ret2.strip()) > 0):
+                                return ret2.translate(None, "'").strip()
+                                else:
+                                return None
+                            ### Delve into BLOCK_HOSTS
+                            if 'GET /' in request:
+                                if self.verbose and request:
+                                    print '\n\n%s' % request
+                                pass
+                            else:
+                                return 0
+                            try:
+                                TSVal, TSecr = packet.getlayer(TCP).options[2][1]
+                            except:
+                                TSVal = None
+                                TSecr = None
+
+                            cookie = self.search_cookie(request)
+                            return (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr)
+                        return None
+                    self.cookie_mgmt(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, args)
+                        
+                    
+                    
+                    
+                    
+                    self.proc_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, single)
+                except:
+                    return
+                            
+                

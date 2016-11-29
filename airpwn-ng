@@ -62,6 +62,7 @@ def load_websites_targeted(websites_file):
 
 def main(args):
     """Launching logic"""
+    
     ## Logging
     if args.o:
         stdOut = sys.stdout
@@ -209,6 +210,6 @@ if __name__ == '__main__':
     ## ADD GLOBAL SIGNAL HANDLER
     signal_handler = crtlC(args)
     signal.signal(signal.SIGINT, signal_handler)
-
+    
     ## Launch
     main(args)

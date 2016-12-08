@@ -11,8 +11,8 @@ from lib.visuals import Bcolors, Pager
 def crtlC(args):
     """Handle CTRL+C."""
     def tmp(signal, frame):
-        print(Bcolors.FAIL + '\n[!] Stopping injection and exiting airpwn-ng ...' + Bcolors.ENDC)
-        print(Bcolors.OKGREEN + '\n[+] Cookies stored to ' + Bcolors.WARNING + 'cookies.log ' + Bcolors.OKGREEN +  'and ' + Bcolors.WARNING + 'cookies.sqlite' + Bcolors.ENDC)
+        print Bcolors.FAIL + '\n[!] Stopping injection and exiting airpwn-ng ...' + Bcolors.ENDC
+        print Bcolors.OKGREEN + '\n[+] Cookies stored to ' + Bcolors.WARNING + 'cookies.log ' + Bcolors.OKGREEN +  'and ' + Bcolors.WARNING + 'cookies.sqlite' + Bcolors.ENDC
         if args.o:
             print(Bcolors.OKGREEN + '\n[+] Output log stored to ' + Bcolors.WARNING + '%s' + Bcolors.ENDC) % args.o
         sys.exit(0)
@@ -23,12 +23,12 @@ def injection_check(args):
     """Injection file -OR- Website list decision logic"""
     if args.injection:
         try:
-            f = open (args.injection, 'r')
+            f = open(args.injection, 'r')
             f.close()
         except:
-            print Bcolors.FAIL + "[!] Selected injection file", args.injection, "does not exist." + Bcolors.ENDC
+            print Bcolors.FAIL + '[!] Selected injection file', args.injection, 'does not exist.' + Bcolors.ENDC
             exit(1)
-        print Bcolors.OKGREEN+"[+] Loaded injection file", args.injection + Bcolors.ENDC
+        print Bcolors.OKGREEN + '[+] Loaded injection file', args.injection + Bcolors.ENDC
         injection = 1
         websites = None
         return injection, websites
@@ -38,12 +38,12 @@ def injection_check(args):
             f = open(args.websites, 'r')
             f.close()
         except:
-            print Bcolors.FAIL + "[!] Selected websites file", args.websites, "does not exist." + Bcolors.ENDC
+            print Bcolors.FAIL + '[!] Selected websites file', args.websites, 'does not exist.' + Bcolors.ENDC
             exit(1)
         injection = 0
         websites = load_websites_targeted(args.websites)
         for website in websites:
-            print Bcolors.OKGREEN + "[+] Loaded target website ", website + Bcolors.ENDC
+            print Bcolors.OKGREEN + '[+] Loaded target website ', website + Bcolors.ENDC
         return injection, websites
 
 
@@ -55,7 +55,7 @@ def load_websites_targeted(websites_file):
     websites = []
     with open(websites_file, 'r') as f:
         for line in f.readlines():
-            if (line.strip()[0] != "#"):
+            if line.strip()[0] != '#':
                 websites.append(line.strip())
     return websites
 
@@ -79,15 +79,15 @@ def main(args):
 
     ## User printouts
     os.system('clear')
-    print "\nairpwn-ng - The new and improved 802.11 packet injector\n"
-    if ("mon" in args.m and args.m != args.i):
-        print Bcolors.WARNING + "[!] It appears you are using a monitor mode interface as your monitoring input. If you are attacking open wireless networks, please use the same monitoring interface with -i for better performance." + Bcolors.ENDC
-    if ("mon" not in args.m):
-        print Bcolors.WARNING + "[!] It appears your are trying to attack a WEP/WPA protected network. Please ensure -m is your dot11 tap interface and that -i is connected to the target AP." + Bcolors.ENDC
+    print '\nairpwn-ng - The new and improved 802.11 packet injector\n'
+    if 'mon' in args.m and args.m != args.i:
+        print Bcolors.WARNING + '[!] It appears you are using a monitor mode interface as your monitoring input. If you are attacking open wireless networks, please use the same monitoring interface with -i for better performance.' + Bcolors.ENDC
+    if 'mon' not in args.m:
+        print Bcolors.WARNING + '[!] It appears your are trying to attack a WEP/WPA protected network. Please ensure -m is your dot11 tap interface and that -i is connected to the target AP.' + Bcolors.ENDC
 
     ### NOT IMPLEMENTED YET
     ## Whitelist checks
-    #if (args.exclude_hosts is not None):
+    #if args.exclude_hosts is not None:
         #EXCLUSION = 1
         #EXCLUDE_LIST = args.exclude_hosts
 
@@ -97,15 +97,15 @@ def main(args):
 
     if args.t is None:
         ## Broadcast mode
-        print Bcolors.WARNING + "[!] You are starting your attack in broadcast mode. This means you will inject packets into all clients you are able to detect. Use with caution." + Bcolors.ENDC
+        print Bcolors.WARNING + '[!] You are starting your attack in broadcast mode. This means you will inject packets into all clients you are able to detect. Use with caution.' + Bcolors.ENDC
     else:
         ## Targeted mode
-        if (len(args.t) == 0):
-            print Bcolors.WARNING + "[!] You must specify at least one target MAC address with -t for targeted mode"
+        if len(args.t) == 0:
+            print Bcolors.WARNING + '[!] You must specify at least one target MAC address with -t for targeted mode'
             exit(1)
         else:
             for target in args.t:
-                print Bcolors.OKGREEN + "[+] Adding target", target + Bcolors.ENDC
+                print Bcolors.OKGREEN + '[+] Adding target' + target + Bcolors.ENDC
 
     ## List of domains used
     if injection == 0:
@@ -145,6 +145,9 @@ def menu():
         txt += '    Sniff cookies both ways\n'
         txt += '    ***Packet injection becomes slower***\n'
         txt += '\n'
+        txt += '  -d\n'
+        txt += '     Enable debugging\n'
+        txt += '\n'
         txt += '  -i <interface>\n'
         txt += '     Your injection interface\n'
         txt += '\n'
@@ -154,11 +157,18 @@ def menu():
         txt += '  -o <output file\n'
         txt += '     Create logfile of stdout and stderr\n'
         txt += '\n'
+        txt += '  -p\n'
+        txt += '     Use pyDot11 for decryption\n'
+        txt += '     ***Experimental***\n'
+        txt += '\n'
         txt += '  -t [<MAC MAC>]\n'
         txt += '     Targeted MACs\n'
         txt += '\n'
         txt += '  -v\n'
         txt += '    Print packet load\n'
+        txt += '\n'
+        txt += '  -w\n'
+        txt += '    WEP password for pyDot11\n'
         txt += '\n'
         txt += '  --bssid\n'
         txt += '    Target BSSID\n'
@@ -197,9 +207,9 @@ if __name__ == '__main__':
     parser.add_argument('-m', metavar = '<interface>', help = 'Your monitor interface')
     parser.add_argument('-o', metavar = '<outfile>', help = 'Output File')
     parser.add_argument('-p', action = 'store_true', help = 'Use pyDot11')
-    parser.add_argument('-w', metavar = '<word>', help = 'wep password')
     parser.add_argument('-t', nargs = '*', metavar = '<MAC address>', help = 'Target MAC addresses')
     parser.add_argument('-v', action = 'store_true', help = 'Verbose packet output')
+    parser.add_argument('-w', metavar = '<word>', help = 'wep password')
     parser.add_argument('--bssid', metavar = '<tgt BSSID>', help = 'Target BSSID')
     parser.add_argument('--covert', action = 'store_true', help = 'Hides cookie grabbing iframes inside the requested page')
     parser.add_argument('--exclude-hosts', nargs = '*', metavar = '<host>', help = 'Space separated list of hosts/IP addresses to exclude from injection')    

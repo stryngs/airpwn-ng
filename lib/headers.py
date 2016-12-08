@@ -20,16 +20,13 @@ class Headers(object):
         headers += "\r\n"
     """
     
-    def __init__(self):
-        pass
-
     def default(self, injection):
         """ Create the HTML headers """
-        headers = "HTTP/1.1 200 OK\r\n"
-        headers += "Date: " + time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime()) + "\r\n"
-        headers += "Server: Apache\r\n"
-        headers += "Content-Length: " + str(len(injection)) + "\r\n"
-        headers += "Connection: close\r\n"
-        headers += "Content-Type: text/html\r\n"
-        headers += "\r\n"
+        headers = 'HTTP/1.1 200 OK\r\n'
+        headers += 'Date: ' + time.strftime('%a, %d %b %Y %H:%M:%S GMT', time.gmtime()) + '\r\n'
+        headers += 'Server: Apache\r\n'
+        headers += 'Content-Length: ' + str(len(injection)) + '\r\n'
+        headers += 'Connection: close\r\n'
+        headers += 'Content-Type: text/html\r\n'
+        headers += '\r\n'
         return headers

@@ -16,7 +16,7 @@ class Injector(object):
     def getHwAddr(self, ifname):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         info = fcntl.ioctl(s.fileno(), 0x8927, struct.pack('256s', ifname[:15]))
-        mac=':'.join(['%02x' % ord(char) for char in info[18:24]])
+        mac = ':'.join(['%02x' % ord(char) for char in info[18:24]])
         return mac
 
 
@@ -25,13 +25,18 @@ class Injector(object):
 
 
     def inject(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args, procTimerStart, procTimerEnd):
-        """Send the injection using Scapy"""
+        """Send the injection using Scapy
+        
+        This method is where the actual packet is created for sending
+        Things such as payload and associated flags are genned here
+        FIN/ACK flag is sent to the victim with this method
+        """
         injectTimerStart = time.time()
         global npackets
         npackets += 1
-        sys.stdout.write(Bcolors.OKBLUE + "[*] Injecting Packet to victim " + Bcolors.WARNING + vicmac + Bcolors.OKBLUE + " (TOTAL: " + str(npackets) + " injected packets)\r" + Bcolors.ENDC)
+        sys.stdout.write(Bcolors.OKBLUE + '[*] Injecting Packet to victim ' + Bcolors.WARNING + vicmac + Bcolors.OKBLUE + ' (TOTAL: ' + str(npackets) + ' injected packets)\r' + Bcolors.ENDC)
         sys.stdout.flush()
-        if ("mon" in self.interface):
+        if 'mon' in self.interface:
             hdr = Headers()
             headers = hdr.default(injection)
 
@@ -122,9 +127,8 @@ class Injector(object):
                 pass
 
             ### Single packet exit point
-            ### Have to work on how to exit cleanly, instantiation is preventing?...
             if args.single:
-                sys.stdout.write(Bcolors.OKBLUE + "[*] Injecting Packet to victim " + Bcolors.WARNING + vicmac + Bcolors.OKBLUE + " (TOTAL: " + str(npackets) + " injected packets)\r" + Bcolors.ENDC)
+                sys.stdout.write(Bcolors.OKBLUE + '[*] Injecting Packet to victim ' + Bcolors.WARNING + vicmac + Bcolors.OKBLUE + ' (TOTAL: ' + str(npackets) + ' injected packets)\r' + Bcolors.ENDC)
                 sys.exit(0)
         else:
             hdr = Headers()
@@ -215,9 +219,9 @@ class Injector(object):
                     sendp(packet, iface = args.i, verbose = 0)
                 else:
                     sendp(packet, iface = self.interface, verbose = 0)
-
-                injectTimerEnd = time.time()
+                
                 if args.d:
+                    injectTimerEnd = time.time()
                     print '\nProcess Began: %f' % procTimerStart
                     print 'Process Ended:   %f' % procTimerEnd
                     print 'Process Delta:   %f' % (procTimerEnd - procTimerStart)

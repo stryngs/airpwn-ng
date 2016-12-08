@@ -20,7 +20,7 @@ class File(object):
 
         ## Broadcast mode
         if not args.t:
-            if (args.exclude_hosts is None):
+            if args.exclude_hosts is None:
                 ph = PacketHandler(Args = args, i = args.i, victim_parameters = vp)
             else:
                 ph = PacketHandler(Args = args, i = args.i, victim_parameters = vp, excluded = args.exclude_hosts)
@@ -32,7 +32,7 @@ class File(object):
                 v1 = Victim(mac = victim, victim_parameters = vp)
                 victims.append(v1)
 
-            if (args.exclude_hosts is None):
+            if args.exclude_hosts is None:
                 ph = PacketHandler(Args = args, i = args.i, victims = victims)
             else:
                 ph = PacketHandler(Args = args, i = args.i, victims = victims, excluded = args.exclude_hosts)
@@ -67,7 +67,7 @@ class List(object):
 
         ## Broadcast mode
         if not args.t:
-            if (args.exclude_hosts is None):
+            if args.exclude_hosts is None:
                 ph = PacketHandler(Args = args, i = args.i, victim_parameters = vp)
             else:
                 ph = PacketHandler(Args = args, i = args.i, victim_parameters = vp, excluded = args.exclude_hosts)
@@ -79,7 +79,7 @@ class List(object):
                 v1 = Victim(mac = victim, victim_parameters = vp)
                 victims.append(v1)
 
-            if (args.exclude_hosts is None):
+            if args.exclude_hosts is None:
                 ph = PacketHandler(Args = args, i = args.i, victims = victims)
             else:
                 ph = PacketHandler(Args = args, i = args.i, victims = victims, excluded = args.exclude_hosts)

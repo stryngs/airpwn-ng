@@ -28,8 +28,6 @@ class Database(object):
         Not 100% reliable, yet...
         See comments in get_request() in packet_handler.py to follow-along
         """
-        #dList = []
-        #cList = []
         cExp = str(int(time.time()) + 31536000)
 
         with self.con:
@@ -39,15 +37,12 @@ class Database(object):
             rCount = tVal[0] + 1
             
             ## Loop through rows
-            ### Probably can deal without a range, but to make sure order stays correct...
             for row in range(1, rCount):
                 with open('cookie-grab_%s.ck' % row, 'w') as oFile:
                     getDM = self.db.execute("SELECT dm FROM cookies WHERE rowid = ?;", (row,))
                     dmVal = getDM.fetchone()
-                    #dList.append(dmVal[0])
                     getCK = self.db.execute("SELECT ck FROM cookies WHERE rowid = ?;", (row,))
                     ckVal = getCK.fetchone()
-                    #cList.append(ckVal[0])
 
                     ## Grab top cookie
                     name = ckVal[0].split(';')[0].split(':')[1].strip().split('=')[0]
@@ -68,7 +63,7 @@ class cookieLogger(object):
     """Plaintext cookie logs"""
     
     def __init__(self):
-        ## Plaintext log of cookies
+        """Plaintext log for cookies"""
         self.cFile = open('cookies.log', 'w')
 
 

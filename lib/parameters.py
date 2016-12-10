@@ -13,48 +13,49 @@ class VictimParameters(object):
     """
 
     def __init__(self, *positional_parameters, **keyword_parameters):
-        if ('websites' in keyword_parameters):
+        if 'websites' in keyword_parameters:
             self.websites = keyword_parameters['websites']
         else:
             self.websites = None
 
-        if ('inject_file' in keyword_parameters):
+        if 'inject_file' in keyword_parameters:
             self.inject_file = keyword_parameters['inject_file']
         else:
             self.inject_file = None
 
-        if ('in_request' in keyword_parameters):
+        if 'in_request' in keyword_parameters:
             self.in_request = keyword_parameters['in_request']
         else:
             self.in_request = None
 
-        if ('covert' in keyword_parameters):
+        if 'covert' in keyword_parameters:
             self.covert = keyword_parameters['covert']
         else:
             self.covert = False
 
-        if ('in_request_handler' in keyword_parameters):
+        if 'in_request_handler' in keyword_parameters:
             self.in_request_handler = keyword_parameters['in_request_handler']
         else:
             self.in_request_handler = None
 
-        if ('highjack' in keyword_parameters):
-            self.highjack = keyword_parameters['highjack']
+        if 'hijack' in keyword_parameters:
+            self.hijack = keyword_parameters['hijack']
         else:
-            self.highjack = None
+            self.hijack = None
 
-        if (self.websites is None and self.inject_file is None and self.in_request is None):
+        if self.websites is None and self.inject_file is None and self.in_request is None:
             print "[ERROR] Please specify victim parameters"
             exit(1)
 
-        if (self.in_request is not None and (self.websites is None and self.inject_file is None)):
+        if self.in_request is not None and (self.websites is None and self.inject_file is None):
             print "[ERROR] You must select websites or an inject file for use with in_request"
         else:
-            if (self.websites is not None):
+            if self.websites is not None:
                 self.website_injects = []
                 for website in self.websites:
                     self.website_injects.append((website, self.get_iframe(website, "0")))
-            if (self.inject_file is not None):
+
+            if self.inject_file is not None:
                 self.file_inject = self.load_injection(self.inject_file)
                 self.file_injected = 0
 
@@ -65,7 +66,7 @@ class VictimParameters(object):
         
         (i.e. in_request="Firefox")
         """
-        if (self.in_request in request):
+        if self.in_request in request:
             return True
         else:
             return False
@@ -77,7 +78,7 @@ class VictimParameters(object):
         n = 2
         inject = "0x"
         for item in [k[i:i+n] for i in range(0, len(k), n)]:
-            inject += item + " "
+            inject += item + ' '
         return inject
 
 
@@ -85,7 +86,7 @@ class VictimParameters(object):
         """Process the request
         Send it to custom handler if declared, otherwise use default.
         """
-        if (self.in_request_handler is not None):
+        if self.in_request_handler is not None:
             return self.in_request_handler(request)
         else:
             return self.default_request_handler(request)

@@ -11,22 +11,22 @@ class Sniffer(object):
     """
 
     def __init__(self, packethandler, *positional_parameters, **keyword_parameters):
-        if ('filter' in keyword_parameters):
+        if 'filter' in keyword_parameters:
             self.filter = keyword_parameters['filter']
         else:
             self.filter = None
 
-        if ('m' in keyword_parameters):
+        if 'm' in keyword_parameters:
             self.m = keyword_parameters['m']
         else:
             self.m = None
 
-        if (self.m is None):
+        if self.m is None:
             print "[ERROR] No monitor interface selected"
             exit()
 
-        if (self.filter is None):
-            if ("mon" not in self.m):
+        if self.filter is None:
+            if "mon" not in self.m:
                 print "[WARN] SNIFFER: Filter empty for non-monitor interface"
 
         self.packethandler = packethandler
@@ -38,7 +38,7 @@ class Sniffer(object):
         Usually we set a filter for GET requests on the dot11 tap interface.
         It can also be an empty string.
         """
-        if ("mon" in self.m):
+        if 'mon' in self.m:
             sniff(iface = self.m, prn = lambda x: q.put(x), store = 0)
         else:
             sniff(iface = self.m, filter = self.filter, prn = lambda x: q.put(x), store = 0)

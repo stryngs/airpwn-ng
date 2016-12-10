@@ -97,8 +97,8 @@ class Victim(object):
                 self.log.cookies(ip, self.mac, cookie[0], cookie[1])
                 self.db.sqlite_cookies(ip, self.mac, cookie[0], cookie[1])
             
-            if self.victim_parameters.highjack is not None:
-                self.victim_parameters.highjack(cookie)
+            if self.victim_parameters.hijack is not None:
+                self.victim_parameters.hijack(cookie)
 
             self.cookies.append(cookie)
 

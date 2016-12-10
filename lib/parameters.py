@@ -38,10 +38,10 @@ class VictimParameters(object):
         else:
             self.in_request_handler = None
 
-        if 'highjack' in keyword_parameters:
-            self.highjack = keyword_parameters['highjack']
+        if 'hijack' in keyword_parameters:
+            self.hijack = keyword_parameters['hijack']
         else:
-            self.highjack = None
+            self.hijack = None
 
         if self.websites is None and self.inject_file is None and self.in_request is None:
             print "[ERROR] Please specify victim parameters"

@@ -8,6 +8,7 @@ from lib.styles import File, List
 from lib.victim import Victim
 from lib.visuals import Bcolors, Pager
 
+
 def crtlC(args):
     """Handle CTRL+C."""
     def tmp(signal, frame):

@@ -31,7 +31,7 @@ class Sniffer(object):
 
         self.packethandler = packethandler
 
-
+    ### This should have the option to filter regardless of which NIC we use.
     def sniff(self, q):
         """Target function for Queue (multithreading).
         
@@ -61,11 +61,13 @@ class Sniffer(object):
         While airpwn-ng only hijacks inbound frames to begin with,
         -b is useful for grabbing any cookies inbound from a server
         
-        Of note:        
-            to-DS is:    1L
-            from-DS is:  2L
+        Useful reminder:        
+            to-DS is:    1L (open) / 65L (crypted)
+            from-DS is:  2L (open) /66L (crypted)
         """
-        q = Queue()
+        ### Play with this later, switch to scapy 2.3.3 required this...
+        #q = Queue()
+        q = Queue.Queue()
         sniffer = Thread(target = self.sniff, args = (q,))
         sniffer.daemon = True
         sniffer.start()
@@ -88,7 +90,7 @@ class Sniffer(object):
             while True:
                 try:
                     pkt = q.get(timeout = 1)
-                    if pkt[Dot11].FCfield == 1:
+                    if pkt[Dot11].FCfield == 1L:
                         self.handler(q, self.m, pkt, args)
                     else:
                         pass
@@ -101,7 +103,7 @@ class Sniffer(object):
             while True:
                 try:
                     pkt = q.get(timeout = 1)
-                    if pkt[Dot11].addr3 == args.bssid and pkt[Dot11].FCfield == 1:
+                    if pkt[Dot11].addr3 == args.bssid and pkt[Dot11].FCfield == 1L:
                         self.handler(q, self.m, pkt, args)
                     else:
                         pass

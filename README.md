@@ -21,7 +21,7 @@ Features
 - Gather cookies for specific websites (--websites websites_list.txt)
 	- In this scenario, airpwn-ng will auto-generate invisible iframes for injection that trigger the request for each website in websites_list.txt
 	- [BETA] Can be used with --covert flag that attempts to inject a big iframe with the real requested website along with the generated invisible iframes. If successful, the victim should get no indication of compromise. This is still beta and doesn't work with all websites.
-	- [BETA] Airpwn-ng API so you can make your own custom attacks. Examples: https://github.com/stryngs/airpwn-ng/blob/master/work-in-progress/api-examples/
+	- [BETA] Airpwn-ng API so you can make your own custom attacks. Examples: https://github.com/ICSec/airpwn-ng/blob/master/work-in-progress/api-examples/
 
 How do we do it?
 ---
@@ -38,13 +38,13 @@ That's cool...  So what can we do with it?
 
 What do we need to get started?
 ---
-- scapy:
- - http://www.secdev.org/projects/scapy/
-- Aircrack-ng:
- - http://www.aircrack-ng.org/
-- libpcap
-- dot11decrypt (For WEP/WPA decryption):
- - https://github.com/mfontanini/dot11decrypt
+* scapy:
+  * https://pypi.python.org/pypi/scapy/2.3.3
+* Aircrack-ng:
+  * http://www.aircrack-ng.org/
+* For WEP/WPA decryption:
+  * https://github.com/ICSec/pyDot11  (Experimental)
+  * https://github.com/mfontanini/dot11decrypt  (Recommended for now)
 
 How do we use airpwn-ng?
 ---

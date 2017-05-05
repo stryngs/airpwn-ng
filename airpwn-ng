@@ -77,6 +77,14 @@ def main(args):
         db.cookieExtractor()
         exit(0)
 
+    ## Enforce password if pyDot11 is chosen
+    if args.p and not args.w:
+        print 'option -p requires -w to be invoked\n'
+        sys.exit(1)
+    if args.w and not args.p:
+        print 'option -w requires -p to be invoked\n'
+        sys.exit(1)
+
     ## User printouts
     os.system('clear')
     print '\nairpwn-ng - The new and improved 802.11 packet injector\n'
@@ -145,9 +153,6 @@ def menu():
         txt += '    Sniff cookies both ways\n'
         txt += '    ***Packet injection becomes slower***\n'
         txt += '\n'
-        txt += '  -d\n'
-        txt += '     Enable debugging\n'
-        txt += '\n'
         txt += '  -i <interface>\n'
         txt += '     Your injection interface\n'
         txt += '\n'
@@ -194,15 +199,13 @@ def menu():
 if __name__ == '__main__':
     ## ARGUMENT PARSING
     parser = argparse.ArgumentParser(description = 'airpwn-ng - the new and improved 802.11 packet injector', usage = menu())
-
     group = parser.add_mutually_exclusive_group(required = True)
 
     group.add_argument('--cm', metavar = '<filename>', help = 'Extract cookies from the DB')
     group.add_argument('--injection', metavar = '<filename>', help = 'File with your injection code')
     group.add_argument('--websites', metavar = '<filename>', help = 'List of websites to sniff cookies from')
-
+    
     parser.add_argument('-b', action = 'store_true', help = 'Sniff both ways')
-    parser.add_argument('-d', action = 'store_true', help = 'Debugging')
     parser.add_argument('-i', metavar = '<interface>', help = 'Your injection interface')
     parser.add_argument('-m', metavar = '<interface>', help = 'Your monitor interface')
     parser.add_argument('-o', metavar = '<outfile>', help = 'Output File')

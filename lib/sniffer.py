@@ -31,7 +31,7 @@ class Sniffer(object):
 
         self.packethandler = packethandler
 
-
+    ### This should have the option to filter regardless of which NIC we use.
     def sniff(self, q):
         """Target function for Queue (multithreading).
         
@@ -65,7 +65,8 @@ class Sniffer(object):
             to-DS is:    1L
             from-DS is:  2L
         """
-        q = Queue()
+        #q = Queue()
+        q = Queue.Queue()
         sniffer = Thread(target = self.sniff, args = (q,))
         sniffer.daemon = True
         sniffer.start()

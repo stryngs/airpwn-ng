@@ -71,15 +71,15 @@ class VictimParameters(object):
         else:
             return False
 
-
-    def hex_injection(self, injection):
-        """Generate hex string in packit style format from injection string."""
-        k = binascii.hexlify(injection)
-        n = 2
-        inject = "0x"
-        for item in [k[i:i+n] for i in range(0, len(k), n)]:
-            inject += item + ' '
-        return inject
+    ### Don't think this is needed anymore
+    #def hex_injection(self, injection):
+        #"""Generate hex string in packit style format from injection string."""
+        #k = binascii.hexlify(injection)
+        #n = 2
+        #inject = "0x"
+        #for item in [k[i:i+n] for i in range(0, len(k), n)]:
+            #inject += item + ' '
+        #return inject
 
 
     def proc_in_request(self, request):

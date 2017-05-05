@@ -1,7 +1,8 @@
 from lib.injector import Injector
 from lib.victim import Victim
 from scapy.all import *
-import socket, time
+#import socket, time
+import socket
 
 global BLOCK_HOSTS
 BLOCK_HOSTS = set()
@@ -63,7 +64,18 @@ class PacketHandler(object):
         self.injector = Injector(self.i)
 
 
-    def cookieManager(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, args):
+    def cookieManager(self,
+                      vicmac,
+                      rtrmac,
+                      vicip,
+                      svrip,
+                      vicport,
+                      svrport,
+                      acknum,
+                      seqnum,
+                      request,
+                      cookie,
+                      args):
         """This function does cookie management for broadcast mode and targeted mode.
 
         A new mode is also added that can work in both broadcast
@@ -92,7 +104,9 @@ class PacketHandler(object):
                                 exists = 1
 
                 if exists == 0:
-                    v1 = Victim(ip = vicip, mac = vicmac, victim_parameters = self.victim_parameters)
+                    v1 = Victim(ip = vicip,
+                                mac = vicmac,
+                                victim_parameters = self.victim_parameters)
                     v1.add_cookie(cookie, args)
                     self.newvictims.append(v1)
 
@@ -122,7 +136,9 @@ class PacketHandler(object):
                                 exists = 1
 
                 if exists == 0:
-                    v1 = Victim(ip = vicip, mac = vicmac, victim_parameters = self.victim_parameters)
+                    v1 = Victim(ip = vicip,
+                                mac = vicmac,
+                                victim_parameters = self.victim_parameters)
                     self.newvictims.append(v1)
 
         else:
@@ -190,7 +206,9 @@ class PacketHandler(object):
                                     exists = 1
 
                     if exists == 0:
-                        v1 = Victim(ip = vicip, mac = vicmac, victim_parameters = self.victim_parameters)
+                        v1 = Victim(ip = vicip,
+                                    mac = vicmac,
+                                    victim_parameters = self.victim_parameters)
                         v1.add_cookie(cookie, args)
                         self.newvictims.append(v1)
 
@@ -220,7 +238,9 @@ class PacketHandler(object):
                                     exists = 1
 
                     if exists == 0:
-                        v1 = Victim(ip = vicip, mac = vicmac, victim_parameters = self.victim_parameters)
+                        v1 = Victim(ip = vicip,
+                                    mac = vicmac,
+                                    victim_parameters = self.victim_parameters)
                         self.newvictims.append(v1)
 
 
@@ -252,8 +272,19 @@ class PacketHandler(object):
         else:
             return None
 
-
-    def covert_injection(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, injection):
+    ### Need docstring
+    def covert_injection(self,
+                         vicmac,
+                         rtrmac,
+                         vicip,
+                         svrip,
+                         vicport,
+                         svrport,
+                         acknum,
+                         seqnum,
+                         request,
+                         cookie,
+                         injection):
         global BLOCK_HOSTS
         #print svrip,BLOCK_HOSTS
         for obj in BLOCK_HOSTS:
@@ -287,18 +318,53 @@ class PacketHandler(object):
         return injection
 
 
-    def condensor(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, args, injection, victim, procTimerStart):
+    def condensor(self,
+                  vicmac,
+                  rtrmac,
+                  vicip,
+                  svrip,
+                  vicport,
+                  svrport,
+                  acknum,
+                  seqnum,
+                  request,
+                  cookie,
+                  TSVal,
+                  TSecr,
+                  args,
+                  injection,
+                  victim):
         """Condense some of the logic into a single function"""
         if victim.victim_parameters.covert:
-            cov_injection = self.covert_injection(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, injection)
+            cov_injection = self.covert_injection(vicmac,
+                                                  rtrmac,
+                                                  vicip,
+                                                  svrip,
+                                                  vicport,
+                                                  svrport,
+                                                  acknum,
+                                                  seqnum,
+                                                  request,
+                                                  cookie,
+                                                  injection)
             if (cov_injection != 0):
                 injection = cov_injection
             else:
                 return 0
 
         #print injection
-        procTimerEnd = time.time()
-        self.injector.inject(vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, injection, TSVal, TSecr, args, procTimerStart, procTimerEnd)
+        self.injector.inject(vicmac,
+                             rtrmac,
+                             vicip,
+                             svrip,
+                             vicport,
+                             svrport,
+                             acknum,
+                             seqnum,
+                             injection,
+                             TSVal,
+                             TSecr,
+                             args)
         #print 'sent'
 
 
@@ -346,7 +412,6 @@ class PacketHandler(object):
         Obtains specific bits of the packet, orders them accordingly
         """
         if packet.haslayer(IP) and packet.haslayer(TCP):
-            procTimerStart = time.time()
 
             ## MONITOR MODE
             if packet.haslayer(Dot11) and not packet.haslayer(Ether):
@@ -392,12 +457,36 @@ class PacketHandler(object):
                 TSecr = None
 
             cookie = self.cookieSearch(request)
-            #print (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, procTimerStart)
-            return (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, procTimerStart)
+            #print (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr)
+            return (vicmac,
+                    rtrmac,
+                    vicip,
+                    svrip,
+                    vicport,
+                    svrport,
+                    acknum,
+                    seqnum,
+                    request,
+                    cookie,
+                    TSVal,
+                    TSecr)
         return None
 
 
-    def proc_injection(self, vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, args, procTimerStart):
+    def proc_injection(self,
+                       vicmac,
+                       rtrmac,
+                       vicip,
+                       svrip,
+                       vicport,
+                       svrport,
+                       acknum,
+                       seqnum,
+                       request,
+                       cookie,
+                       TSVal,
+                       TSecr,
+                       args):
         """Process injection function using the PacketHandler.victims List.
         
         If it was set, to check if the packet belongs to any of the targets.
@@ -421,44 +510,42 @@ class PacketHandler(object):
                     if victim.ip == vicip:
                         injection = victim.get_injection()
                         if injection is not None:
-                            self.condensor(vicmac,\
-                                            rtrmac,\
-                                            vicip,\
-                                            svrip,\
-                                            vicport,\
-                                            svrport,\
-                                            acknum,\
-                                            seqnum,\
-                                            request,\
-                                            cookie,\
-                                            TSVal,\
-                                            TSecr,\
-                                            args,\
-                                            injection,\
-                                            victim,\
-                                            procTimerStart)
+                            self.condensor(vicmac,
+                                           rtrmac,
+                                           vicip,
+                                           svrip,
+                                           vicport,
+                                           svrport,
+                                           acknum,
+                                           seqnum,
+                                           request,
+                                           cookie,
+                                           TSVal,
+                                           TSecr,
+                                           args,
+                                           injection,
+                                           victim)
 
                 else:
                     if victim.mac is not None:
                         if victim.mac.lower() == vicmac.lower():
                             injection = victim.get_injection()
                             if injection is not None:
-                                self.condensor(vicmac,\
-                                                rtrmac,\
-                                                vicip,\
-                                                svrip,\
-                                                vicport,\
-                                                svrport,\
-                                                acknum,\
-                                                seqnum,\
-                                                request,\
-                                                cookie,\
-                                                TSVal,\
-                                                TSecr,\
-                                                args,\
-                                                injection,\
-                                                victim,\
-                                                procTimerStart)
+                                self.condensor(vicmac,
+                                               rtrmac,
+                                               vicip,
+                                               svrip,
+                                               vicport,
+                                               svrport,
+                                               acknum,
+                                               seqnum,
+                                               request,
+                                               cookie,
+                                               TSVal,
+                                               TSecr,
+                                               args,
+                                               injection,
+                                               victim)
 
         else:
             if self.victim_parameters is not None:
@@ -477,44 +564,42 @@ class PacketHandler(object):
                         if victim.ip == vicip:
                             injection = victim.get_injection()
                             if injection is not None:
-                                self.condensor(vicmac,\
-                                                rtrmac,\
-                                                vicip,\
-                                                svrip,\
-                                                vicport,\
-                                                svrport,\
-                                                acknum,\
-                                                seqnum,\
-                                                request,\
-                                                cookie,\
-                                                TSVal,\
-                                                TSecr,\
-                                                args,\
-                                                injection,\
-                                                victim,\
-                                                procTimerStart)
+                                self.condensor(vicmac,
+                                               rtrmac,
+                                               vicip,
+                                               svrip,
+                                               vicport,
+                                               svrport,
+                                               acknum,
+                                               seqnum,
+                                               request,
+                                               cookie,
+                                               TSVal,
+                                               TSecr,
+                                               args,
+                                               injection,
+                                               victim)
 
                     else:
                         if victim.mac is not None:
                             if victim.mac.lower() == vicmac.lower():
                                 injection = victim.get_injection()
                                 if injection is not None:
-                                    self.condensor(vicmac,\
-                                                    rtrmac,\
-                                                    vicip,\
-                                                    svrip,\
-                                                    vicport,\
-                                                    svrport,\
-                                                    acknum,\
-                                                    seqnum,\
-                                                    request,\
-                                                    cookie,\
-                                                    TSVal,\
-                                                    TSecr,\
-                                                    args,\
-                                                    injection,\
-                                                    victim,\
-                                                    procTimerStart)
+                                    self.condensor(vicmac,
+                                                   rtrmac,
+                                                   vicip,
+                                                   svrip,
+                                                   vicport,
+                                                   svrport,
+                                                   acknum,
+                                                   seqnum,
+                                                   request,
+                                                   cookie,
+                                                   TSVal,
+                                                   TSecr,
+                                                   args,
+                                                   injection,
+                                                   victim)
 
             if self.excluded is not None:
                 if svrip in self.excluded:
@@ -530,22 +615,21 @@ class PacketHandler(object):
 
                         injection = victim.get_injection()
                         if injection is not None:
-                            self.condensor(vicmac,\
-                                            rtrmac,\
-                                            vicip,\
-                                            svrip,\
-                                            vicport,\
-                                            svrport,\
-                                            acknum,\
-                                            seqnum,\
-                                            request,\
-                                            cookie,\
-                                            TSVal,\
-                                            TSecr,\
-                                            args,\
-                                            injection,\
-                                            victim,\
-                                            procTimerStart)
+                            self.condensor(vicmac,
+                                           rtrmac,
+                                           vicip,
+                                           svrip,
+                                           vicport,
+                                           svrport,
+                                           acknum,
+                                           seqnum,
+                                           request,
+                                           cookie,
+                                           TSVal,
+                                           TSecr,
+                                           args,
+                                           injection,
+                                           victim)
                 else:
                     if victim.mac is not None:
                         if victim.mac.lower() == vicmac.lower():
@@ -556,22 +640,21 @@ class PacketHandler(object):
 
                             injection = victim.get_injection()
                             if injection is not None:
-                                self.condensor(vicmac,\
-                                                rtrmac,\
-                                                vicip,\
-                                                svrip,\
-                                                vicport,\
-                                                svrport,\
-                                                acknum,\
-                                                seqnum,\
-                                                request,\
-                                                cookie,\
-                                                TSVal,\
-                                                TSecr,\
-                                                args,\
-                                                injection,\
-                                                victim,\
-                                                procTimerStart)
+                                self.condensor(vicmac,
+                                               rtrmac,
+                                               vicip,
+                                               svrip,
+                                               vicport,
+                                               svrport,
+                                               acknum,
+                                               seqnum,
+                                               request,
+                                               cookie,
+                                               TSVal,
+                                               TSecr,
+                                               args,
+                                               injection,
+                                               victim)
 
     def process(self, interface, pkt, args):
         """Process packets coming from the sniffer.
@@ -586,32 +669,33 @@ class PacketHandler(object):
             self.handler(interface, pkt)
         else:
             try:
-                vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr, procTimerStart = self.proc_handler(pkt)
-                self.cookieManager(vicmac,\
-                                    rtrmac,\
-                                    vicip,\
-                                    svrip,\
-                                    vicport,\
-                                    svrport,\
-                                    acknum,\
-                                    seqnum,\
-                                    request,\
-                                    cookie,\
+                vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr = self.proc_handler(pkt)
+                
+                self.cookieManager(vicmac,
+                                   rtrmac,
+                                   vicip,
+                                   svrip,
+                                   vicport,
+                                   svrport,
+                                   acknum,
+                                   seqnum,
+                                   request,
+                                   cookie,
+                                   args)
+                
+                self.proc_injection(vicmac,
+                                    rtrmac,
+                                    vicip,
+                                    svrip,
+                                    vicport,
+                                    svrport,
+                                    acknum,
+                                    seqnum,
+                                    request,
+                                    cookie,
+                                    TSVal,
+                                    TSecr,
                                     args)
-                self.proc_injection(vicmac,\
-                                    rtrmac,\
-                                    vicip,\
-                                    svrip,\
-                                    vicport,\
-                                    svrport,\
-                                    acknum,\
-                                    seqnum,\
-                                    request,\
-                                    cookie,\
-                                    TSVal,\
-                                    TSecr,\
-                                    args,\
-                                    procTimerStart)
             except:
                 return
  

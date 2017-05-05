@@ -22,10 +22,6 @@ class Injector(object):
         mac = ':'.join(['%02x' % ord(char) for char in info[18:24]])
         return mac
 
-    ### No longer in use
-    #def float_to_hex(self,f):
-        #return hex(struct.unpack('<I', struct.pack('<f', f))[0])
-
 
     def inject(self,
                vicmac,
@@ -140,8 +136,8 @@ class Injector(object):
             hdr = Headers()
             headers = hdr.default(injection)
             
-            ### Nasty quick&dirty PoC for pyDot11
-            ### WARN, THIS IS NOT SET PROPER YET, DISREGARDING FOR NOW, DO NOT USE THIS SECTIOn
+            ### WARN, THIS IS NOT SET PROPER YET, DISREGARDING FOR NOW, DO NOT USE THIS SECTION
+            ## pyDot11
             if args.p:
                 packet = RadioTap()\
                         /Dot11(
@@ -221,7 +217,7 @@ class Injector(object):
                                           ]
 
             try:
-                ### pyDot11 hack
+                ### pyDot11
                 if args.p:
                     sendp(packet, iface = args.i, verbose = 0)
                 else:

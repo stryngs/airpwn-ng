@@ -19,7 +19,7 @@ class File(object):
             ## Broadcast mode
             if not args.t:
                 
-                ### Trace out what highjacker is
+                ### Trace hijacker
                 vp = VictimParameters(inject_file = args.injection, covert = args.covert, hijack = 'hijacker')
 
             ## Targeted mode
@@ -47,6 +47,7 @@ class File(object):
             else:
                 ph = PacketHandler(Args = args, i = args.i, victims = victims, excluded = args.exclude_hosts)
 
+        ### Need a better way to define monitor mode NIC
         ## Begin sniffing
         if 'mon' in args.m:
             snif = Sniffer(ph, m = args.m)

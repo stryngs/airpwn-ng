@@ -43,7 +43,7 @@ What do we need to get started?
 * Aircrack-ng:
   * http://www.aircrack-ng.org/
 * For WEP/WPA decryption:
-  * https://github.com/ICSec/pyDot11  (Currently experimental)
+  * https://github.com/ICSec/pyDot11  (Experimental)
   * https://github.com/mfontanini/dot11decrypt  (Recommended for now)
 
 How do we use airpwn-ng?

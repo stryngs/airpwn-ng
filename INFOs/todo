@@ -1,0 +1,13 @@
+## stryngs or Jack64
+- channel hop automate
+
+## stryngs
+- simplify parameters
+    - snif = Sniffer(ph, args, m = args.m) << perfect example of redundancy
+
+## stryngs   
+-- wep magic number explain
+
+## Jack64
+- Add --covert and --websites explanation to INFOs/Tutorial
+

@@ -1,0 +1,40 @@
+General guidance:
+    - Ensure NICs are on the channel you are trying to monitor
+    - Try to be at least 1 meter from a target or the access point
+    - Have patience, airpwn-ng is based on the race condition presented by TCP
+        - As such, airpwn-ng is not a 100% solution, sometimes it wins, sometimes it doesn't
+
+
+Open Access Point guidance:
+    - Open Access Points require only 1 NIC
+    - Drop desired NIC to monitor mode
+    - Switch to proper channel
+    - Example syntax:
+        - ./airpwn-ng -m <monitor mode NIC> -i <monitor mode NIC> --inject payloads/wargames
+
+
+WEP Access Point guidance:
+    - WEP Access Points require only 1 NIC
+    - Drop desired NIC to monitor mode
+    - Switch to proper channel
+    - Example syntax:
+        - ./airpwn-ng -m <monitor mode NIC> -i <monitor mode NIC> --wep '<WEP password>' --bssid '<BSSID of Access Point>' --inject payloads/wargames
+
+
+WPA Access Point guidance:
+    - WPA Access Points currently require 2 NICs
+        - The need for a 2nd physical NIC can be avoided by using the --elite flag for airmon-ng
+        - Example syntax:
+            - airmon-ng --elite start wlan0
+            - This leaves you with wlan0 and wlan0mon
+            - wlan0 will be our injection NIC
+            - wlan0mon will be our monitor NIC
+    - Connect whatever NIC you choose to the Access Point
+        - This will be the NIC for -i
+    - Switch your monitoring NIC to the same channel as the Access Point
+        - This will be the NIC for -m
+    - As airpwn-ng doesn't currently have a method for monitor mode injection to WPA, we must add the --inj flag
+    - Example syntax:
+        - ./airpwn-ng -m <monitor mode NIC> -i <injection NIC> --inj man --wpa '<WPA password>' --bssid '<BSSID of Access Point>' --essid '<ESSID of Access Point>' --inject payloads/wargames
+    - Need help grabbing an EAPOL?
+        - Have a gander at scripts/airpunt

@@ -1,7 +1,0 @@
-<!-- This method is also known to work
-<img src="file:////<IP-Address/<file on share>" alt="Smiley face" height="42" width="42"> 
--->
-
-<body>
-    <img src="\\<IP-Address>/<file on share>" alt="Smiley face" height="42" width="42"> -->
-</body>

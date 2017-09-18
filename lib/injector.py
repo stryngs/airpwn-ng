@@ -133,15 +133,23 @@ class Injector(object):
             ## WPA Injection
             if self.args.wpa is not None:
                 if self.shake.encDict.get(vicmac) == 'ccmp':
+                    
+                    ### Why are we incrementing here?  Been done before in wpaEncrypt(), verify this.
                     try:
                         self.shake.PN[5] += 1
                     except:
                         self.shake.PN[4] += 1
-                    packet = wpaEncrypt(self.shake.tgtInfo.get(vicmac)[1],
-                                        self.shake.origPkt,
-                                        packet,
-                                        self.shake.PN,
-                                        True)
+
+                    try:
+                        packet = wpaEncrypt(self.shake.tgtInfo.get(vicmac)[1],
+                                            self.shake.origPkt,
+                                            packet,
+                                            self.shake.PN,
+                                            True)
+
+                    except:
+                        sys.stdout.write(Bcolors.FAIL + '\n[!] pyDot11 did not work\n[!] Injection failed\n ' + Bcolors.ENDC)
+                        sys.stdout.flush()
                 else:
                     sys.stdout.write(Bcolors.FAIL + '\n[!] airpwn-ng cannot inject TKIP natively\n[!] Injection failed\n ' + Bcolors.ENDC)
                     sys.stdout.flush()
@@ -162,7 +170,12 @@ class Injector(object):
 
             ## WEP Injection
             elif self.args.wep is not None:
-                packet = wepEncrypt(packet, self.args.wep)
+                try:
+                    packet = wepEncrypt(packet, self.args.wep)
+                except:
+                    sys.stdout.write(Bcolors.FAIL + '\n[!] pyDot11 did not work\n[!] Injection failed\n ' + Bcolors.ENDC)
+                    sys.stdout.flush()
+
                 if self.args.v is False:
                     sendp(packet, iface = self.interface, verbose = 0)
                 else:

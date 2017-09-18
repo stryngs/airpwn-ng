@@ -55,7 +55,11 @@ class Sniffer(object):
                 encKey = self.shake.tgtInfo.get(self.tgtMAC)[0]
 
             ## Decrypt
-            self.packethandler.injector.shake.origPkt, decodedPkt, self.packethandler.injector.shake.PN = wpaDecrypt(encKey, pkt, eType, False)
+            try:
+                self.packethandler.injector.shake.origPkt, decodedPkt, self.packethandler.injector.shake.PN = wpaDecrypt(encKey, pkt, eType, False)
+            except:
+                sys.stdout.write(Bcolors.FAIL + '\n[!] pyDot11 did not work\n[!] Decryption failed\n ' + Bcolors.ENDC)
+                sys.stdout.flush()
             
             #print decodedPkt.summary()
             
@@ -66,7 +70,11 @@ class Sniffer(object):
         elif args.wep:
             
             ## Decrypt
-            pkt, iVal = wepDecrypt(pkt, args.wep, False)
+            try:
+                pkt, iVal = wepDecrypt(pkt, args.wep, False)
+            except:
+                sys.stdout.write(Bcolors.FAIL + '\n[!] pyDot11 did not work\n[!] Decryption failed\n ' + Bcolors.ENDC)
+                sys.stdout.flush()
 
             ## Process
             self.packethandler.process(m, pkt, args)

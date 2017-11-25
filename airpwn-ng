@@ -156,21 +156,6 @@ def main(args):
         if args.inj == 'mon':
             channelSet(args.i, args.channel)
     
-    ## Printouts
-    ### Thinking about it, in the scenario they would print...
-    ### -i wlan0mon and -m wlan0mon, open wifi, etc..
-    ### We're probably getting better performance anyways,
-    ### nic 1 inbound, nic 2 outbound, less processing spent full-dupliex, etc..
-    ### This printout is silly.
-    ### Coverage in the new tutorial should be sufficient
-    #if (args.mon == 'mon' and args.inj == 'mon') and (args.wpa is None or args.wep is None) and (args.i != args.m):
-        #print Bcolors.WARNING + '[!] It appears you are using a monitor mode interface as your monitoring input.'
-        #print '[!] If you are attacking open wireless networks, please use the same monitoring interface with -i for better performance.' + Bcolors.ENDC
-        
-    ### no more tap needed....
-    #if 'mon' not in args.m:
-        #print Bcolors.WARNING + '[!] It appears your are trying to attack a WEP/WPA protected network. Please ensure -m is your dot11 tap interface and that -i is connected to the target AP.' + Bcolors.ENDC
-
     ### NOT IMPLEMENTED YET
     ## Whitelist checks
     #if args.exclude_hosts is not None:

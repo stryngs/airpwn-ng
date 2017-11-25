@@ -235,18 +235,21 @@ class Sniffer(object):
                     try:
                         pkt = q.get(timeout = 1)
                         
-                        if packet.haslayer(EAPOL):
-                            self.shake.eapolGrab(packet)
+                        ### Extreme bug found here.
+                        ### packet instead of pkt was used
+                        ### Perhaps the cause of many prior errors
+                        if pkt.haslayer(EAPOL):
+                            self.shake.eapolGrab(pkt)
                         
                         
                         elif (pkt[Dot11].addr1 == args.bssid and pkt[Dot11].FCfield == 65L and len(pkt) >= args.s) or (pkt[Dot11].addr2 == args.bssid and pkt[Dot11].FCfield == 66L and len(pkt) >= args.s):
                             self.tgtMAC = False
                             
                             ## MAC verification
-                            if packet.addr1 in self.shake.availTgts:
-                                self.tgtMAC = packet.addr1
-                            elif packet.addr2 in self.shake.availTgts:
-                                self.tgtMAC = packet.addr2
+                            if pkt.addr1 in self.shake.availTgts:
+                                self.tgtMAC = pkt.addr1
+                            elif pkt.addr2 in self.shake.availTgts:
+                                self.tgtMAC = pkt.addr2
                             
                             ## Pass the packet
                             if self.tgtMAC:

@@ -41,15 +41,9 @@ Prerequisites:
 ---
 airpwn-ng was built around scapy2.3.3 from PyPI.  Support and/or advice about airpwn-ng requires the user have this version on their system.  For your convience, a local copy of scapy has been included in RESOURCEs/.  If you don't have scapy, or have a different version of scapy on your system, then feel free to use the locally included .tgz.
 
-During testing it was found there are some conflicts using scapy-2.3.3. So we have provided the older 2.2 version. For now, until those issues are worked out, please use the 2.2 version. 
+During testing it was found there are some conflicts using scapy-2.3.3. So we have provided the older 2.2 version. For now, until those issues are worked out, please use the 2.2 version.
 
-airpwn-ng and pyDot11 are currently undergoing a merge.  As both projects wish to support PyPy, certain requirements must be dealt with prior to this merge.  After the merge, these requirements will still be there, but they won't specifically revolve around the solution currently baked in to get airpwn-ng up and running with pyDot11.
-
-Initial testing shows that PyPy slows down some aspects and speeds up other aspects of airpwn-ng and pyDot11.  It is not recommended to attempt airpwn-ng usage with PyPy at this time, but the option is still available if you wish.
-
-Whether or not you wish to use PyPy, you must choose one of the following methods to get airpwn-ng up and running:
-
-#### Non PyPy usage:
+#### Setup Directions:
 If you have scapy-2.2.0 from pyDot11 installed and available in your Python sys.path, you may disregard this step:
 ````bash
 ## From the airpwn-ng folder run the following
@@ -77,20 +71,6 @@ pip install RESOURCEs/pbkdf2-1.3.tar.gz -t _PYPY
 pip install RESOURCEs/rc4-0.1.tar.gz -t _PYPY
 pip install RESOURCEs/pycryptodomex-3.4.5.tar.gz
 ````
-
-#### PyPy usage:
-While using something such as virtualenv would achieve the desired outcome, the logic for avoiding the need has been baked into airpwn-ng by modifying sys.path and uing _PYPY as the parent folder for the PyPy modules.  Of the modules needed, pycryptodomex requires compilation by pypy itself.  Every other module can simply be installed to the _PYPY folder.  Directions are as such:
-````bash
-## From the airpwn-ng folder run the folder
-pip install RESOURCEs/pyDot11-0.8.6.tar.gz -t _PYPY
-pip install RESOURCEs/pbkdf2-1.3.tar.gz -t _PYPY
-pip install RESOURCEs/rc4-0.1.tar.gz -t _PYPY
-#pip install RESOURCEs/scapy-2.3.3.tgz -t _PYPY
-pip install RESOURCEs/scapy_2.2.0.orig.tar.gz -t _PYPY
-tar zxf RESOURCEs/pycryptodomex-3.4.5.tar.gz -C _PYPY
-cd _PYPY/pycryptodomex-3.4.5/ && pypy setup.py build && mv build/lib*/Cryptodome ../ && cd ../../ && rm -rf _PYPY/pycryptodomex-3.4.5/
-````
-
 
 What else do we need to get started?
 ---

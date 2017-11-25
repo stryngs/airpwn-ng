@@ -21,7 +21,7 @@ class PacketHandler(object):
     """
 
     def __init__(self, *positional_parameters, **keyword_parameters):
-        if ('victims' in keyword_parameters):
+        if 'victims' in keyword_parameters:
             self.victims = keyword_parameters['victims']
         else:
             self.victims = []

@@ -2,6 +2,7 @@
 
 import logging, subprocess, os, sys, argparse, signal
 from lib.logger import Database, Tee as tee
+from lib.styles import File, List
 from lib.visuals import Bcolors
 from lib.victim import Victim
 
@@ -95,11 +96,6 @@ def main(args):
     if args.wpa is not None and (args.bssid is None or args.essid is None):
         print '--wpa requires --bssid and --essid\n'
         sys.exit(1)
-
-    ## Enforce managed mode for injection for WPA for the time being
-    #if args.wpa is not None and (args.inj is None or args.inj == 'mon'):
-        #print "--wpa requires --inj 'man' for now\n'"
-        #sys.exit(1)
 
     ## Lowercase BSSID
     if args.bssid is not None:
@@ -295,13 +291,6 @@ if __name__ == '__main__':
     ## ADD GLOBAL SIGNAL HANDLER
     signal_handler = crtlC(args)
     signal.signal(signal.SIGINT, signal_handler)
-    
-    ## Paths and imports
-    if args.o == 'pypy':
-        pwd = os.getcwd()
-        sys.path.append(pwd + '/_PYPY')
-        sys.path.append(pwd + '/_PYPY/pyDot11')
-    from lib.styles import File, List
-    
+
     ## Launch
     main(args)

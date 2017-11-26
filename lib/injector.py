@@ -38,6 +38,7 @@ class Injector(object):
     def inject(self,
                vicmac,
                rtrmac,
+               dstmac,
                vicip,
                svrip,
                vicport,
@@ -70,7 +71,7 @@ class Injector(object):
                               FCfield = 'from-DS',
                               addr1 = vicmac,
                               addr2 = rtrmac,
-                              addr3 = rtrmac,
+                              addr3 = dstmac,
                               subtype = 8L,
                               type = 2
                               )\
@@ -98,7 +99,7 @@ class Injector(object):
                               FCfield = 'from-DS',
                               addr1 = vicmac,
                               addr2 = rtrmac,
-                              addr3 = rtrmac
+                              addr3 = dstmac
                               )\
                         /LLC()\
                         /SNAP()\

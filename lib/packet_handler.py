@@ -69,16 +69,10 @@ class PacketHandler(object):
         #print 'packet_handler has instantiated Injector()'
 
 
+    ### Trace out args for victim.add_cookie
     def cookieManager(self,
                       vicmac,
-                      rtrmac,
                       vicip,
-                      svrip,
-                      vicport,
-                      svrport,
-                      acknum,
-                      seqnum,
-                      request,
                       cookie,
                       args):
         """This function does cookie management for broadcast mode and targeted mode.
@@ -279,16 +273,9 @@ class PacketHandler(object):
 
     ### Need docstring
     def covert_injection(self,
-                         vicmac,
-                         rtrmac,
-                         vicip,
                          svrip,
-                         vicport,
-                         svrport,
-                         acknum,
                          seqnum,
                          request,
-                         cookie,
                          injection):
         global BLOCK_HOSTS
         #print svrip,BLOCK_HOSTS
@@ -326,6 +313,7 @@ class PacketHandler(object):
     def condensor(self,
                   vicmac,
                   rtrmac,
+                  dstmac,
                   vicip,
                   svrip,
                   vicport,
@@ -341,18 +329,11 @@ class PacketHandler(object):
                   victim):
         """Condense some of the logic into a single function"""
         if victim.victim_parameters.covert:
-            cov_injection = self.covert_injection(vicmac,
-                                                  rtrmac,
-                                                  vicip,
-                                                  svrip,
-                                                  vicport,
-                                                  svrport,
-                                                  acknum,
+            cov_injection = self.covert_injection(svrip,
                                                   seqnum,
                                                   request,
-                                                  cookie,
                                                   injection)
-            if (cov_injection != 0):
+            if cov_injection != 0:
                 injection = cov_injection
             else:
                 return 0
@@ -360,6 +341,7 @@ class PacketHandler(object):
         #print injection
         self.injector.inject(vicmac,
                              rtrmac,
+                             dstmac,
                              vicip,
                              svrip,
                              vicport,
@@ -422,13 +404,16 @@ class PacketHandler(object):
 
                 ## MONITOR MODE
                 if self.nic == 'mon':
-                    vicmac = packet.getlayer(Dot11).addr2
                     rtrmac = packet.getlayer(Dot11).addr1
+                    vicmac = packet.getlayer(Dot11).addr2
+                    dstmac = packet.getlayer(Dot11).addr3
 
                 ## TAP MODE
                 else:
-                    vicmac = packet.getlayer(Ether).src
                     rtrmac = packet.getlayer(Ether).dst
+                    vicmac = packet.getlayer(Ether).src
+                    dstmac = 'TAP'
+                    
 
                 vicip = packet.getlayer(IP).src
                 svrip = packet.getlayer(IP).dst
@@ -463,6 +448,7 @@ class PacketHandler(object):
             #print (vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr)
             return (vicmac,
                     rtrmac,
+                    dstmac,
                     vicip,
                     svrip,
                     vicport,
@@ -479,6 +465,7 @@ class PacketHandler(object):
     def proc_injection(self,
                        vicmac,
                        rtrmac,
+                       dstmac,
                        vicip,
                        svrip,
                        vicport,
@@ -515,6 +502,7 @@ class PacketHandler(object):
                         if injection is not None:
                             self.condensor(vicmac,
                                            rtrmac,
+                                           dstmac,
                                            vicip,
                                            svrip,
                                            vicport,
@@ -536,6 +524,7 @@ class PacketHandler(object):
                             if injection is not None:
                                 self.condensor(vicmac,
                                                rtrmac,
+                                               dstmac,
                                                vicip,
                                                svrip,
                                                vicport,
@@ -569,6 +558,7 @@ class PacketHandler(object):
                             if injection is not None:
                                 self.condensor(vicmac,
                                                rtrmac,
+                                               dstmac,
                                                vicip,
                                                svrip,
                                                vicport,
@@ -590,6 +580,7 @@ class PacketHandler(object):
                                 if injection is not None:
                                     self.condensor(vicmac,
                                                    rtrmac,
+                                                   dstmac,
                                                    vicip,
                                                    svrip,
                                                    vicport,
@@ -620,6 +611,7 @@ class PacketHandler(object):
                         if injection is not None:
                             self.condensor(vicmac,
                                            rtrmac,
+                                           dstmac,
                                            vicip,
                                            svrip,
                                            vicport,
@@ -645,6 +637,7 @@ class PacketHandler(object):
                             if injection is not None:
                                 self.condensor(vicmac,
                                                rtrmac,
+                                               dstmac,
                                                vicip,
                                                svrip,
                                                vicport,
@@ -673,22 +666,16 @@ class PacketHandler(object):
             #self.handler(interface, pkt, args)
         #else:
         try:
-            vicmac, rtrmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr = self.proc_handler(pkt, args)
+            vicmac, rtrmac, dstmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr = self.proc_handler(pkt, args)
             
             self.cookieManager(vicmac,
-                                rtrmac,
-                                vicip,
-                                svrip,
-                                vicport,
-                                svrport,
-                                acknum,
-                                seqnum,
-                                request,
-                                cookie,
-                                args)
+                               vicip,
+                               cookie,
+                               args)
             
             self.proc_injection(vicmac,
                                 rtrmac,
+                                dstmac,
                                 vicip,
                                 svrip,
                                 vicport,

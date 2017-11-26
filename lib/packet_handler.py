@@ -666,8 +666,19 @@ class PacketHandler(object):
             #self.handler(interface, pkt, args)
         #else:
         try:
-            vicmac, rtrmac, dstmac, vicip, svrip, vicport, svrport, acknum, seqnum, request, cookie, TSVal, TSecr = self.proc_handler(pkt, args)
-            
+            vicmac,\
+            rtrmac,\
+            dstmac,\
+            vicip,\
+            svrip,\
+            vicport,\
+            svrport,\
+            acknum,\
+            seqnum,\
+            request,\
+            cookie,\
+            TSVal,\
+            TSecr = self.proc_handler(pkt, args)
             self.cookieManager(vicmac,
                                vicip,
                                cookie,

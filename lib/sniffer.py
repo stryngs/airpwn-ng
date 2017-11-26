@@ -35,9 +35,16 @@ class Sniffer(object):
 
 
     def handler(self, q, m, pkt, args):
-        """This function exists solely to reduce lines of code"""
+        """This function exists solely to reduce lines of code
         
-        ### This will need a different structure for self.shake bridge
+        This function has been changed a bit to have the processing,
+        moved to within the try: for WPA and WEP
+        If errors are seen where pyDot11 fails to process, and
+        airpwn-ng starts to hang, move self.packethandler.process()
+        out from under the try/except like it previously was
+        """
+        
+        ### This might need a different structure for self.shake bridge
         ### Multiple vics might collide...
         ## WPA
         if args.wpa:
@@ -56,15 +63,17 @@ class Sniffer(object):
 
             ## Decrypt
             try:
-                self.packethandler.injector.shake.origPkt, decodedPkt, self.packethandler.injector.shake.PN = wpaDecrypt(encKey, pkt, eType, False)
+                self.packethandler.injector.shake.origPkt,\
+                pkt,\
+                self.packethandler.injector.shake.PN = wpaDecrypt(encKey,
+                                                                  pkt,
+                                                                  eType,
+                                                                  False)
+                #print pkt.summary()
             except:
                 sys.stdout.write(Bcolors.FAIL + '\n[!] pyDot11 did not work\n[!] Decryption failed\n ' + Bcolors.ENDC)
                 sys.stdout.flush()
-            
-            #print decodedPkt.summary()
-            
-            ## Process
-            self.packethandler.process(m, decodedPkt, args)
+                return
 
         ## WEP
         elif args.wep:
@@ -72,18 +81,14 @@ class Sniffer(object):
             ## Decrypt
             try:
                 pkt, iVal = wepDecrypt(pkt, args.wep, False)
+                #print pkt.summary()
             except:
                 sys.stdout.write(Bcolors.FAIL + '\n[!] pyDot11 did not work\n[!] Decryption failed\n ' + Bcolors.ENDC)
                 sys.stdout.flush()
+                return
 
-            ## Process
-            self.packethandler.process(m, pkt, args)
-
-        ## Open
-        else:
-            
-            ## Process
-            self.packethandler.process(m, pkt, args)
+        ## Process and finish out the task
+        self.packethandler.process(m, pkt, args)
         q.task_done()
 
 
@@ -109,6 +114,7 @@ class Sniffer(object):
 
         ## Sniffing in Monitor Mode for Open wifi
         if args.mon == 'mon' and not args.wep and not args.wpa:
+
             ## BSSID filtering and Speedpatch
             if args.bssid and not args.b:
                 #print 'BSSID filtering and Speedpatch\n'
@@ -143,7 +149,8 @@ class Sniffer(object):
                 while True:
                     try:
                         pkt = q.get(timeout = 1)
-                        if (pkt[Dot11].addr1 == args.bssid and pkt[Dot11].FCfield == 1L and len(pkt) >= args.s) or (pkt[Dot11].addr2 == args.bssid and pkt[Dot11].FCfield == 2L and len(pkt) >= args.s):                                                       
+                        if (pkt[Dot11].addr1 == args.bssid and pkt[Dot11].FCfield == 1L and len(pkt) >= args.s) or\
+                            (pkt[Dot11].addr2 == args.bssid and pkt[Dot11].FCfield == 2L and len(pkt) >= args.s):                                                       
                             self.handler(q, self.m, pkt, args)
                         else:
                             pass
@@ -195,10 +202,8 @@ class Sniffer(object):
 
         ## Sniffing in Monitor Mode for WPA
         elif args.mon == 'mon' and args.wpa:
-            ### Moved to __init__ for now
-            #self.shake = Handshake(args.wpa, args.essid)
             
-             ## BSSID filtering and Speedpatch
+            ## BSSID filtering and Speedpatch
             if args.bssid and not args.b:
                 #print 'BSSID filtering and Speedpatch\n'
                 while True:
@@ -234,14 +239,9 @@ class Sniffer(object):
                 while True:
                     try:
                         pkt = q.get(timeout = 1)
-                        
-                        ### Extreme bug found here.
-                        ### packet instead of pkt was used
-                        ### Perhaps the cause of many prior errors
                         if pkt.haslayer(EAPOL):
                             self.shake.eapolGrab(pkt)
-                        
-                        
+
                         elif (pkt[Dot11].addr1 == args.bssid and pkt[Dot11].FCfield == 65L and len(pkt) >= args.s) or (pkt[Dot11].addr2 == args.bssid and pkt[Dot11].FCfield == 66L and len(pkt) >= args.s):
                             self.tgtMAC = False
                             
@@ -265,13 +265,13 @@ class Sniffer(object):
         ## Sniffing in Tap Mode -- aka Encrypted WiFi
         ## No longer needed!
         ## Left for historical purposes
-        else:
-            ## Tap mode
-            print 'Tap mode\n'
-            while True:
-                try:
-                    pkt = q.get(timeout = 1)
-                    self.handler(q, self.m, pkt, args)
-                except Empty:
-                    #q.task_done()
-                    pass
+        #else:
+            ### Tap mode
+            #print 'Tap mode\n'
+            #while True:
+                #try:
+                    #pkt = q.get(timeout = 1)
+                    #self.handler(q, self.m, pkt, args)
+                #except Empty:
+                    ##q.task_done()
+                    #pass

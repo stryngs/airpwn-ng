@@ -219,9 +219,6 @@ if __name__ == '__main__':
     parser.add_argument('-m',
                         metavar = '<interface>',
                         help = 'Your monitor interface')
-    parser.add_argument('-o',
-                        metavar = '<Op Mode>',
-                        help = 'Interpreter selection ---- [Default: python]')
     parser.add_argument('-s',
                         metavar = '<pkt size>',
                         help = 'minimum size packet to decipher')

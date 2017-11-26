@@ -1,1 +1,4 @@
 *.pyc
+cookies.log
+cookies.sqlite
+handshakes.sqlite

@@ -63,7 +63,7 @@ class Sniffer(object):
 
             ## Decrypt
             try:
-                self.packethandler.injector.shake.origPkt,\
+                self.packethandler.injector.shake.origPkt = pkt
                 pkt,\
                 self.packethandler.injector.shake.PN = wpaDecrypt(encKey,
                                                                   pkt,

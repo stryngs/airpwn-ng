@@ -16,7 +16,7 @@ Features
 ---
 
 - Inject to all visible clients (a.k.a Broadcast Mode)
-- Inject on both open networks and WEP/WPA protected networks
+- Inject on OPEN, WEP and WPA protected networks
 - Targeted injection with -t MAC:ADDRESS [MAC:ADDRESS]
 - Gather all visible cookies (Broadcast Mode)
 - Gather cookies for specific websites (--websites websites_list.txt)
@@ -39,37 +39,29 @@ That's cool...  So what can we do with it?
 
 Prerequisites:
 ---
-airpwn-ng was built around scapy2.3.3 from PyPI.  Support and/or advice about airpwn-ng requires the user have this version on their system.  For your convience, a local copy of scapy has been included in RESOURCEs/.  If you don't have scapy, or have a different version of scapy on your system, then feel free to use the locally included .tgz.
+packetEssentials-1.0.2
+pbkdf2-1.3
+pycryptodomex-3.4.5
+pyDot11-2.0.1
+rc4-0.1
+scapy 2.4.0
 
-During testing it was found there are some conflicts using scapy-2.3.3. So we have provided the older 2.2 version. For now, until those issues are worked out, please use the 2.2 version.
+#### Setup:
 
-#### Setup Directions:
-If you have scapy-2.2.0 from pyDot11 installed and available in your Python sys.path, you may disregard this step:
+In the RESOURCEs folder you will find the python modules which have been tested.  As newer versions of the modules come out, sufficient testing must be done before they can be made known as "stable" with pyDot11.  Feel free to use pip or whatever method you would like to get these installed.  If you wish to use the modules locally provided with this git, then an installation would be something like so:
 ````bash
-## From the airpwn-ng folder run the following
-#pip install RESOURCEs/scapy-2.3.3.tgz
-pip install RESOURCEs/scapy_2.2.0.orig.tar.gz
-
-    ## OR ##
-
-#tar zxf RESOURCEs/scapy-2.3.3.tgz
-#mv scapy-2.3.3/scapy/ .
-#rm -rf scapy-2.3.3/
-tar zxf RESOURCEs/scapy_2.2.0.orig.tar.gz
-mv scapy-2.2.0/scapy/ .
-rm -rf scapy-2.2.0/
-````
-If you already have pyDot11 installed to your system and available in your Python sys.path, you may disregard this step:
-````bash
-## From the airpwn-ng folder run the following
-pip install RESOURCEs/pyDot11-0.8.6.tar.gz
-````
-These other requirements can be met by using pip and the PyPI repository, or directly installing as such:
-````bash
-## From the airpwn-ng folder run the following
-pip install RESOURCEs/pbkdf2-1.3.tar.gz -t _PYPY
-pip install RESOURCEs/rc4-0.1.tar.gz -t _PYPY
+pip install RESOURCEs/packetEssentials-1.0.2.tar.gz
+pip install RESOURCEs/pbkdf2-1.3.tar.gz
+pip install RESOURCEs/pyDot11-2.0.1.tar.gz
 pip install RESOURCEs/pycryptodomex-3.4.5.tar.gz
+pip install RESOURCEs/rc4-0.1.tar.gz
+pip install RESOURCEs/scapy-2.4.0.tar.gz
+
+## If you run into issues with the scapy module not being found
+## Try this local folder workaround
+tar zxf RESOURCEs/scapy-2.4.0.tar.gz
+mv scapy-2.4.0/scapy/ .
+rm -rf scapy-2.4.0/
 ````
 
 What else do we need to get started?

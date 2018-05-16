@@ -1,7 +1,8 @@
 from Queue import Queue, Empty
 from pyDot11 import *
+from lib.visuals import Bcolors
 from scapy.layers.dot11 import Dot11, Dot11WEP
-from scapy.layers.l2 import EAPOL
+from scapy.layers.eap import EAPOL
 from scapy.sendrecv import sniff
 from threading import Thread
 import sys, time

@@ -3,7 +3,7 @@
 import argparse, sys, time
 from scapy.sendrecv import sendp, sniff
 from scapy.layers.dot11 import Dot11, Dot11Deauth, RadioTap, Raw
-from scapy.layers.l2 import EAPOL
+from scapy.layers.eap import EAPOL
 from scapy.utils import hexstr
 from pyDot11.lib.utils import Packet
 

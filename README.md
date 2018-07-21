@@ -39,10 +39,10 @@ That's cool...  So what can we do with it?
 
 Prerequisites:
 ---
-packetEssentials-1.0.2
+packetEssentials-1.0.8
 pbkdf2-1.3
 pycryptodomex-3.4.5
-pyDot11-2.0.1
+pyDot11-2.0.7
 rc4-0.1
 scapy 2.4.0
 
@@ -50,9 +50,9 @@ scapy 2.4.0
 
 In the RESOURCEs folder you will find the python modules which have been tested.  As newer versions of the modules come out, sufficient testing must be done before they can be made known as "stable" with pyDot11.  Feel free to use pip or whatever method you would like to get these installed.  If you wish to use the modules locally provided with this git, then an installation would be something like so:
 ````bash
-pip install RESOURCEs/packetEssentials-1.0.2.tar.gz
+pip install RESOURCEs/packetEssentials-1.0.8.tar.gz
 pip install RESOURCEs/pbkdf2-1.3.tar.gz
-pip install RESOURCEs/pyDot11-2.0.1.tar.gz
+pip install RESOURCEs/pyDot11-2.0.7.tar.gz
 pip install RESOURCEs/pycryptodomex-3.4.5.tar.gz
 pip install RESOURCEs/rc4-0.1.tar.gz
 pip install RESOURCEs/scapy-2.4.0.tar.gz

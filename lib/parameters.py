@@ -1,9 +1,21 @@
-from Queue import Queue, Empty
+# #from Queue import Queue, Empty
+# try:
+#     import queue
+# except ImportError:
+#     # Python 2
+#     import Queue as queue
+
+try:
+    from queue import Queue, Empty
+except ImportError:
+    # Python 2
+    from Queue import Queue, Empty
+
 import binascii
 
 class VictimParameters(object):
     """An instance of this class is always necessary to run the application
-    
+
     This class holds your injections.
 
     Define victim detection parameters.
@@ -38,11 +50,11 @@ class VictimParameters(object):
             self.in_request_handler = None
 
         if self.websites is None and self.inject_file is None and self.in_request is None:
-            print "[ERROR] Please specify victim parameters"
+            print ('[ERROR] Please specify victim parameters')
             exit(1)
 
         if self.in_request is not None and (self.websites is None and self.inject_file is None):
-            print "[ERROR] You must select websites or an inject file for use with in_request"
+            print ('[ERROR] You must select websites or an inject file for use with in_request')
         else:
             if self.websites is not None:
                 self.website_injects = []
@@ -57,7 +69,7 @@ class VictimParameters(object):
     def default_request_handler(self, request):
         """Default request handler
         Checks if in_request string is contained in the request.
-        
+
         (i.e. in_request="Firefox")
         """
         if self.in_request in request:
@@ -128,7 +140,7 @@ class VictimParameters(object):
 
     def get_iframe(self,website,i):
         """iframe generation function, src filled in via JS.
-        
+
         This generates an iFrame with an empty source.
         It will be filled in later via js to bypass restrictions.
         """

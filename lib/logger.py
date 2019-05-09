@@ -35,7 +35,7 @@ class Database(object):
             getRows = self.db.execute("SELECT count(rowid) from cookies;")
             tVal = getRows.fetchone()
             rCount = tVal[0] + 1
-            
+
             ## Loop through rows
             for row in range(1, rCount):
                 with open('cookie-grab_%s.ck' % row, 'w') as oFile:
@@ -55,13 +55,13 @@ class Database(object):
                         name = ckVal[0].split(';')[c].strip().split('=')[0]
                         nameLen = len(ckVal[0].split(';')[c].strip().split('=')[0]) + 1
                         oFile.write(re.sub('^www.', '.', dmVal[0]) + '\t' + 'TRUE' + '\t' + '/' + '\t' + 'FALSE' + '\t' + cExp + '\t' + name + '\t' + ckVal[0].split(';')[c].strip()[nameLen:] + '\t' + '1' + '\r\n')
-                print 'cookie-grab_%s.ck created!' % row
+                print ('cookie-grab_{0}.ck created!'.format(str(row)))
 
 
 
 class cookieLogger(object):
     """Plaintext cookie logs"""
-    
+
     def __init__(self):
         """Plaintext log for cookies"""
         self.cFile = open('cookies.log', 'w')

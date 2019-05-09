@@ -30,11 +30,11 @@ class Victim(object):
             self.victim_parameters = None
 
         if self.ip is None and self.mac is None:
-            print "[ERROR] Victim: No IP or Mac, or in_request selected"
+            print ('[ERROR] Victim: No IP or Mac, or in_request selected')
             exit(1)
 
         if self.victim_parameters is None:
-            print "[ERROR] Please create VictimParameters for this Victim"
+            print ('[ERROR] Please create VictimParameters for this Victim')
             exit(1)
 
 
@@ -87,8 +87,7 @@ class Victim(object):
                 exists = 1
 
         if not exists and cookie[1] != "NONE":
-            print ""
-            print Bcolors.OKGREEN + '[+] New cookie detected for: %s -- %s' % (cookie[0], self.mac) + Bcolors.ENDC
+            print (Bcolors.OKGREEN + '[+] New cookie detected for: %s -- %s' % (cookie[0], self.mac) + Bcolors.ENDC)
             if not args.t:
                 self.log.cookies(self.ip, self.mac, cookie[0], cookie[1])
                 self.db.sqlite_cookies(self.ip, self.mac, cookie[0], cookie[1])
@@ -96,7 +95,7 @@ class Victim(object):
                 ip = ''
                 self.log.cookies(ip, self.mac, cookie[0], cookie[1])
                 self.db.sqlite_cookies(ip, self.mac, cookie[0], cookie[1])
-            
+
             self.cookies.append(cookie)
 
         else:
@@ -104,13 +103,11 @@ class Victim(object):
                 ## ADD THE NONE ANYWAY COOKIE SO GET_INJECTION() CAN SKIP TO THE NEXT IFRAME
                 self.cookies.append(cookie)
                 if self.ip is not None:
-                    print ""
-                    #print Bcolors.WARNING + "[!] No cookie on client %s for %s" % (self.ip, cookie[0]) + Bcolors.ENDC
-                    print Bcolors.WARNING + "[!] No cookie on client " + Bcolors.OKBLUE + "%s" % (self.ip) + Bcolors.WARNING + " for " + Bcolors.OKBLUE + "%s" % (cookie[0]) + Bcolors.ENDC
+                    print ('')
+                    print (Bcolors.WARNING + "[!] No cookie on client " + Bcolors.OKBLUE + "%s" % (self.ip) + Bcolors.WARNING + " for " + Bcolors.OKBLUE + "%s" % (cookie[0]) + Bcolors.ENDC)
                 else:
-                    print ""
-                    #print Bcolors.WARNING + "[!] No cookie on client %s for %s" % (self.mac, cookie[0]) + Bcolors.ENDC
-                    print Bcolors.WARNING + "[!] No cookie on client " + Bcolors.OKBLUE + "%s" % (self.ip) + Bcolors.WARNING + " for " + Bcolors.OKBLUE + "%s" % (cookie[0]) + Bcolors.ENDC
+                    print ('')
+                    print (Bcolors.WARNING + "[!] No cookie on client " + Bcolors.OKBLUE + "%s" % (self.ip) + Bcolors.WARNING + " for " + Bcolors.OKBLUE + "%s" % (cookie[0]) + Bcolors.ENDC)
 
 
     def add_cookie(self, cookie, args):

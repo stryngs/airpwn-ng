@@ -1,6 +1,13 @@
 #! /usr/bin/python2.7
 
-import logging, subprocess, os, sys, argparse, signal
+import argparse
+import logging
+import os
+# import pysnooper
+import subprocess
+import sys
+
+import signal
 from lib.logger import Database, Tee as tee
 from lib.styles import File, List
 from lib.visuals import Bcolors
@@ -13,10 +20,10 @@ def channelSet(nic, chan):
 def crtlC(args):
     """Handle CTRL+C."""
     def tmp(signal, frame):
-        print Bcolors.FAIL + '\n[!] Stopping injection and exiting airpwn-ng ...' + Bcolors.ENDC
-        print Bcolors.OKGREEN + '\n[+] Cookies stored to ' + Bcolors.WARNING + 'cookies.log ' + Bcolors.OKGREEN +  'and ' + Bcolors.WARNING + 'cookies.sqlite' + Bcolors.ENDC
+        print (Bcolors.FAIL + '\n[!] Stopping injection and exiting airpwn-ng ...' + Bcolors.ENDC)
+        print (Bcolors.OKGREEN + '\n[+] Cookies stored to ' + Bcolors.WARNING + 'cookies.log ' + Bcolors.OKGREEN +  'and ' + Bcolors.WARNING + 'cookies.sqlite' + Bcolors.ENDC)
         if args.l:
-            print(Bcolors.OKGREEN + '\n[+] Output log stored to ' + Bcolors.WARNING + '%s' + Bcolors.ENDC) % args.l
+            print (Bcolors.OKGREEN + '\n[+] Output log stored to ' + Bcolors.WARNING + '{0}'.format(str(args.l)) + Bcolors.ENDC)
         sys.exit(0)
     return tmp
 
@@ -28,9 +35,9 @@ def injection_check(args):
             f = open(args.injection, 'r')
             f.close()
         except:
-            print Bcolors.FAIL + '[!] Selected injection file', args.injection, 'does not exist.' + Bcolors.ENDC
+            print (Bcolors.FAIL + '[!] Selected injection file', args.injection, 'does not exist.' + Bcolors.ENDC)
             exit(1)
-        print Bcolors.OKGREEN + '[+] Loaded injection file', args.injection + Bcolors.ENDC
+        print (Bcolors.OKGREEN + '[+] Loaded injection file {0}'.format(str(args.injection)) + Bcolors.ENDC)
         injection = 1
         websites = None
         return injection, websites
@@ -42,7 +49,7 @@ def injection_check(args):
             f = open(args.websites, 'r')
             f.close()
         except IOError:
-            print Bcolors.FAIL + '[!] Selected websites file', args.websites, 'does not exist.' + Bcolors.ENDC
+            print (Bcolors.FAIL + '[!] Selected websites file', args.websites, 'does not exist.' + Bcolors.ENDC)
             sys.exit(1)
         except:
             raise
@@ -50,14 +57,14 @@ def injection_check(args):
         injection = 0
         websites = load_websites_targeted(args.websites)
         for website in websites:
-            print Bcolors.OKGREEN + '[+] Loaded target website ', website + Bcolors.ENDC
+            print (Bcolors.OKGREEN + '[+] Loaded target website ', website + Bcolors.ENDC)
         return injection, websites
 
 
 ### Make this simplistic with import re
 def load_websites_targeted(websites_file):
     """Load websites from a file to a List object.
-    
+
     Ignore lines starting with #.
     """
     websites = []
@@ -69,10 +76,10 @@ def load_websites_targeted(websites_file):
                 websites.append(i.strip())
     return websites
 
-
+# @pysnooper.snoop('./air.log')
 def main(args):
     """Launching logic"""
-    
+
     ## Logging
     if args.l is not None:
         stdOut = sys.stdout
@@ -80,7 +87,7 @@ def main(args):
         sys.stderr = stdOut
         oLog = open(args.l, 'w')
         sys.stdout = tee(stdOut, oLog)
-    
+
     ## Cookie extractor
     if args.cm is not None:
         db = Database(args.cm)
@@ -89,12 +96,12 @@ def main(args):
 
     ## Enforce BSSID if WEP is chosen
     if args.wep is not None and args.bssid is None:
-        print '--wep requires --bssid\n'
+        print ('--wep requires --bssid\n')
         sys.exit(1)
-    
+
     ## Enforce BSSID and ESSID if WPA is chosen
     if args.wpa is not None and (args.bssid is None or args.essid is None):
-        print '--wpa requires --bssid and --essid\n'
+        print ('--wpa requires --bssid and --essid\n')
         sys.exit(1)
 
     ## Lowercase BSSID
@@ -112,7 +119,7 @@ def main(args):
     ## WPA2 AES  -- 212
     ## WEP       -- 204
     ## Open      -- 196
-    
+
     if args.wpa is not None:
         if args.s is None:
             args.s = 208
@@ -136,18 +143,18 @@ def main(args):
     ## Force websites if covert
     ### Decide if we want this as default behavior
     if args.covert is not False and args.websites is None:
-        print '--covert requires --websites'
+        print ('--covert requires --websites')
         sys.exit(1)
 
     ## User printouts
     #os.system('clear')
-    print '\nairpwn-ng - The new and improved 802.11 packet injector\n'
+    print ('\nairpwn-ng - The new and improved 802.11 packet injector\n')
 
     ### Add error checks
     ## Set channel if so desired
     if args.channel is not None:
-        print Bcolors.OKGREEN + '[+] Setting NIC Channel(s) to %s' % args.channel + Bcolors.ENDC
-        
+        print (Bcolors.OKGREEN + '[+] Setting NIC Channel(s) to %s' % args.channel + Bcolors.ENDC)
+
         ## Set monitor nic
         if args.mon == 'mon':
             channelSet(args.m, args.channel)
@@ -155,7 +162,7 @@ def main(args):
         ## Set injector nic
         if args.inj == 'mon':
             channelSet(args.i, args.channel)
-    
+
     ### NOT IMPLEMENTED YET
     ## Whitelist checks
     #if args.exclude_hosts is not None:
@@ -168,27 +175,28 @@ def main(args):
 
     if args.t is None:
         ## Broadcast mode
-        print Bcolors.WARNING + '[!] You are starting your attack in broadcast mode.'
-        print '[!] This means you will inject packets into all clients you are able to detect.'
-        print '[!] Use with caution.' + Bcolors.ENDC
+        print (Bcolors.WARNING + '[!] You are starting your attack in broadcast mode.')
+        print ('[!] This means you will inject packets into all clients you are able to detect.')
+        print ('[!] Use with caution.' + Bcolors.ENDC)
     else:
         ## Targeted mode
         if len(args.t) == 0:
-            print Bcolors.WARNING + '[!] You must specify at least one target MAC address with -t for targeted mode'
+            print (Bcolors.WARNING + '[!] You must specify at least one target MAC address with -t for targeted mode')
             exit(1)
         else:
             for target in args.t:
-                print Bcolors.OKGREEN + '[+] Adding target ' + Bcolors.OKBLUE + target + Bcolors.ENDC
+                print (Bcolors.OKGREEN + '[+] Adding target ' + Bcolors.OKBLUE + target + Bcolors.ENDC)
 
     ## List of domains used
     if injection == 0:
         style = List()
-        
+
     ## Injection file used
     elif injection == 1:
         style = File()
 
     ## Launch the handler
+    print('BEFORE')
     style.handler(args, websites)
 
 
@@ -206,7 +214,7 @@ if __name__ == '__main__':
     group.add_argument('--websites',
                        metavar = '<filename>',
                        help = 'List of websites to sniff cookies from')
-    
+
     parser.add_argument('-b',
                         action = 'store_true',
                         help = 'Sniff both ways')
@@ -270,7 +278,7 @@ if __name__ == '__main__':
                         help = 'Password for WPA')
     args = parser.parse_args()
 
-    ## ADD GLOBAL SIGNAL HANDLER
+    ## ADD SIGNAL HANDLER
     signal_handler = crtlC(args)
     signal.signal(signal.SIGINT, signal_handler)
 

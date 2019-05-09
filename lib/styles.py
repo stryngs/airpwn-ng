@@ -37,7 +37,7 @@ class File(object):
         ## Begin sniffing
         #snif = Sniffer(ph, m = args.m)
         snif = Sniffer(ph, args, m = args.m)
-        snif.threaded_sniff(args)
+        snif.threaded_sniff(args) ## Here
 
 
 

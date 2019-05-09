@@ -13,9 +13,9 @@ BLOCK_HOSTS = set()
 class PacketHandler(object):
     """This class does all the heavy-lifting.
 
-    It has an optional Victims parameter that is a 
+    It has an optional Victims parameter that is a
     List of instances of Victims for targeted mode.
-    
+
     It can also be fed an instance of VictimParameters
     directly if working in broadcast mode and attacking all clients.
     """
@@ -47,11 +47,11 @@ class PacketHandler(object):
             self.victim_parameters = None
 
         if self.i is None:
-            print "[ERROR] No injection interface selected"
+            print ('[ERROR] No injection interface selected')
             exit(1)
 
         if len(self.victims) == 0 and self.victim_parameters is None:
-            print "[ERROR] Please specify victim parameters or Victim List"
+            print ('[ERROR] Please specify victim parameters or Victim List')
             exit(1)
 
         ## Argument handling
@@ -80,7 +80,7 @@ class PacketHandler(object):
         A new mode is also added that can work in both broadcast
         added that if VictimParameters is set, it also performs a broadcast attack.
         """
-        
+
         ### Need to comment this up...
         if len(self.victims) == 0:
             try:
@@ -245,7 +245,7 @@ class PacketHandler(object):
 
     def cookieSearch(self, ret2):
         """Looks for cookie in string returned by PacketHandler.requestExtractor().
-        
+
         Returns a List object [host, cookie] if there is one, otherwise returns None.
         """
         if len(ret2.strip()) > 0:
@@ -338,7 +338,8 @@ class PacketHandler(object):
             else:
                 return 0
 
-        #print injection
+        print('DEBUG injection print')
+        print (injection)
         self.injector.inject(vicmac,
                              rtrmac,
                              dstmac,
@@ -356,7 +357,7 @@ class PacketHandler(object):
 
     def proc_excluded(self, excluded):
         """Check if argument provided in excluded is an ip.
-        
+
         If it's not, dns resolve it and add those IPs to the exclude list.
         """
         processed = set()
@@ -413,7 +414,7 @@ class PacketHandler(object):
                     rtrmac = packet.getlayer(Ether).dst
                     vicmac = packet.getlayer(Ether).src
                     dstmac = 'TAP'
-                    
+
 
                 vicip = packet.getlayer(IP).src
                 svrip = packet.getlayer(IP).dst
@@ -426,7 +427,7 @@ class PacketHandler(object):
                 for obj in BLOCK_HOSTS:
                     ip, seq = obj
                     if svrip == ip and seqnum != seq:
-                        #print "REMOVING ", svrip
+                        print ("REMOVING {0}".format(svrip))
                         for obj2 in BLOCK_HOSTS:
                             ip2, seq2 = obj2
                             if ip2 == svrip:
@@ -478,7 +479,7 @@ class PacketHandler(object):
                        TSecr,
                        args):
         """Process injection function using the PacketHandler.victims List.
-        
+
         If it was set, to check if the packet belongs to any of the targets.
         If no victims List is set, meaning it's in broadcast mode, it checks
         for the victim in PacketHandler.newvictims and gets the injection for it,
@@ -654,7 +655,7 @@ class PacketHandler(object):
 
     def process(self, interface, pkt, args):
         """Process packets coming from the sniffer.
-        
+
         You can override the handler with one of your own,
         that you can use for any other packet type (e.g DNS),
         otherwise it uses the default packet handler looking
@@ -683,7 +684,8 @@ class PacketHandler(object):
                                vicip,
                                cookie,
                                args)
-            
+
+            print('BREAK IS HERE')
             self.proc_injection(vicmac,
                                 rtrmac,
                                 dstmac,
@@ -700,8 +702,8 @@ class PacketHandler(object):
                                 args)
         except:
             return
- 
- 
+
+
     def requestExtractor(self, pkt):
         """Extracts the payload for trigger processing"""
         ret2 = "\n".join(pkt.sprintf("{Raw:%Raw.load%}\n").split(r"\r\n"))

@@ -3,7 +3,7 @@
 import argparse
 import logging
 import os
-# import pysnooper
+#import pysnooper                          ## Uncomment to use pysnooper tracing
 import subprocess
 import sys
 
@@ -11,7 +11,6 @@ import signal
 from lib.logger import Database, Tee as tee
 from lib.styles import File, List
 from lib.visuals import Bcolors
-from lib.victim import Victim
 
 def channelSet(nic, chan):
     """Set the channel for a given NIC"""
@@ -76,7 +75,7 @@ def load_websites_targeted(websites_file):
                 websites.append(i.strip())
     return websites
 
-# @pysnooper.snoop('./air.log')
+#@pysnooper.snoop('./air.log')             ## Uncomment to use pysnooper tracing
 def main(args):
     """Launching logic"""
 
@@ -196,7 +195,6 @@ def main(args):
         style = File()
 
     ## Launch the handler
-    print('BEFORE')
     style.handler(args, websites)
 
 

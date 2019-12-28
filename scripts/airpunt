@@ -8,6 +8,8 @@ from scapy.utils import hexstr
 # from pyDot11.lib.utils import Poption
 import pyDot11 as p11
 
+
+### Next update will just use the Handshake() class from pyDot11
 class Handshake(object):
     """Deal with any type of EAPOL traffic"""
 
@@ -116,7 +118,7 @@ def packetParser(args, shake):
             shake.eapolGrab(packet)
 
         ## Verify we're only caring about data frames and From-DS
-        elif packet[Dot11].type == 2 and packet[Dot11].FCfield == 66L:
+        elif packet[Dot11].type == 2 and packet[Dot11].FCfield == 66:
 
             ## Reasons for deAuth
             if not packet.addr1 in shake.availTgts:
@@ -124,7 +126,7 @@ def packetParser(args, shake):
                 tMAC = packet.addr1
 
         ## Verify we're only caring about data frames and To-DS
-        elif packet[Dot11].type == 2 and packet[Dot11].FCfield == 65L:
+        elif packet[Dot11].type == 2 and packet[Dot11].FCfield == 65:
 
             ## Reasons for deAuth
             if not packet.addr2 in shake.availTgts:

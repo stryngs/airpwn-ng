@@ -1,14 +1,8 @@
-# #from Queue import Queue, Empty
-# try:
-#     import queue
-# except ImportError:
-#     # Python 2
-#     import Queue as queue
-
+## Python3
 try:
     from queue import Queue, Empty
+## Python2
 except ImportError:
-    # Python 2
     from Queue import Queue, Empty
 
 import binascii

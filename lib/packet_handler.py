@@ -338,8 +338,7 @@ class PacketHandler(object):
             else:
                 return 0
 
-        print('DEBUG injection print')
-        print (injection)
+        # print (injection)
         self.injector.inject(vicmac,
                              rtrmac,
                              dstmac,
@@ -501,6 +500,8 @@ class PacketHandler(object):
                     if victim.ip == vicip:
                         injection = victim.get_injection()
                         if injection is not None:
+
+                            ## Open wifi condensor
                             self.condensor(vicmac,
                                            rtrmac,
                                            dstmac,
@@ -680,12 +681,12 @@ class PacketHandler(object):
             cookie,\
             TSVal,\
             TSecr = self.proc_handler(pkt, args)
+
             self.cookieManager(vicmac,
                                vicip,
                                cookie,
                                args)
 
-            print('BREAK IS HERE')
             self.proc_injection(vicmac,
                                 rtrmac,
                                 dstmac,
@@ -708,6 +709,7 @@ class PacketHandler(object):
         """Extracts the payload for trigger processing"""
         ret2 = "\n".join(pkt.sprintf("{Raw:%Raw.load%}\n").split(r"\r\n"))
         if len(ret2.strip()) > 0:
-            return ret2.translate(None, "'").strip()
+            # return ret2.translate(None, "'").strip()
+            return ret2.replace("'", '').strip()
         else:
             return None

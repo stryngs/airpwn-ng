@@ -54,7 +54,6 @@ class Injector(object):
         Things such as payload and associated flags are genned here
         FIN/ACK flag is sent to the victim with this method
         """
-        print('lib.injector.inject() called !!')
         global npackets
         npackets += 1
         sys.stdout.write(Bcolors.OKBLUE + '[*] Injecting Packet to victim ' + Bcolors.WARNING + vicmac + Bcolors.OKBLUE + ' (TOTAL: ' + str(npackets) + ' injected packets)\r' + Bcolors.ENDC)
@@ -157,12 +156,6 @@ class Injector(object):
                 else:
                     sys.stdout.write(Bcolors.FAIL + '\n[!] airpwn-ng cannot inject TKIP natively\n[!] Injection failed\n ' + Bcolors.ENDC)
                     sys.stdout.flush()
-                    #packet = wpaEncrypt(self.shake.tgtInfo.get(vicmac)[0],
-                                        #self.shake.origPkt,
-                                        #packet,
-                                        #self.shake.PN,
-                                        #True)
-
 
 
                 if self.args.v is False:

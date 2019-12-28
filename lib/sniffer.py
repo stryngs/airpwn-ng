@@ -1,13 +1,9 @@
-# from Queue import Queue, Empty
-
-
+## Python 3
 try:
     from queue import Queue, Empty
+## Python 2
 except ImportError:
-    # Python 2
     from Queue import Queue, Empty
-
-
 
 from pyDot11 import *
 from lib.visuals import Bcolors
@@ -116,10 +112,9 @@ class Sniffer(object):
         -b is useful for grabbing data inbound from a server
 
         Useful reminder:
-            to-DS is:    1L (open) / 65L (crypted)
-            from-DS is:  2L (open) /66L (crypted)
+            to-DS is:    1 (open) / 65 (crypted)
+            from-DS is:  2 (open) / 66 (crypted)
         """
-        # print('stryngsDEBUG')
         q = Queue()
         sniffer = Thread(target = self.sniff, args = (q,))
         sniffer.daemon = True
@@ -134,15 +129,11 @@ class Sniffer(object):
                 while True:
                     try:
                         pkt = q.get(timeout = 1)
-
-                        ### DEBUG
-                        # if pkt[Dot11].addr1 == args.bssid and pkt[Dot11].FCfield == 1L and len(pkt) >= args.s:
                         if pkt[Dot11].addr1 == args.bssid and pkt[Dot11].FCfield == 1 and len(pkt) >= args.s:
                             self.handler(q, self.m, pkt, args)
                         else:
                             pass
                     except Empty:
-                        #q.task_done()
                         pass
 
             ## NO Speedpatch and NO BSSID filtering
@@ -151,15 +142,11 @@ class Sniffer(object):
                 while True:
                     try:
                         pkt = q.get(timeout = 1)
-
-                        ### DEBUG
-                        # if (pkt[Dot11].FCfield == 1L or pkt[Dot11].FCfield == 2L) and len(pkt) >= args.s:
                         if (pkt[Dot11].FCfield == 1 or pkt[Dot11].FCfield == 2) and len(pkt) >= args.s:
                             self.handler(q, self.m, pkt, args)
                         else:
                             pass
                     except Empty:
-                        #q.task_done()
                         pass
 
             ## BSSID filtering and NO Speedpatch
@@ -168,16 +155,12 @@ class Sniffer(object):
                 while True:
                     try:
                         pkt = q.get(timeout = 1)
-                        ### DEBUG
-                        # if (pkt[Dot11].addr1 == args.bssid and pkt[Dot11].FCfield == 1L and len(pkt) >= args.s) or\
-                        #     (pkt[Dot11].addr2 == args.bssid and pkt[Dot11].FCfield == 2L and len(pkt) >= args.s):
                         if (pkt[Dot11].addr1 == args.bssid and pkt[Dot11].FCfield == 1 and len(pkt) >= args.s) or\
                             (pkt[Dot11].addr2 == args.bssid and pkt[Dot11].FCfield == 2 and len(pkt) >= args.s):
                             self.handler(q, self.m, pkt, args)
                         else:
                             pass
                     except Empty:
-                        #q.task_done()
                         pass
 
             ## Speedpatch and NO BSSID filtering
@@ -185,13 +168,9 @@ class Sniffer(object):
                 while True:
                     try:
                         pkt = q.get(timeout = 1)
-
-                        ### DEBUG
-                        # if pkt[Dot11].FCfield == 1L and len(pkt) >= args.s:
                         if pkt[Dot11].FCfield == 1 and len(pkt) >= args.s:
                             self.handler(q, self.m, pkt, args)
                     except Empty:
-                        #q.task_done()
                         pass
 
         ## Sniffing in Monitor Mode for WEP
@@ -202,15 +181,11 @@ class Sniffer(object):
                 while True:
                     try:
                         pkt = q.get(timeout = 1)
-
-                        ### DEBUG
-                        # if pkt[Dot11].addr1 == args.bssid and pkt[Dot11].FCfield == 65L and len(pkt) >= args.s:
                         if pkt[Dot11].addr1 == args.bssid and pkt[Dot11].FCfield == 65 and len(pkt) >= args.s:
                             self.handler(q, self.m, pkt, args)
                         else:
                             pass
                     except Empty:
-                        #q.task_done()
                         pass
 
             ## BSSID filtering and NO Speedpatch
@@ -219,15 +194,11 @@ class Sniffer(object):
                 while True:
                     try:
                         pkt = q.get(timeout = 1)
-
-                        ### DEBUG
-                        # if (pkt[Dot11].addr1 == args.bssid and pkt[Dot11].FCfield == 65L and len(pkt) >= args.s) or (pkt[Dot11].addr2 == args.bssid and pkt[Dot11].FCfield == 66L and len(pkt) >= args.s):
                         if (pkt[Dot11].addr1 == args.bssid and pkt[Dot11].FCfield == 65 and len(pkt) >= args.s) or (pkt[Dot11].addr2 == args.bssid and pkt[Dot11].FCfield == 66 and len(pkt) >= args.s):
                             self.handler(q, self.m, pkt, args)
                         else:
                             pass
                     except Empty:
-                        #q.task_done()
                         pass
 
         ## Sniffing in Monitor Mode for WPA
@@ -243,8 +214,6 @@ class Sniffer(object):
                         if pkt.haslayer(EAPOL):
                             self.shake.eapolGrab(pkt)
 
-                        ### DEBUG
-                        # elif pkt[Dot11].addr1 == args.bssid and pkt[Dot11].FCfield == 65L and len(pkt) >= args.s:
                         elif pkt[Dot11].addr1 == args.bssid and pkt[Dot11].FCfield == 65 and len(pkt) >= args.s:
                             self.tgtMAC = False
 
@@ -262,7 +231,6 @@ class Sniffer(object):
                         else:
                             pass
                     except Empty:
-                        #q.task_done()
                         pass
 
             ## BSSID filtering and NO Speedpatch
@@ -274,8 +242,6 @@ class Sniffer(object):
                         if pkt.haslayer(EAPOL):
                             self.shake.eapolGrab(pkt)
 
-                        ### DEBUG
-                        # elif (pkt[Dot11].addr1 == args.bssid and pkt[Dot11].FCfield == 65L and len(pkt) >= args.s) or (pkt[Dot11].addr2 == args.bssid and pkt[Dot11].FCfield == 66L and len(pkt) >= args.s):
                         elif (pkt[Dot11].addr1 == args.bssid and pkt[Dot11].FCfield == 65 and len(pkt) >= args.s) or (pkt[Dot11].addr2 == args.bssid and pkt[Dot11].FCfield == 66 and len(pkt) >= args.s):
                             self.tgtMAC = False
 
@@ -293,19 +259,4 @@ class Sniffer(object):
                         else:
                             pass
                     except Empty:
-                        #q.task_done()
                         pass
-
-        ## Sniffing in Tap Mode -- aka Encrypted WiFi
-        ## No longer needed!
-        ## Left for historical purposes
-        #else:
-            ### Tap mode
-            #print 'Tap mode\n'
-            #while True:
-                #try:
-                    #pkt = q.get(timeout = 1)
-                    #self.handler(q, self.m, pkt, args)
-                #except Empty:
-                    ##q.task_done()
-                    #pass

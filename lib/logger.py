@@ -1,4 +1,6 @@
-import re, sys, time
+import re
+import sys
+import time
 import sqlite3 as lite
 
 class Database(object):

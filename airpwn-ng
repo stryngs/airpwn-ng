@@ -3,18 +3,17 @@
 import argparse
 import logging
 import os
-#import pysnooper                          ## Uncomment to use pysnooper tracing
+#import pysnooper                                                               ## Uncomment to use pysnooper tracing
+import signal
 import subprocess
 import sys
-
-import signal
 from lib.logger import Database, Tee as tee
 from lib.styles import File, List
 from lib.visuals import Bcolors
 
 def channelSet(nic, chan):
     """Set the channel for a given NIC"""
-    subprocess.call('iwconfig %s channel %s' % (nic, chan), shell=True)
+    subprocess.call('iwconfig {0} channel {1}'.format(nic, chan), shell = True)
 
 def crtlC(args):
     """Handle CTRL+C."""
@@ -41,8 +40,7 @@ def injection_check(args):
         websites = None
         return injection, websites
 
-    ### Verify this is what you want
-    ### Jack64
+    ### Jack64, Verify this is what you want
     elif args.websites:
         try:
             f = open(args.websites, 'r')
@@ -109,7 +107,7 @@ def main(args):
 
     ## Packet size
     ## Observed packet lengths for a GET /
-    ## Can change depending upon card
+    ## Can change depending upon NIC
     ## Defaults have been set 4 bytes lower as a precaution
     ## Adjust based according to your needs, or use -s 0
     ## WPA TKIP  -- 216
@@ -146,7 +144,6 @@ def main(args):
         sys.exit(1)
 
     ## User printouts
-    #os.system('clear')
     print ('\nairpwn-ng - The new and improved 802.11 packet injector\n')
 
     ### Add error checks
@@ -232,9 +229,6 @@ if __name__ == '__main__':
                         nargs = '*',
                         metavar = '<MAC address>',
                         help = 'Target MAC addresses')
-    parser.add_argument('-v',
-                        action = 'store_true',
-                        help = 'Verbose packet sent affirmation')
     parser.add_argument('--bssid',
                         metavar = '<tgt BSSID>',
                         help = 'Target BSSID')
@@ -259,9 +253,6 @@ if __name__ == '__main__':
                         choices = ['mon', 'man'],
                         metavar = '<mon nic type>',
                         help = 'Monitor NIC type - mon or man')
-    parser.add_argument('--pcap',
-                        action = 'store_true',
-                        help = 'Write PCAPs for debugging')
     parser.add_argument('--single',
                         action = 'store_true',
                         help = 'Single packet injection attempt')

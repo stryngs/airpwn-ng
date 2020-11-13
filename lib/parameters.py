@@ -18,30 +18,13 @@ class VictimParameters(object):
     """
 
     def __init__(self, *positional_parameters, **keyword_parameters):
-        if 'websites' in keyword_parameters:
-            self.websites = keyword_parameters['websites']
-        else:
-            self.websites = None
-
-        if 'inject_file' in keyword_parameters:
-            self.inject_file = keyword_parameters['inject_file']
-        else:
-            self.inject_file = None
-
-        if 'in_request' in keyword_parameters:
-            self.in_request = keyword_parameters['in_request']
-        else:
-            self.in_request = None
-
-        if 'covert' in keyword_parameters:
-            self.covert = keyword_parameters['covert']
-        else:
+        self.websites = keyword_parameters.get('websites')
+        self.inject_file = keyword_parameters.get('inject_file')
+        self.in_request = keyword_parameters.get('in_request')
+        self.in_request_handler = keyword_parameters.get('in_request_handler')
+        self.covert = keyword_parameters.get('covert')
+        if self.covert is None:
             self.covert = False
-
-        if 'in_request_handler' in keyword_parameters:
-            self.in_request_handler = keyword_parameters['in_request_handler']
-        else:
-            self.in_request_handler = None
 
         if self.websites is None and self.inject_file is None and self.in_request is None:
             print ('[ERROR] Please specify victim parameters')

@@ -35,7 +35,6 @@ class File(object):
                 ph = PacketHandler(Args = args, i = args.i, victims = victims, excluded = args.exclude_hosts)
 
         ## Begin sniffing
-        #snif = Sniffer(ph, m = args.m)
         snif = Sniffer(ph, args, m = args.m)
         snif.threaded_sniff(args) ## Here
 

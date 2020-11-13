@@ -13,21 +13,9 @@ class Victim(object):
         self.cookies = []
         self.db = Database('cookies.sqlite')
         self.log = cookieLogger()
-
-        if 'ip' in keyword_parameters:
-            self.ip = keyword_parameters['ip']
-        else:
-            self.ip = None
-
-        if 'mac' in keyword_parameters:
-            self.mac = keyword_parameters['mac']
-        else:
-            self.mac = None
-
-        if 'victim_parameters' in keyword_parameters:
-            self.victim_parameters = keyword_parameters['victim_parameters']
-        else:
-            self.victim_parameters = None
+        self.ip = keyword_parameters.get('ip')
+        self.mac = keyword_parameters.get('mac')
+        self.victim_parameters = keyword_parameters.get('victim_parameters')
 
         if self.ip is None and self.mac is None:
             print ('[ERROR] Victim: No IP or Mac, or in_request selected')

@@ -1,3 +1,4 @@
+import socket
 from lib.injector import Injector
 from lib.victim import Victim
 from scapy.layers.dot11 import RadioTap, Dot11, Dot11QoS
@@ -5,8 +6,8 @@ from scapy.layers.l2 import Ether, LLC, SNAP
 from scapy.layers.inet import IP, TCP
 from scapy.packet import Raw
 from scapy.utils import wrpcap
-import socket
 
+## GLOBALS
 global BLOCK_HOSTS
 BLOCK_HOSTS = set()
 
@@ -21,9 +22,9 @@ class PacketHandler(object):
     """
 
     def __init__(self, *positional_parameters, **keyword_parameters):
-        if 'victims' in keyword_parameters:
-            self.victims = keyword_parameters['victims']
-        else:
+
+        self.victims = keyword_parameters.get('victims')
+        if self.victims is None:
             self.victims = []
 
         if 'excluded' in keyword_parameters:
@@ -31,20 +32,9 @@ class PacketHandler(object):
         else:
             self.excluded = None
 
-        if 'handler' in keyword_parameters:
-            self.handler = keyword_parameters['handler']
-        else:
-            self.handler = None
-
-        if 'i' in keyword_parameters:
-            self.i = keyword_parameters['i']
-        else:
-            self.i = None
-
-        if 'victim_parameters' in keyword_parameters:
-            self.victim_parameters = keyword_parameters['victim_parameters']
-        else:
-            self.victim_parameters = None
+        self.handler = keyword_parameters.get('handler')
+        self.i = keyword_parameters.get('i')
+        self.victim_parameters = keyword_parameters.get('victim_parameters')
 
         if self.i is None:
             print ('[ERROR] No injection interface selected')
@@ -55,10 +45,11 @@ class PacketHandler(object):
             exit(1)
 
         ## Argument handling
-        args = keyword_parameters['Args']
+        args = keyword_parameters.get('Args')
         self.nic = args.mon
         self.single = args.single
-        self.verbose = args.v
+
+        ## Trigger setup
         if args.trigger is None:
             self.trigger = 'GET /'
         else:
@@ -66,7 +57,6 @@ class PacketHandler(object):
 
         self.newvictims = []
         self.injector = Injector(self.i, args)
-        #print 'packet_handler has instantiated Injector()'
 
 
     ### Trace out args for victim.add_cookie
@@ -431,8 +421,7 @@ class PacketHandler(object):
                             ip2, seq2 = obj2
                             if ip2 == svrip:
                                 BLOCK_HOSTS.remove((ip2, seq2))
-                if args.pcap:
-                    wrpcap('inbound.pcap', packet)
+                # wrpcap('inbound.pcap', packet)
             else:
                 return 0
 

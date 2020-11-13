@@ -5,13 +5,14 @@ try:
 except ImportError:
     from Queue import Queue, Empty
 
+import sys
+import time
 from pyDot11 import *
 from lib.visuals import Bcolors
 from scapy.layers.dot11 import Dot11, Dot11WEP
 from scapy.layers.eap import EAPOL
 from scapy.sendrecv import sniff
 from threading import Thread
-import sys, time
 
 class Sniffer(object):
     """This is the highest level object in the library.
@@ -21,11 +22,7 @@ class Sniffer(object):
     """
 
     def __init__(self, packethandler, args, *positional_parameters, **keyword_parameters):
-        if 'm' in keyword_parameters:
-            self.m = keyword_parameters['m']
-        else:
-            self.m = None
-
+        self.m = keyword_parameters.get('m')
         if self.m is None:
             print ('[ERROR] No monitor interface selected')
             exit()
@@ -33,7 +30,10 @@ class Sniffer(object):
         self.packethandler = packethandler
 
         if args.wpa:
-            self.shake = Handshake(args.wpa, args.essid, args.pcap)
+
+            ### DEBUG ~~> pcap intake
+            self.shake = Handshake(psk = args.wpa, essid = args.essid, pcap = False)
+            
             self.packethandler.injector.shake = self.shake
 
 
@@ -114,6 +114,10 @@ class Sniffer(object):
         Useful reminder:
             to-DS is:    1 (open) / 65 (crypted)
             from-DS is:  2 (open) / 66 (crypted)
+
+        Need to look into sending other than 1/65 or 2/66
+        Probably get more success...
+
         """
         q = Queue()
         sniffer = Thread(target = self.sniff, args = (q,))
@@ -175,6 +179,7 @@ class Sniffer(object):
 
         ## Sniffing in Monitor Mode for WEP
         elif args.mon == 'mon' and args.wep:
+
             ## BSSID filtering and Speedpatch
             if args.bssid and not args.b:
                 #print 'BSSID filtering and Speedpatch\n'

@@ -10,7 +10,6 @@ Overview
 	* What if the user isn't browsing the vulnerable site at the point in time which you are sniffing?
 	* Wait, you say I can't force your browser to do something?  I sure can if you have cookies stored...
 * Demo video: https://www.youtube.com/watch?v=hiyaUZh-UiU
-* Find us on IRC (Freenode) at ##ha
 
 Features
 ---
@@ -27,7 +26,7 @@ Features
 How do we do it?
 ---
 * We inject packets into a pre-existing TCP stream
-    * For a more detailed and in-depth explanation as to how this occurs, read the original documentation for airpwn: 
+    * For a more detailed and in-depth explanation as to how this occurs, read the original documentation for airpwn:
         * http://airpwn.sourceforge.net/Documentation.html
 
 
@@ -37,32 +36,12 @@ That's cool...  So what can we do with it?
 - Inject lots of wonderful images just like the original airpwn
 - All sorts of fun...
 
-Prerequisites:
----
-packetEssentials-1.0.8
-pbkdf2-1.3
-pycryptodomex-3.4.5
-pyDot11-2.0.7
-rc4-0.1
-scapy 2.4.0
-
 #### Setup:
 
-In the RESOURCEs folder you will find the python modules which have been tested.  As newer versions of the modules come out, sufficient testing must be done before they can be made known as "stable" with pyDot11.  Feel free to use pip or whatever method you would like to get these installed.  If you wish to use the modules locally provided with this git, then an installation would be something like so:
-````bash
-pip install RESOURCEs/packetEssentials-1.0.8.tar.gz
-pip install RESOURCEs/pbkdf2-1.3.tar.gz
-pip install RESOURCEs/pyDot11-2.0.7.tar.gz
-pip install RESOURCEs/pycryptodomex-3.4.5.tar.gz
-pip install RESOURCEs/rc4-0.1.tar.gz
-pip install RESOURCEs/scapy-2.4.0.tar.gz
-
-## If you run into issues with the scapy module not being found
-## Try this local folder workaround
-tar zxf RESOURCEs/scapy-2.4.0.tar.gz
-mv scapy-2.4.0/scapy/ .
-rm -rf scapy-2.4.0/
-````
+Prerequisites are met via pip and local file storage
+```
+python3 -m pip install RESOURCEs/*.tar.gz
+```
 
 What else do we need to get started?
 ---
